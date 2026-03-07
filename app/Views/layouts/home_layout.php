@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
   <?= $this->include('layouts/head') ?>
@@ -8,28 +8,34 @@
   <?= $this->renderSection('head') ?>
 
   <link rel="stylesheet" href="<?= base_url('assets/css/home.css'); ?>">
+
+  <style>
+    /* Reset padding bawaan agar hero bisa full-width/height */
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    /* Hilangkan wrapper pembatas dari layout lama */
+    .page-wrapper,
+    .body-wrapper,
+    .container {
+      all: unset;
+      display: block;
+    }
+  </style>
 </head>
 
 <body class="position-relative">
-  <!--  Body Wrapper -->
-  <div class="background">
-  </div>
 
-  <div class="page-wrapper" id="main-wrapper">
-    <!--  Main wrapper -->
-    <div class="body-wrapper position-relative">
-      <?= $this->renderSection('back') ?>
-      <div class="container col-xxl-8 px-4 py-5" style="min-height: 100vh;">
-        <!-- Main content -->
-        <div class="w-100">
-          <?= $this->renderSection('content') ?>
-        </div>
+  <!-- Main content langsung, tanpa container pembatas -->
+  <div id="main-wrapper">
+    <?= $this->renderSection('back') ?>
+    
+    <!-- Main content section (hero, dll) -->
+    <?= $this->renderSection('content') ?>
 
-        <div class="align-self-end w-100">
-          <?= $this->include('layouts/footer') ?>
-        </div>
-      </div>
-    </div>
+    <!-- Footer tetap di bawah -->
+    <?= $this->include('layouts/footer') ?>
   </div>
 
   <!-- Scripts -->
