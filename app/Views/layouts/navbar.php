@@ -2,9 +2,13 @@
 <nav class="bilah-navigasi">
 
   <a href="<?= base_url('/') ?>" class="merek-perpus">
-    <div class="ikon-merek">📚</div>
-    Perpustakaan SMK
-  </a>
+  <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="logo-smk-nav">
+
+  <div class="teks-merek">
+    <span class="teks-atas">Perpustakaan</span>
+    <span class="teks-bawah">SMK Al-Munawwir IIBS</span>
+  </div>
+</a>
 
   <ul class="daftar-menu">
     <li>
@@ -32,7 +36,7 @@
       </a>
     </li>
     <li>
-      <a href="#"
+      <a href="<?= base_url('kontak') ?>"
         <?= (isset($activeNav) && $activeNav === 'kontak') ? 'class="aktif"' : '' ?>>
         Kontak
       </a>

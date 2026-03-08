@@ -35,7 +35,8 @@ $routes->get('/', 'Home::index');
 $routes->get('/book', 'Home::book');
 $routes->get('/layanan', 'Home::layanan');
 $routes->get('/leaderboard', 'Home::leaderboard');
-
+$routes->get('/kontak', 'Home::kontak');
+// $routes->post('/kontak/kirim', 'Home::kontakKirim'); // ← aktifkan saat form siap
 service('auth')->routes($routes);
 
 $routes->group('admin', ['filter' => 'session'], static function (RouteCollection $routes) {

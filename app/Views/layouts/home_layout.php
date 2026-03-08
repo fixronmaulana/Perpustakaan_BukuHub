@@ -27,7 +27,25 @@
 
   <!-- Slot untuk script tambahan per-halaman -->
   <?= $this->renderSection('scripts') ?>
+<script>
+  /* ── Navbar scroll effect ── */
+  (function () {
+    const navbar = document.querySelector('.bilah-navigasi');
+    if (!navbar) return;
 
+    function cekGulir() {
+      if (window.scrollY > 30) {
+        navbar.classList.add('menggulir');
+      } else {
+        navbar.classList.remove('menggulir');
+      }
+    }
+
+    // Cek langsung saat halaman load (kalau refresh di tengah halaman)
+    cekGulir();
+    window.addEventListener('scroll', cekGulir, { passive: true });
+  })();
+</script>
 </body>
 
 </html>

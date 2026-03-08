@@ -44,59 +44,143 @@ body {
 }
 
 /* ════════════════════════════════════════
-   NAVBAR
+   NAVBAR — Transparan + Scroll Effect
+   Ganti blok NAVBAR lama di home.css
    ════════════════════════════════════════ */
+
 .bilah-navigasi {
   position: fixed;
   top: 0; left: 0; width: 100%;
   z-index: 1000;
-  background: rgba(13,27,62,0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(201,168,76,0.15);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid transparent;
   padding: 0 2.5rem;
   display: flex; align-items: center; justify-content: space-between;
+  height: 70px;
+  transition: background 0.35s ease, border-color 0.35s ease,
+              backdrop-filter 0.35s ease, height 0.35s ease,
+              box-shadow 0.35s ease;
+}
+
+/* Saat sudah di-scroll — navbar jadi solid */
+.bilah-navigasi.menggulir {
+  background: rgba(10, 20, 50, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
   height: 64px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
 }
 
+/* Brand / logo */
 .merek-perpus {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 12px;
   text-decoration: none; color: var(--putih);
-  font-weight: 600; font-size: 1rem;
+  font-weight: 700; font-size: 1rem;
+}
+/* Container teks brand */
+.teks-merek{
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
 }
 
-.merek-perpus .ikon-merek {
-  width: 36px; height: 36px;
-  background: var(--emas); border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; flex-shrink: 0;
+/* teks atas */
+.teks-atas{
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.5px;
 }
 
+/* teks bawah */
+.teks-bawah{
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--putih);
+  letter-spacing: 0.3px;
+}
+/* Logo gambar SMK */
+.logo-smk-nav {
+  width: 38px; height: 38px;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+   background: var(--putih);        /* ← background putih */
+  padding: 3px;                    /* ← sedikit padding agar logo tidak kepotong */
+  filter: none;                    /* ← hapus drop-shadow */
+  /* drop shadow agar logo tetap kelihatan di atas hero gelap */
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+  transition: filter 0.3s;
+}
+
+.bilah-navigasi.menggulir .logo-smk-nav {
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+}
+
+/* Menu links */
 .daftar-menu {
   display: flex; gap: 2rem;
   list-style: none; margin: 0; padding: 0;
 }
 
 .daftar-menu a {
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none; font-size: 0.9rem; font-weight: 500;
+  position: relative; padding-bottom: 3px;
   transition: color 0.2s;
 }
-.daftar-menu a:hover  { color: var(--putih); }
-.daftar-menu a.aktif  {
-  color: var(--putih);
-  border-bottom: 2px solid var(--emas);
-  padding-bottom: 2px;
+
+/* Garis bawah animasi saat hover */
+.daftar-menu a::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0;
+  width: 0; height: 2px;
+  background: var(--emas);
+  border-radius: 2px;
+  transition: width 0.25s ease;
 }
 
+.daftar-menu a:hover        { color: var(--putih); }
+.daftar-menu a:hover::after { width: 100%; }
+
+.daftar-menu a.aktif {
+  color: var(--putih);
+  font-weight: 600;
+}
+.daftar-menu a.aktif::after { width: 100%; }
+
+/* Tombol login */
 .tombol-masuk {
-  background: var(--biru-aksen); color: var(--putih);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--putih);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
   padding: 8px 22px; border-radius: 6px;
   font-size: 0.875rem; font-weight: 600;
-  text-decoration: none; transition: background 0.2s;
+  text-decoration: none;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
-.tombol-masuk:hover { background: #2450b5; color: var(--putih); }
 
+.tombol-masuk:hover {
+  background: var(--putih);
+  color: var(--navy);
+  border-color: var(--putih);
+}
+
+/* Saat navbar solid — tombol login ganti jadi biru */
+.bilah-navigasi.menggulir .tombol-masuk {
+  background: var(--biru-aksen);
+  border-color: var(--biru-aksen);
+  color: var(--putih);
+}
+
+.bilah-navigasi.menggulir .tombol-masuk:hover {
+  background: #2450b5;
+  border-color: #2450b5;
+}
 /* ════════════════════════════════════════
    HERO (Halaman Beranda)
    ════════════════════════════════════════ */
@@ -1247,3 +1331,456 @@ body {
   .nama-podium   { font-size: 0.78rem; }
   .daftar-panduan{ flex-direction: column; }
 }
+
+/* ════════════════════════════════════════
+   HALAMAN KONTAK
+   Paste di bagian paling bawah home.css
+   ════════════════════════════════════════ */
+
+/* Pembungkus utama */
+.bungkus-kontak {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+/* ── Grid utama: info kiri + form kanan ── */
+.grid-kontak-utama {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* Judul & deskripsi kolom */
+.judul-kolom-kontak {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--teks); margin: 0 0 0.4rem;
+}
+
+.deskripsi-kolom-kontak {
+  font-size: 0.875rem; color: var(--teks-redup);
+  line-height: 1.65; margin: 0 0 1.5rem;
+}
+
+/* ── Kartu info kontak ── */
+.daftar-info-kontak {
+  display: flex; flex-direction: column; gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.kartu-info-kontak {
+  display: flex; align-items: flex-start; gap: 1rem;
+  background: var(--putih);
+  border: 1px solid var(--batas);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.kartu-info-kontak:hover {
+  box-shadow: 0 4px 20px rgba(13,27,62,0.08);
+  transform: translateX(4px);
+}
+
+.ikon-info-kontak {
+  width: 40px; height: 40px;
+  background: #eef1f8; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.ikon-info-kontak svg {
+  width: 20px; height: 20px;
+  stroke: var(--navy); fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.label-info-kontak {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--teks-redup);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.nilai-info-kontak {
+  font-size: 0.875rem; color: var(--teks);
+  line-height: 1.6;
+}
+
+.teks-tutup { color: #e53e3e; font-weight: 600; }
+
+/* ── Sosial media ── */
+.area-sosmed { }
+
+.label-sosmed {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--teks-redup);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.daftar-sosmed {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+
+.tombol-sosmed {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 16px;
+  background: var(--putih);
+  border: 1.5px solid var(--batas);
+  border-radius: 8px;
+  font-size: 0.82rem; font-weight: 600;
+  color: var(--teks); text-decoration: none;
+  transition: all 0.2s;
+}
+
+.tombol-sosmed svg {
+  width: 16px; height: 16px;
+  stroke: var(--teks-redup);
+  transition: stroke 0.2s;
+}
+
+.tombol-sosmed:hover {
+  background: var(--navy); color: var(--putih);
+  border-color: var(--navy);
+}
+
+.tombol-sosmed:hover svg { stroke: var(--putih); }
+
+/* ── Form kontak ── */
+.kolom-form-kontak {
+  background: var(--putih);
+  border: 1px solid var(--batas);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 16px rgba(13,27,62,0.06);
+}
+
+.pesan-form {
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.pesan-form.sukses { background: #f0fff6; border: 1px solid #a8e6c3; color: #1a7a4a; }
+.pesan-form.gagal  { background: #fff0f0; border: 1px solid #f5c2c2; color: #c0392b; }
+
+.form-kontak { display: flex; flex-direction: column; gap: 1rem; }
+
+.baris-form-kontak {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.grup-form-kontak { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.grup-form-kontak label {
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--teks);
+}
+
+.wajib { color: #e53e3e; }
+
+.grup-form-kontak input,
+.grup-form-kontak select,
+.grup-form-kontak textarea {
+  width: 100%;
+  padding: 9px 13px;
+  background: #f3f5fb;
+  border: 1.5px solid var(--batas);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--teks); outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  resize: vertical;
+}
+
+.grup-form-kontak input:focus,
+.grup-form-kontak select:focus,
+.grup-form-kontak textarea:focus {
+  border-color: var(--biru-aksen);
+  background: var(--putih);
+  box-shadow: 0 0 0 3px rgba(30,58,138,0.08);
+}
+
+.grup-form-kontak input::placeholder,
+.grup-form-kontak textarea::placeholder { color: #b8c3d8; }
+
+/* Tombol kirim */
+.tombol-kirim-kontak {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px;
+  background: var(--navy); color: var(--putih);
+  border: none; border-radius: 10px;
+  font-size: 0.95rem; font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.tombol-kirim-kontak:hover  { background: var(--biru-aksen); transform: translateY(-2px); }
+.tombol-kirim-kontak:active { transform: translateY(0); }
+
+.catatan-form {
+  font-size: 0.75rem; color: var(--teks-redup);
+  margin: 0; line-height: 1.5; text-align: center;
+}
+
+/* ── Peta lokasi ── */
+.area-peta { }
+
+.kepala-area-peta {
+  text-align: center; margin-bottom: 1.25rem;
+}
+
+.kepala-area-peta h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--teks); margin: 0 0 0.3rem;
+}
+
+.kepala-area-peta p {
+  font-size: 0.875rem; color: var(--teks-redup); margin: 0;
+}
+
+.bingkai-peta {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--batas);
+  box-shadow: 0 2px 16px rgba(13,27,62,0.07);
+  height: 380px;
+}
+
+.bingkai-peta iframe {
+  width: 100%; height: 100%; border: 0; display: block;
+}
+
+/* Placeholder peta (sebelum embed diisi) */
+.placeholder-peta {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #eef1f8, #dde3f0);
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem; flex-direction: column; text-align: center;
+  padding: 2rem;
+}
+
+.ikon-peta { font-size: 3rem; opacity: 0.5; }
+
+.teks-placeholder-peta {
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+
+.teks-placeholder-peta strong { font-size: 1rem; color: var(--teks); }
+.teks-placeholder-peta span   { font-size: 0.85rem; color: var(--teks-redup); }
+.teks-placeholder-peta code   {
+  font-size: 0.78rem; background: rgba(255,255,255,0.7);
+  padding: 4px 10px; border-radius: 6px; color: var(--biru-aksen);
+}
+
+/* ── FAQ ── */
+.area-faq { }
+
+.judul-faq {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 700;
+  color: var(--teks); margin: 0 0 1.5rem; text-align: center;
+}
+
+.grid-faq {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+}
+
+.kartu-faq {
+  background: var(--putih);
+  border: 1px solid var(--batas);
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem 1.1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 3px solid var(--emas);
+}
+
+.kartu-faq:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(13,27,62,0.09);
+}
+
+.pertanyaan-faq {
+  font-size: 0.9rem; font-weight: 700;
+  color: var(--teks); margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+
+.jawaban-faq {
+  font-size: 0.82rem; color: var(--teks-redup);
+  line-height: 1.65;
+}
+
+/* ── Responsif ── */
+@media (max-width: 900px) {
+  .grid-kontak-utama { grid-template-columns: 1fr; }
+  .grid-faq          { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .baris-form-kontak { grid-template-columns: 1fr; }
+  .grid-faq          { grid-template-columns: 1fr; }
+  .bingkai-peta      { height: 260px; }
+  .daftar-sosmed     { flex-direction: column; }
+}
+/* ════════════════════════════════════════
+   REGISTER PAGE
+   Paste di bagian paling bawah home.css
+   ════════════════════════════════════════ */
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #dde3f0;
+}
+
+.register-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 36px rgba(13,27,62,0.15);
+  width: 380px;
+  padding: 1.6rem 1.8rem 1.4rem;
+}
+
+/* Head */
+.register-head {
+  text-align: center;
+  margin-bottom: 0.9rem;
+}
+
+.register-logo {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 0.55rem;
+  box-shadow: 0 3px 14px rgba(13,27,62,0.25);
+  border: 2px solid var(--batas);
+  background: var(--putih);
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px;
+}
+
+.register-logo img {
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+}
+
+.register-school  { font-size: 0.88rem; font-weight: 700; color: var(--teks); }
+.register-tagline { font-size: 0.74rem; color: var(--teks-redup); margin-top: 2px; }
+
+/* Divider */
+.register-divider {
+  height: 1px;
+  background: var(--batas);
+  margin: 0.85rem 0;
+}
+
+/* Title */
+.register-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--teks); text-align: center;
+  margin-bottom: 0.9rem;
+}
+
+/* Alert */
+.register-alert {
+  border-radius: 7px;
+  padding: 7px 11px;
+  font-size: 0.78rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.45;
+}
+
+.register-alert-error {
+  background: #fff0f0;
+  border: 1px solid #f5c2c2;
+  color: #c0392b;
+}
+
+/* Field */
+.register-field {
+  margin-bottom: 0.6rem;
+}
+
+.register-field label {
+  display: block;
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--teks); margin-bottom: 0.28rem;
+}
+
+.register-field input {
+  width: 100%;
+  padding: 8px 11px;
+  background: #f3f5fb;
+  border: 1.5px solid var(--batas);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--teks); outline: none;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+
+.register-field input:focus {
+  border-color: #3b5bdb;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59,91,219,.1);
+}
+
+.register-field input::placeholder { color: #b8c3d8; }
+
+/* Submit button */
+.register-btn {
+  width: 100%; padding: 10px;
+  background: #3b5bdb; color: #ffffff;
+  border: none; border-radius: 8px;
+  font-size: 0.88rem; font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; margin-top: 0.4rem;
+  transition: background .18s, transform .13s;
+}
+
+.register-btn:hover  { background: #2f4ec0; transform: translateY(-1px); }
+.register-btn:active { transform: translateY(0); }
+
+/* Extra link */
+.register-extra {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--teks-redup);
+  margin-top: 0.55rem;
+}
+
+.register-extra a {
+  color: #3b5bdb; text-decoration: none; font-weight: 600;
+}
+
+.register-extra a:hover { color: #2f4ec0; }
+
+/* Back link */
+.register-back {
+  display: block; text-align: center;
+  margin-top: 0.85rem;
+  font-size: 0.78rem; font-weight: 500;
+  color: #3b5bdb; text-decoration: none;
+  transition: color .18s;
+}
+
+.register-back:hover { color: #2f4ec0; }

@@ -69,4 +69,15 @@ class Home extends BaseController
         // contoh: $data['leaderboard'] = $this->gamifikasiModel->getLeaderboardBulanan();
         return view('home/leaderboard', ['activeNav' => 'leaderboard']);
     }
+    public function kontak(): string
+    {
+        return view('home/kontak', ['activeNav' => 'kontak']);
+    }
+
+    // Nanti: handle POST form kontak
+    // public function kontakKirim(): RedirectResponse
+    // {
+    //     // validasi + simpan / kirim email
+    //     return redirect()->to('kontak')->with('sukses', 'Pesan berhasil dikirim!');
+    // }
 }
