@@ -15,7 +15,7 @@ class Home extends BaseController
 
     public function index(): string
     {
-        return view('home/home');
+        return view('home/home', ['activeNav' => 'beranda']);
     }
 
     public function book(): string
@@ -48,13 +48,25 @@ class Home extends BaseController
         }
 
         $data = [
-            'books'         => $books,
-            'pager'         => $this->bookModel->pager,
-            'currentPage'   => $this->request->getVar('page_books') ?? 1,
-            'itemPerPage'   => $itemPerPage,
-            'search'        => $this->request->getGet('search')
+            'books'       => $books,
+            'pager'       => $this->bookModel->pager,
+            'currentPage' => $this->request->getVar('page_books') ?? 1,
+            'itemPerPage' => $itemPerPage,
+            'search'      => $this->request->getGet('search'),
+            'activeNav'   => 'koleksi',
         ];
 
         return view('home/book', $data);
+    }
+
+    public function layanan(): string
+    {
+        return view('home/layanan', ['activeNav' => 'layanan']);
+    }
+    public function leaderboard(): string
+    {
+        // Nanti $data diisi dari model gamifikasi
+        // contoh: $data['leaderboard'] = $this->gamifikasiModel->getLeaderboardBulanan();
+        return view('home/leaderboard', ['activeNav' => 'leaderboard']);
     }
 }

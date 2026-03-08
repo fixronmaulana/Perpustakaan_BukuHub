@@ -2,47 +2,32 @@
 <html lang="id">
 
 <head>
-  <?= $this->include('layouts/head') ?>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Extra head e.g title -->
+  <!-- Google Fonts — load di head agar tidak blocking render -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- CSS global home -->
+  <link rel="stylesheet" href="<?= base_url('assets/css/home.css') ?>">
+
+  <!-- Slot untuk tambahan head per-halaman (title, css khusus, dll) -->
   <?= $this->renderSection('head') ?>
-
-  <link rel="stylesheet" href="<?= base_url('assets/css/home.css'); ?>">
-
-  <style>
-    /* Reset padding bawaan agar hero bisa full-width/height */
-    body {
-      padding: 0;
-      margin: 0;
-    }
-    /* Hilangkan wrapper pembatas dari layout lama */
-    .page-wrapper,
-    .body-wrapper,
-    .container {
-      all: unset;
-      display: block;
-    }
-  </style>
 </head>
 
-<body class="position-relative">
+<body>
 
-  <!-- Main content langsung, tanpa container pembatas -->
-  <div id="main-wrapper">
-    <?= $this->renderSection('back') ?>
-    
-    <!-- Main content section (hero, dll) -->
-    <?= $this->renderSection('content') ?>
+  <!-- Slot untuk konten utama tiap halaman -->
+  <?= $this->renderSection('content') ?>
 
-    <!-- Footer tetap di bawah -->
-    <?= $this->include('layouts/footer') ?>
-  </div>
-
-  <!-- Scripts -->
+  <!-- Scripts dasar (bootstrap js, dll jika ada) -->
   <?= $this->include('imports/scripts/basic_scripts') ?>
 
-  <!-- Extra scripts -->
+  <!-- Slot untuk script tambahan per-halaman -->
   <?= $this->renderSection('scripts') ?>
+
 </body>
 
 </html>
