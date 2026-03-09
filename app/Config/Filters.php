@@ -26,6 +26,7 @@ class Filters extends \CodeIgniter\Config\Filters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'memberFilter'  => \App\Filters\MemberFilter::class,
     ];
 
     /**

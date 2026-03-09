@@ -447,6 +447,12 @@ class Auth extends ShieldAuth
      */
     public function loginRedirect(): string
     {
+        //jika anggota -> ke portal anggota
+        if (auth()->user()->inGroup('member')) {
+            return $this->getUrl('/member/dashboard');
+        }
+
+        //jika admin/superadmin ke portal admin
         $session = session();
         $url     = $session->getTempdata('beforeLoginUrl') ?? setting('Auth.redirects')['login'];
 

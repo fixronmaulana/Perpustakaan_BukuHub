@@ -49,6 +49,10 @@ class AuthGroups extends ShieldAuthGroups
             'title'       => 'Admin',
             'description' => 'Day to day administrators of the site.',
         ],
+        'member' => [                              // ← TAMBAHKAN INI
+        'title'       => 'Anggota',
+        'description' => 'Anggota perpustakaan.',
+        ],
         // 'developer' => [
         //     'title'       => 'Developer',
         //     'description' => 'Site programmers.',

@@ -39,6 +39,21 @@ $routes->get('/kontak', 'Home::kontak');
 // $routes->post('/kontak/kirim', 'Home::kontakKirim'); // ← aktifkan saat form siap
 service('auth')->routes($routes);
 
+/*
+ * --------------------------------------------------------------------
+ * Route Member (butuh login + group member)
+ * --------------------------------------------------------------------
+ */
+$routes->group('member', ['filter' => 'memberFilter'], static function (RouteCollection $routes) {
+    $routes->get('/', 'Member\MemberDashboardController::index');
+    $routes->get('dashboard', 'Member\MemberDashboardController::index');
+    $routes->get('peminjaman', 'Member\MemberDashboardController::peminjaman');
+    $routes->get('pengembalian', 'Member\MemberDashboardController::pengembalian');
+    $routes->get('denda', 'Member\MemberDashboardController::denda');
+    $routes->get('poin', 'Member\MemberDashboardController::poin');
+    $routes->get('profil', 'Member\MemberDashboardController::profil');
+});
+
 $routes->group('admin', ['filter' => 'session'], static function (RouteCollection $routes) {
     $routes->get('/', 'Dashboard\DashboardController');
     $routes->get('dashboard', 'Dashboard\DashboardController::dashboard');
