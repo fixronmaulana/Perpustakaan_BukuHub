@@ -47,10 +47,11 @@ service('auth')->routes($routes);
 $routes->group('member', ['filter' => 'memberFilter'], static function (RouteCollection $routes) {
     $routes->get('/', 'Member\MemberDashboardController::index');
     $routes->get('dashboard', 'Member\MemberDashboardController::index');
+    $routes->get('kartu', 'Member\MemberDashboardController::kartu');
     $routes->get('peminjaman', 'Member\MemberDashboardController::peminjaman');
     $routes->get('pengembalian', 'Member\MemberDashboardController::pengembalian');
-    $routes->get('denda', 'Member\MemberDashboardController::denda');
-    $routes->get('poin', 'Member\MemberDashboardController::poin');
+    $routes->get('kunjungan', 'Member\MemberDashboardController::kunjungan');
+    $routes->get('daftarbuku', 'Member\MemberDashboardController::daftarbuku');
     $routes->get('profil', 'Member\MemberDashboardController::profil');
 });
 
