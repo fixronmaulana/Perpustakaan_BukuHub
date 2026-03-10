@@ -67,11 +67,11 @@ class MemberDashboardController extends Controller
         ]);
     }
 
-    public function denda()
+        public function leaderboard()
     {
-        return view('member/denda', [
+        return view('member/leaderboard', [
             'member'    => $this->getMember(),
-            'activeNav' => 'denda',
+            'activeNav' => 'leaderboard',
         ]);
     }
 

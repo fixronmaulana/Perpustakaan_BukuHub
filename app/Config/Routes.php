@@ -52,6 +52,8 @@ $routes->group('member', ['filter' => 'memberFilter'], static function (RouteCol
     $routes->get('pengembalian', 'Member\MemberDashboardController::pengembalian');
     $routes->get('kunjungan', 'Member\MemberDashboardController::kunjungan');
     $routes->get('daftarbuku', 'Member\MemberDashboardController::daftarbuku');
+    $routes->get('poin',        'Member\MemberDashboardController::poin');
+    $routes->get('leaderboard', 'Member\MemberDashboardController::leaderboard');
     $routes->get('profil', 'Member\MemberDashboardController::profil');
 });
 
