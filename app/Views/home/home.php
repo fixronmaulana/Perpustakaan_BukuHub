@@ -14,8 +14,10 @@
   <div class="lapisan-hero"></div>
 
   <div class="konten-hero">
-    <h1>Jelajahi Dunia Pengetahuan<br>di Perpustakaan Kami</h1>
-    <p>Temukan ribuan koleksi buku, sumber belajar digital, dan ruang baca yang nyaman untuk mendukung perjalanan akademikmu.</p>
+    <h1>Perpustkaan Digital<br>SMK Al-Munawwir IIBS</h1>
+    <p>Akses ribuan koleksi buku fisik dengan mudah. Cari, temukan
+      dan kunjungi perpustakaan kami untuk meminjam buku yang
+      anda butuhkan</p>
 
     <div class="kotak-cari-hero">
       <input type="text" placeholder="Cari judul buku, penulis, atau kategori…">

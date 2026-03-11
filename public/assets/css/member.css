@@ -60,8 +60,8 @@ body {
 
 .sidebar-logo {
   width: 38px; height: 38px;
-  object-fit: contain; border-radius: 9px;
-  background: var(--latar); padding: 3px; flex-shrink: 0;
+  object-fit: contain; border-radius: 90px;
+  background: var(--latar); padding: 1px; flex-shrink: 0;
 }
 
 .sidebar-brand-title {
@@ -392,7 +392,7 @@ body {
   border-radius: 16px;
   padding: 2.5rem 2rem 2rem;
   width: 100%;
-  max-width: 520px;
+  max-width: 820px;
   box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
@@ -415,11 +415,11 @@ body {
   width: 100%;
   max-width: 420px;
   aspect-ratio: 85.6 / 54;
-  border-radius: 14px;
+  border-radius: 8px;
   background: linear-gradient(135deg, #0d1b3e 0%, #1a2f6a 55%, #0d1b3e 100%);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(13,27,62,0.35);
+  box-shadow: 0 6px 10px rgba(13,27,62,0.15);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -454,8 +454,8 @@ body {
 .kartu-instansi { display: flex; align-items: center; gap: 9px; }
 
 .kartu-logo {
-  width: 30px; height: 30px; border-radius: 6px;
-  background: #fff; padding: 2px; object-fit: contain; flex-shrink: 0;
+  width: 40px; height: 40px; border-radius: 90px;
+  background: #fff; padding: 1px; object-fit: contain; flex-shrink: 0;
 }
 
 .kartu-nama-sekolah {
@@ -517,9 +517,9 @@ body {
 }
 
 .kartu-qr {
-  width: 60px; height: 60px;
-  background: #fff; border-radius: 8px; padding: 5px;
-  flex-shrink: 0;
+  width: 90px; height: 90px;
+  background: #fff; border-radius: 3px; padding: 5px;
+  flex-shrink: 0; margin-right: 10px;
   display: flex; align-items: center; justify-content: center;
 }
 
