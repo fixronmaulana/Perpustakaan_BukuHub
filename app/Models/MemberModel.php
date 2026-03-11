@@ -23,7 +23,8 @@ class MemberModel extends Model
         'address',
         'date_of_birth',
         'gender',
-        'qr_code'
+        'qr_code',
+        'foto_profil'
     ];
 
     // Dates

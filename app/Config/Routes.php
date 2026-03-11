@@ -55,6 +55,8 @@ $routes->group('member', ['filter' => 'memberFilter'], static function (RouteCol
     $routes->get('poin',        'Member\MemberDashboardController::poin');
     $routes->get('leaderboard', 'Member\MemberDashboardController::leaderboard');
     $routes->get('profil', 'Member\MemberDashboardController::profil');
+    $routes->post('profil/update',   'Member\MemberDashboardController::updateProfil');
+    $routes->post('profil/password', 'Member\MemberDashboardController::updatePassword');
 });
 
 $routes->group('admin', ['filter' => 'session'], static function (RouteCollection $routes) {
