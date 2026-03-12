@@ -1,0 +1,337 @@
+@media only screen and (max-width: 768px) {
+    #navBtn {
+      display: none;
+    }
+  }
+  
+  /* ════════════════════════════════════════
+     HEADER — SMK Al-Munawwir (FINAL FIX)
+     ════════════════════════════════════════ */
+  
+  /* ── Font ─ */
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+  
+  .app-header,
+  .app-header *,
+  .navbar,
+  .navbar * {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+  }
+  
+  /* ── Header Container ── */
+  .app-header {
+    background: linear-gradient(to right, #1e3a8a, #3b82f6) !important;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.15) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  .navbar {
+    padding: 1rem 1.5rem !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  /* ── Toggle Button ── */
+  .sidebartoggler {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    padding: 6px 8px !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .sidebartoggler:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.05);
+  }
+  
+  .sidebartoggler i {
+    font-size: 1.2rem !important;
+    stroke-width: 2 !important;
+  }
+  
+  /* ── Action Buttons ── */
+  #navbarNav .btn {
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    padding: 0.4rem 0.75rem !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Primary - Ajukan Peminjaman */
+  #navbarNav .btn-primary {
+    background: #ffffff !important;
+    color: #1e3a8a !important;
+    border: 1.5px solid #ffffff !important;
+  }
+  
+  #navbarNav .btn-primary:hover {
+    background: #f1f5f9 !important;
+    color: #172554 !important;
+    border-color: #e2e8f0 !important;
+    transform: translateY(-1px);
+  }
+  
+  /* Outline Primary - Pengembalian Buku */
+  #navbarNav .btn-outline-primary {
+    color: #7dd3fc !important;
+    border: 1.5px solid #7dd3fc !important;
+    background: transparent !important;
+  }
+  
+  #navbarNav .btn-outline-primary:hover {
+    background: rgba(125, 211, 252, 0.15) !important;
+    color: #bae6fd !important;
+    border-color: #bae6fd !important;
+    transform: translateY(-1px);
+  }
+  
+  /* Outline Warning - Bayar Denda */
+  #navbarNav .btn-outline-warning {
+    color: #fde047 !important;
+    border: 1.5px solid #fde047 !important;
+    background: transparent !important;
+  }
+  
+  #navbarNav .btn-outline-warning:hover {
+    background: rgba(253, 224, 71, 0.15) !important;
+    color: #fef08a !important;
+    border-color: #fef08a !important;
+    transform: translateY(-1px);
+  }
+  
+  /* Outline Danger - Pengaturan Denda */
+  #navbarNav .btn-outline-danger {
+    color: #fda4af !important;
+    border: 1.5px solid #fda4af !important;
+    background: transparent !important;
+  }
+  
+  #navbarNav .btn-outline-danger:hover {
+    background: rgba(253, 164, 175, 0.15) !important;
+    color: #fecdd3 !important;
+    border-color: #fecdd3 !important;
+    transform: translateY(-1px);
+  }
+  
+  /* ── Profile Avatar — BULAT SEMPURNA ══ */
+  .nav-icon-hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  
+  .nav-icon-hover:hover,
+  .nav-icon-hover.show {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    transform: scale(1.05) !important;
+  }
+  
+  .nav-icon-hover img.rounded-circle {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    border: none !important;
+  }
+  
+  .nav-icon-hover i.ti-user {
+    color: #ffffff !important;
+    font-size: 1.4rem !important;
+    stroke-width: 2 !important;
+    position: static !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* ── Dropdown Menu — SIMPLE ══ */
+  .dropdown-menu-end.dropdown-menu-animate-up {
+    background: #ffffff !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12) !important;
+    padding: 12px 8px !important;
+    margin-top: 10px !important;
+    min-width: 240px !important;
+    animation: slideUp 0.15s ease !important;
+    z-index: 1040 !important;
+  }
+  
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .message-body {
+    padding: 4px 0 !important;
+  }
+  
+  .message-body h5 {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin: 4px 0 8px 12px !important;
+    padding: 0 !important;
+    border-bottom: none !important;
+  }
+  
+  .message-body span {
+    font-size: 0.82rem !important;
+    color: #64748b !important;
+    line-height: 1.5 !important;
+    display: block !important;
+    margin: 2px 0 !important;
+    padding-left: 12px !important;
+  }
+  
+  .message-body span b {
+    color: #1e3a8a !important;
+    font-weight: 600 !important;
+  }
+  
+  .message-body .badge {
+    font-size: 0.72rem !important;
+    padding: 3px 10px !important;
+    font-weight: 500 !important;
+    margin-top: 6px !important;
+    text-transform: capitalize !important;
+  }
+  
+  .message-body .badge.bg-success {
+    background: #dcfce7 !important;
+    color: #166534 !important;
+  }
+  
+  .message-body .badge.bg-primary {
+    background: #dbeafe !important;
+    color: #1e40af !important;
+  }
+  
+  .message-body .badge.bg-secondary {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+  }
+  
+  /* ── Logout Button — MERAH TUA + ICON SVG ══ */
+  .message-body .btn-outline-danger {
+    width: calc(100% - 32px) !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    padding: 0.55rem 0.85rem !important;
+    margin: 16px auto 8px auto !important;
+    color: #991b1b !important;
+    border: 2px solid #991b1b !important;
+    background: transparent !important;
+    border-radius: 8px !important;
+    transition: all 0.15s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    text-align: center !important;
+    text-decoration: none !important;
+  }
+  
+  .message-body .btn-outline-danger:hover {
+    background: #7f1d1d !important; /* 🔴 MERAH LEBIH GELAP (BUKAN PUTIH) */
+    color: #fecaca !important; /* ✅ Text merah muda terang */
+    border-color: #7f1d1d !important;
+  }
+  
+  /* SVG Icon Logout */
+  .message-body .btn-outline-danger svg {
+    stroke: currentColor !important;
+    flex-shrink: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  /* ── Responsive ── */
+  @media (max-width: 1200px) {
+    #navbarNav .btn {
+      padding: 0.4rem !important;
+      min-width: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    #navbarNav .btn span {
+      display: none !important;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .navbar {
+      padding: 0.5rem 1rem !important;
+    }
+    
+    #navbarNav .nav-item {
+      margin: 6px 0 !important;
+    }
+    #navbarNav .btn {
+      width: 100% !important;
+      justify-content: center !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dropdown-menu-end {
+      right: -10px !important;
+      min-width: 220px !important;
+    }
+  }
+
+  /* ══ FIX HEADER OVERLAP - PASTI BERHASIL ══ */
+  
+  /* 1. Header fixed di atas */
+  .app-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 270px !important;
+    right: 0 !important;
+    height: 70px !important;
+    z-index: 9999 !important;
+  }
+  
+  /* 2. Dorong konten ke bawah */
+  .body-wrapper {
+    margin-left: 280px !important;
+    padding-top: 90px !important; /* INI KUNCINYA - jarak header ke konten */
+    min-height: 100vh !important;
+  }
+  
+  /* 3. Container dapat padding */
+  .container-fluid {
+    padding-top: 1.5rem !important;
+  }
+  
+  /* 4. Mobile */
+  @media (max-width: 1199px) {
+    .app-header {
+      left: 0 !important;
+    }
+    .body-wrapper {
+      margin-left: 0 !important;
+      padding-top: 85px !important;
+    }
+  }

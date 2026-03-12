@@ -5,6 +5,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+
 <div class="row">
   <!-- BOOKS -->
   <div class="col-lg-3 col-sm-6">

@@ -6,6 +6,9 @@
 
   <!-- Extra head e.g title -->
   <?= $this->renderSection('head') ?>
+  <style>
+  
+</style>
 </head>
 
 <body>
