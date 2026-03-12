@@ -84,26 +84,8 @@
       <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Leaderboard
     </a>
-
-    <div class="sidebar-divider"></div>
-
-    <a href="<?= base_url('member/profil') ?>"
-       class="sidebar-link <?= ($activeNav ?? '') === 'profil' ? 'aktif' : '' ?>">
-      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Profil Saya
-    </a>
-
   </nav>
-
-  <div class="sidebar-footer">
-    <a href="<?= url_to('logout') ?>" class="tombol-keluar">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Keluar
-    </a>
-  </div>
-
 </aside>
-
 <!-- ══ KONTEN UTAMA ══ -->
 <div class="member-konten">
 
@@ -124,9 +106,54 @@
         ?>, <?= isset($member['first_name']) ? esc($member['first_name']) : 'Anggota' ?></p>
       </div>
     </div>
-    <div class="topbar-kanan">
-      <div class="topbar-hari">Hari ini</div>
-      <div class="topbar-tgl"><?= date('l, d F Y') ?></div>
+    <!-- Dropdown Profil -->
+    <div class="profil-dropdown" id="profilDropdown">
+      
+      <!-- Trigger: Avatar + Nama + Email -->
+      <button class="profil-trigger" onclick="toggleProfilDropdown(event)" aria-label="Menu Profil">
+        
+        <!-- Avatar: Foto atau Inisial -->
+        <?php
+          $inisial = '';
+          if (!empty($member['first_name'])) $inisial .= strtoupper(substr(trim($member['first_name']), 0, 1));
+          $inisial = $inisial ?: 'A';
+          $adaFoto = !empty($member['foto_profil']);
+        ?>
+        
+        <?php if ($adaFoto): ?>
+          <img src="<?= base_url('uploads/foto_profil/' . esc($member['foto_profil'])) ?>" 
+               alt="Foto Profil" 
+               class="profil-avatar"
+               onerror="this.onerror=null; this.closest('.profil-trigger').querySelector('.profil-inisial').style.display='flex'; this.style.display='none';">
+        <?php endif; ?>
+        
+        <div class="profil-inisial" style="<?= $adaFoto ? 'display:none;' : 'display:flex;' ?>">
+          <?= esc($inisial) ?>
+        </div>
+        
+        <!-- Info Nama + Email -->
+        <div class="profil-info">
+          <span class="profil-nama"><?= esc($member['first_name'] ?? 'Anggota') ?></span>
+          <span class="profil-email"><?= esc($member['email'] ?? '') ?></span>
+        </div>
+        
+        <!-- Chevron Icon -->
+        <svg class="profil-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        
+      </button>
+      
+      <!-- Dropdown Menu -->
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="<?= base_url('member/profil') ?>" class="dropdown-item">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profil Saya
+        </a>
+        <a href="<?= url_to('logout') ?>" class="dropdown-item item-keluar">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </a>
+      </div>
+      
     </div>
   </header>
 
@@ -147,6 +174,42 @@
       sidebar.classList.remove('terbuka');
     }
   });
+</script>
+<script>
+// Toggle Dropdown Profil
+function toggleProfilDropdown(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('profilDropdown');
+  dropdown.classList.toggle('active');
+}
+
+// Tutup dropdown jika klik di luar
+document.addEventListener('click', function(e) {
+  const dropdown = document.getElementById('profilDropdown');
+  const trigger  = document.querySelector('.profil-trigger');
+  
+  if (dropdown && dropdown.classList.contains('active')
+      && !dropdown.contains(e.target)) {
+    dropdown.classList.remove('active');
+  }
+  
+  // Toggle sidebar logic (existing)
+  const sidebar = document.getElementById('sidebar');
+  const toggle  = document.querySelector('.tombol-toggle-sidebar');
+  if (sidebar && sidebar.classList.contains('terbuka')
+      && !sidebar.contains(e.target)
+      && toggle && !toggle.contains(e.target)) {
+    sidebar.classList.remove('terbuka');
+  }
+});
+
+// Tutup dropdown dengan tombol Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const dropdown = document.getElementById('profilDropdown');
+    if (dropdown) dropdown.classList.remove('active');
+  }
+});
 </script>
 </body>
 </html>
