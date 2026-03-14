@@ -40,6 +40,7 @@
 
   <!-- Extra scripts -->
   <?= $this->renderSection('scripts') ?>
+  
 </body>
 
 </html>

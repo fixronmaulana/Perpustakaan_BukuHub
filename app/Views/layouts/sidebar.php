@@ -1,6 +1,6 @@
 <?php
 /**
- * List of sidebar navigations
+ * Sidebar Admin — Portal Petugas
  */
 $sidebarNavs = [
   'Home',
@@ -59,12 +59,14 @@ if (auth()->user()->inGroup('superadmin') ?? false) {
   ]);
 }
 
-// Deteksi URL aktif
 $currentPath = '/' . ltrim(current_url(true)->getPath(), '/');
 ?>
 
+<!-- Overlay (klik untuk tutup sidebar di mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="tutupSidebar()"></div>
+
 <!-- Sidebar Start -->
-<aside class="left-sidebar" id="left-sidebar">
+<aside class="left-sidebar" id="leftSidebar">
 
   <!-- Brand -->
   <div class="sidebar-brand">
@@ -75,31 +77,26 @@ $currentPath = '/' . ltrim(current_url(true)->getPath(), '/');
     </div>
   </div>
 
-  <!-- Sidebar Navigation -->
+  <!-- Navigation -->
   <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
     <ul id="sidebarnav">
 
       <?php foreach ($sidebarNavs as $nav) : ?>
 
         <?php if (gettype($nav) === 'string') : ?>
-          <!-- Label section -->
           <li class="nav-small-cap">
             <span class="hide-menu"><?= esc($nav) ?></span>
           </li>
 
-        <?php else : ?>
-          <?php
-            // Cek apakah link ini aktif
-            $isActive = str_starts_with($currentPath, $nav['link']);
-            $activeClass = $isActive ? ' active' : '';
-          ?>
+        <?php else :
+          $isActive   = str_starts_with($currentPath, $nav['link']);
+          $activeClass = $isActive ? ' active' : '';
+        ?>
           <li class="sidebar-item<?= $isActive ? ' selected' : '' ?>">
             <a class="sidebar-link<?= $activeClass ?>"
                href="<?= base_url($nav['link']) ?>"
                aria-expanded="false">
-              <span>
-                <i class="<?= esc($nav['icon']) ?>"></i>
-              </span>
+              <span><i class="<?= esc($nav['icon']) ?>"></i></span>
               <span class="hide-menu"><?= esc($nav['name']) ?></span>
             </a>
           </li>
@@ -110,7 +107,36 @@ $currentPath = '/' . ltrim(current_url(true)->getPath(), '/');
 
     </ul>
   </nav>
-  <!-- End Sidebar Navigation -->
 
 </aside>
 <!-- Sidebar End -->
+
+<script>
+// ── Toggle sidebar (dipanggil dari tombol di header/topbar) ──
+function toggleSidebar() {
+  const sidebar  = document.getElementById('leftSidebar');
+  const overlay  = document.getElementById('sidebarOverlay');
+  const isOpen   = sidebar.classList.contains('terbuka');
+
+  if (isOpen) {
+    tutupSidebar();
+  } else {
+    sidebar.classList.add('terbuka');
+    overlay.classList.add('aktif');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function tutupSidebar() {
+  const sidebar = document.getElementById('leftSidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.remove('terbuka');
+  overlay.classList.remove('aktif');
+  document.body.style.overflow = '';
+}
+
+// Tutup dengan tombol Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') tutupSidebar();
+});
+</script>
