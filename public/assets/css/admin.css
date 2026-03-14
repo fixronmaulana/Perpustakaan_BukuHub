@@ -18,7 +18,7 @@
 }
 
 .app-header .navbar {
-  padding: 0 1.75rem !important;
+  padding: 0 1rem !important;
   height: 80px !important;
   display: flex !important;
   align-items: center !important;
@@ -177,6 +177,7 @@
   align-items: center;
   gap: 9px;
   padding: 5px 10px 5px 5px;
+  margin-left: 10px;
   border-radius: 50px;
   background: rgba(255,255,255,0.1);
   border: 1.5px solid rgba(255,255,255,0.2);

@@ -21,7 +21,7 @@
   --teks:         #1a2340;
   --teks-redup:   #8492b4;
   --batas:        #e4e8f4;
-  --sidebar-w:    232px;
+  --sidebar-w:    240px;
   --topbar-h:     64px;
   --radius:       12px;
   --shadow-sm:    none;
@@ -52,7 +52,7 @@ body {
 
 /* ── Container Sidebar ── */
 .sidebar {
-  width: var(--sidebar-w, 260px);
+  width: var(--sidebar-w);
   background: #ffffff;
   min-height: 100vh;
   position: fixed;
@@ -61,9 +61,10 @@ body {
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(30, 58, 138, 0.12); /* Navy subtle border */
-  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.08); /* Depth sync dengan topbar */
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.07); /* Depth sync dengan topbar */
   z-index: 200;
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
 /* ── Brand Section ── */
@@ -71,20 +72,20 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 1.3rem 1.75rem;
+  padding: 1.6rem 1.5rem;
   background: linear-gradient(135deg, rgba(30, 58, 138, 0.04), rgba(30, 64, 175, 0.02));
   border-bottom: 1px solid rgba(30, 58, 138, 0.12);
 }
 
 .sidebar-logo {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(30, 58, 138, 0);
+  object-fit: contain;
 }
 
 .sidebar-brand-title {
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 800;
   color: var(--navy-dark);
   line-height: 1.25;
@@ -92,7 +93,7 @@ body {
 }
 
 .sidebar-brand-sub {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #64748b;
   margin-top: 2px;
   font-weight: 500;
@@ -100,25 +101,23 @@ body {
 
 /* ── Label Section ── */
 .sidebar-label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
-  padding: 1.3rem 1.75rem 0.6rem;
+  padding: 1rem 1.75rem 0.6rem;
   margin: 0;
 }
 
 /* ── Navigation Links ── */
 .sidebar-nav {
-  flex: 1;
-  padding: 0.5rem 0.75rem 1rem;
+  list-style: none;
+  padding: 0.5rem 0.65rem 1.5rem;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  gap: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(30, 58, 138, 0.2) transparent;
+  gap: 2px;
 }
 
 .sidebar-nav::-webkit-scrollbar {
@@ -140,20 +139,23 @@ body {
 
 /* ── Link Styles ── */
 .sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  color: #000000;
-  text-decoration: none;
-  font-size: 0.87rem;
-  font-weight: 500;
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  color: #1a1a2e;
+  text-decoration: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  position: relative !important;
+  overflow: hidden !important;
+  line-height: 1.4 !important;
 }
-
+.sidebar-nav .sidebar-link {
+  margin: 0 0.9rem !important;
+}
 .sidebar-link::before {
   content: '';
   position: absolute;
@@ -161,7 +163,7 @@ body {
   top: 50%;
   transform: translateY(-50%) scaleX(0);
   width: 3px;
-  height: 70%;
+  height: 65%;
   background: linear-gradient(180deg, var(--navy-main), var(--navy-light));
   border-radius: 0 4px 4px 0;
   transition: transform 0.2s ease;
@@ -200,6 +202,9 @@ body {
   background: linear-gradient(135deg, rgba(30, 64, 175, 0.12), rgba(59, 130, 246, 0.08));
   color: var(--navy-dark);
   font-weight: 600;
+  border-left: none !important;
+  padding-left: 14px !important;
+  transform: none !important;
   box-shadow: inset 3px 0 0 var(--navy-main);
 }
 
