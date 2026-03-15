@@ -153,8 +153,17 @@ body {
   overflow: hidden !important;
   line-height: 1.4 !important;
 }
+.sidebar-link i {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .sidebar-nav .sidebar-link {
-  margin: 0 0.9rem !important;
+  margin: 0 1rem !important;
 }
 .sidebar-link::before {
   content: '';
@@ -171,8 +180,8 @@ body {
 }
 
 .sidebar-link svg {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   stroke: currentColor;
   fill: none;
   stroke-width: 2;

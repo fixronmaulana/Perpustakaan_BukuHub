@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= base_url('assets/css/member.css') ?>">
   <?= $this->renderSection('head') ?>
@@ -45,13 +46,13 @@
 
     <a href="<?= base_url('member/peminjaman') ?>"
        class="sidebar-link <?= ($activeNav ?? '') === 'peminjaman' ? 'aktif' : '' ?>">
-      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      <i class="ti ti-arrows-exchange"></i>
       Peminjaman
     </a>
 
     <a href="<?= base_url('member/pengembalian') ?>"
        class="sidebar-link <?= ($activeNav ?? '') === 'pengembalian' ? 'aktif' : '' ?>">
-      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+      <i class="ti ti-check"></i>
       Pengembalian
     </a>
 
