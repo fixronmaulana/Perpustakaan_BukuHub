@@ -43,15 +43,15 @@
     <form action="<?= url_to('login') ?>" method="post">
       <?= csrf_field() ?>
 
-<div class="grup-input">
-  <label for="username">No. Identitas</label>
-  <input
-    type="text" id="username" name="username"
-    inputmode="text" autocomplete="username"
-    placeholder="Masukkan No. Identitas (NIS/NISN/NIK)"
-    value="<?= old('username') ?>" required
-  >
-</div>
+      <div class="grup-input">
+        <label for="username">No. Identitas</label>
+        <input
+          type="text" id="username" name="username"
+          inputmode="text" autocomplete="username"
+          placeholder="Masukkan No. Identitas (NIS/NISN/NIK)"
+          value="<?= old('username') ?>" required
+        >
+      </div>
 
       <div class="grup-input">
         <label for="password"><?= lang('Auth.password') ?></label>
