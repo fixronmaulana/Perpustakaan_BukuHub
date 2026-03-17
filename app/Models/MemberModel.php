@@ -11,7 +11,9 @@ class MemberModel extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = true;
+
+    // code dibawah untuk menyembunyikan data yang dihapus
+    // protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [
         'uid',
@@ -19,12 +21,12 @@ class MemberModel extends Model
         'first_name',
         'last_name',
         'email',
+        'no_identitas',
+        'tipe_anggota',
         'phone',
-        'address',
-        'date_of_birth',
         'gender',
         'qr_code',
-        'foto_profil'
+        'foto_profil',
     ];
 
     // Dates

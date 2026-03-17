@@ -37,6 +37,7 @@ $routes->get('/layanan', 'Home::layanan');
 $routes->get('/leaderboard', 'Home::leaderboard');
 $routes->get('/kontak', 'Home::kontak');
 // $routes->post('/kontak/kirim', 'Home::kontakKirim'); // ← aktifkan saat form siap
+$routes->post('login', 'Auth\LoginController::loginAction');
 service('auth')->routes($routes);
 
 /*

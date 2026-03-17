@@ -45,6 +45,7 @@ class MembersController extends ResourceController
                 ->like('first_name', $keyword, insensitiveSearch: true)
                 ->orLike('last_name', $keyword, insensitiveSearch: true)
                 ->orLike('email', $keyword, insensitiveSearch: true)
+                ->orLike('no_identitas', $keyword, insensitiveSearch: true)
                 ->paginate($itemPerPage, 'members');
 
             $members = array_filter($members, function ($member) {
@@ -143,13 +144,13 @@ class MembersController extends ResourceController
     public function create()
     {
         if (!$this->validate([
-            'first_name'    => 'required|alpha_numeric_punct|max_length[100]',
-            'last_name'     => 'permit_empty|alpha_numeric_punct|max_length[100]',
-            'email'         => 'required|valid_email|max_length[255]',
-            'phone'         => 'required|alpha_numeric_punct|min_length[4]|max_length[20]',
-            'address'       => 'required|string|min_length[5]|max_length[511]',
-            'date_of_birth' => 'required|valid_date',
-            'gender'        => 'required|alpha_numeric_punct',
+            'first_name'   => 'required|alpha_numeric_punct|max_length[100]',
+            'last_name'    => 'permit_empty|alpha_numeric_punct|max_length[100]',
+            'no_identitas' => 'required|alpha_numeric|max_length[50]|is_unique[members.no_identitas]',
+            'tipe_anggota' => 'required|in_list[Murid,Guru,Staf]',
+            'email'        => 'permit_empty|valid_email|max_length[255]',
+            'phone'        => 'permit_empty|alpha_numeric_punct|min_length[4]|max_length[20]',
+            'gender'       => 'required|in_list[Male,Female]',
         ])) {
             return view('members/create', [
                 'validation' => \Config\Services::validation(),
@@ -157,27 +158,30 @@ class MembersController extends ResourceController
             ]);
         }
 
-        $firstName = $this->request->getVar('first_name');
-        $lastName  = $this->request->getVar('last_name');
-        $email     = $this->request->getVar('email');
-        $phone     = $this->request->getVar('phone');
-        $gender    = $this->request->getVar('gender');
+        $firstName    = $this->request->getVar('first_name');
+        $lastName     = $this->request->getVar('last_name');
+        $noIdentitas  = $this->request->getVar('no_identitas');
+        $tipeAnggota  = $this->request->getVar('tipe_anggota');
+        $email        = $this->request->getVar('email') ?? '';
+        $phone        = $this->request->getVar('phone') ?? '';
+        $gender       = $this->request->getVar('gender');
 
-        // ── Buat akun Shield untuk anggota ──────────────────────────
+        // ── Buat akun Shield ──────────────────────────────────────────
+        // Username = no_identitas, password = no_identitas
         $shieldUser = new User([
-            'username' => $email,           // username = email
-            'email'    => $email,
-            'password' => $phone,           // password sementara = nomor telepon
+            'username' => $noIdentitas,
+            'email'    => $email ?: $noIdentitas . '@member.local', // email dummy jika kosong
+            'password' => $noIdentitas,
         ]);
 
         $this->userModel->save($shieldUser);
         $shieldUser = $this->userModel->findById($this->userModel->getInsertID());
-        $shieldUser->addGroup('member');    // tambah ke group member
+        $shieldUser->addGroup('member');
         $shieldUser->activate();
         $userId = $shieldUser->id;
-        // ────────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────
 
-        $uid = sha1($firstName . $email . $phone . rand(0, 1000) . md5($gender));
+        $uid = sha1($firstName . $noIdentitas . rand(0, 1000) . md5($gender));
 
         $qrGenerator = new QRGenerator();
         $qrCodeLabel = $firstName . ($lastName ? ' ' . $lastName : '');
@@ -189,18 +193,18 @@ class MembersController extends ResourceController
         );
 
         if (!$this->memberModel->save([
-            'uid'           => $uid,
-            'user_id'       => $userId,     // ← simpan link ke Shield user
-            'first_name'    => $firstName,
-            'last_name'     => $lastName,
-            'email'         => $email,
-            'phone'         => $phone,
-            'address'       => $this->request->getVar('address'),
-            'date_of_birth' => $this->request->getVar('date_of_birth'),
-            'gender'        => $gender,
-            'qr_code'       => $qrCode,
+            'uid'          => $uid,
+            'user_id'      => $userId,
+            'first_name'   => $firstName,
+            'last_name'    => $lastName,
+            'no_identitas' => $noIdentitas,
+            'tipe_anggota' => $tipeAnggota,
+            'email'        => $email,
+            'phone'        => $phone,
+            'gender'       => $gender,
+            'qr_code'      => $qrCode,
         ])) {
-            // Rollback: hapus Shield user yang sudah dibuat
+            // Rollback: hapus Shield user
             $this->userModel->delete($userId, purge: true);
 
             session()->setFlashdata(['msg' => 'Insert failed']);
@@ -237,13 +241,13 @@ class MembersController extends ResourceController
         }
 
         if (!$this->validate([
-            'first_name'    => 'required|alpha_numeric_punct|max_length[100]',
-            'last_name'     => 'permit_empty|alpha_numeric_punct|max_length[100]',
-            'email'         => 'required|valid_email|max_length[255]',
-            'phone'         => 'required|alpha_numeric_punct|min_length[4]|max_length[20]',
-            'address'       => 'required|string|min_length[5]|max_length[511]',
-            'date_of_birth' => 'required|valid_date',
-            'gender'        => 'required|alpha_numeric_punct',
+            'first_name'   => 'required|alpha_numeric_punct|max_length[100]',
+            'last_name'    => 'permit_empty|alpha_numeric_punct|max_length[100]',
+            'no_identitas' => 'required|alpha_numeric|max_length[50]|is_unique[members.no_identitas,id,' . $member['id'] . ']',
+            'tipe_anggota' => 'required|in_list[Murid,Guru,Staf]',
+            'email'        => 'permit_empty|valid_email|max_length[255]',
+            'phone'        => 'permit_empty|alpha_numeric_punct|min_length[4]|max_length[20]',
+            'gender'       => 'required|in_list[Male,Female]',
         ])) {
             return view('members/edit', [
                 'member'     => $member,
@@ -252,18 +256,20 @@ class MembersController extends ResourceController
             ]);
         }
 
-        $firstName = $this->request->getVar('first_name');
-        $email     = $this->request->getVar('email');
-        $phone     = $this->request->getVar('phone');
-        $gender    = $this->request->getVar('gender');
-        $lastName  = $this->request->getVar('last_name');
+        $firstName   = $this->request->getVar('first_name');
+        $lastName    = $this->request->getVar('last_name');
+        $noIdentitas = $this->request->getVar('no_identitas');
+        $tipeAnggota = $this->request->getVar('tipe_anggota');
+        $email       = $this->request->getVar('email') ?? '';
+        $phone       = $this->request->getVar('phone') ?? '';
+        $gender      = $this->request->getVar('gender');
 
-        $isChanged = ($firstName != $member['first_name']
-            || $email != $member['email']
-            || $phone != $member['phone']);
+        // Cek apakah data yang mempengaruhi uid berubah
+        $isChanged = ($firstName    != $member['first_name']
+            || $noIdentitas != $member['no_identitas']);
 
         $newUid = $isChanged
-            ? sha1($firstName . $email . $phone . rand(0, 1000) . md5($gender))
+            ? sha1($firstName . $noIdentitas . rand(0, 1000) . md5($gender))
             : $member['uid'];
 
         if ($isChanged) {
@@ -276,38 +282,45 @@ class MembersController extends ResourceController
                 filename: $qrCodeLabel
             );
             deleteMembersQRCode($member['qr_code']);
-
-            // ── Update akun Shield jika email/phone berubah ──────────
-            if (!empty($member['user_id'])) {
-                $shieldUser = $this->userModel->findById($member['user_id']);
-                if ($shieldUser) {
-                    $shieldUser->fill([
-                        'username' => $email,
-                        'email'    => $email,
-                        'password' => $phone,
-                    ]);
-                    $this->userModel->save($shieldUser);
-                }
-            }
-            // ────────────────────────────────────────────────────────
         } else {
             $qrCode = $member['qr_code'];
         }
 
+        // ── Update akun Shield jika no_identitas berubah ──────────────
+        // no_identitas tidak boleh diubah dari sisi anggota,
+        // tapi admin tetap bisa update jika diperlukan
+        if (!empty($member['user_id'])) {
+            $shieldUser = $this->userModel->findById($member['user_id']);
+            if ($shieldUser) {
+                $updateData = [
+                    'email' => $email ?: $noIdentitas . '@member.local',
+                ];
+                // Jika no_identitas berubah, update username Shield juga
+                if ($noIdentitas != $member['no_identitas']) {
+                    $updateData['username'] = $noIdentitas;
+                    $updateData['password'] = $noIdentitas;
+                }
+                $shieldUser->fill($updateData);
+                $this->userModel->save($shieldUser);
+            }
+        }
+        // ─────────────────────────────────────────────────────────────
+
         if (!$this->memberModel->save([
-            'id'            => $member['id'],
-            'uid'           => $newUid,
-            'first_name'    => $firstName,
-            'last_name'     => $lastName,
-            'email'         => $email,
-            'phone'         => $phone,
-            'address'       => $this->request->getVar('address'),
-            'date_of_birth' => $this->request->getVar('date_of_birth'),
-            'gender'        => $gender,
-            'qr_code'       => $qrCode,
+            'id'           => $member['id'],
+            'uid'          => $newUid,
+            'first_name'   => $firstName,
+            'last_name'    => $lastName,
+            'no_identitas' => $noIdentitas,
+            'tipe_anggota' => $tipeAnggota,
+            'email'        => $email,
+            'phone'        => $phone,
+            'gender'       => $gender,
+            'qr_code'      => $qrCode,
         ])) {
             session()->setFlashdata(['msg' => 'Update failed']);
             return view('members/edit', [
+                'member'     => $member,
                 'validation' => \Config\Services::validation(),
                 'oldInput'   => $this->request->getVar(),
             ]);
@@ -325,11 +338,11 @@ class MembersController extends ResourceController
             throw new PageNotFoundException('Member not found');
         }
 
-        // ── Hapus akun Shield anggota sekaligus ──────────────────────
+        // ── Hapus akun Shield sekaligus ───────────────────────────────
         if (!empty($member['user_id'])) {
             $this->userModel->delete($member['user_id'], purge: true);
         }
-        // ────────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────
 
         if (!$this->memberModel->delete($member['id'])) {
             session()->setFlashdata(['msg' => 'Failed to delete member', 'error' => true]);

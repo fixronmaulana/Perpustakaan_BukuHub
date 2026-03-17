@@ -16,71 +16,86 @@
 
 <div class="card">
   <div class="card-body">
-    <div class="row mb-2">
+    <div class="row mb-3">
       <div class="col-12 col-lg-5">
-        <h5 class="card-title fw-semibold mb-4">Data Anggota</h5>
+        <h5 class="card-title fw-semibold mb-0">Data Anggota</h5>
       </div>
       <div class="col-12 col-lg-7">
         <div class="d-flex gap-2 justify-content-md-end">
-          <div>
-            <form action="" method="get">
-              <div class="input-group mb-3">
-                <input type="text" class="form-control" name="search" value="<?= $search ?? ''; ?>" placeholder="Cari anggota" aria-label="Cari anggota" aria-describedby="searchButton">
-                <button class="btn btn-outline-secondary" type="submit" id="searchButton">Cari</button>
-              </div>
-            </form>
-          </div>
-          <div>
-            <a href="<?= base_url('admin/members/new'); ?>" class="btn btn-primary py-2">
-              <i class="ti ti-plus"></i>
-              Tambah Anggota
-            </a>
-          </div>
+          <form action="" method="get">
+            <div class="input-group">
+              <input type="text" class="form-control" name="search"
+                     value="<?= esc($search ?? '') ?>"
+                     placeholder="Cari nama / no. identitas"
+                     aria-label="Cari anggota">
+              <button class="btn btn-outline-secondary" type="submit">Cari</button>
+            </div>
+          </form>
+          <a href="<?= base_url('admin/members/new'); ?>" class="btn btn-primary text-nowrap">
+            <i class="ti ti-plus"></i> Tambah Anggota
+          </a>
         </div>
       </div>
     </div>
+
     <div class="overflow-x-scroll">
       <table class="table table-hover table-striped">
         <thead class="table-light">
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Nama lengkap</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-            <th scope="col">Alamat</th>
-            <th scope="col">Jenis kelamin</th>
-            <th scope="col" class="text-center">Aksi</th>
+            <th>#</th>
+            <th>Nama Lengkap</th>
+            <th>No. Identitas</th>
+            <th>Tipe</th>
+            <th>Email</th>
+            <th>No. Telepon</th>
+            <th>Jenis Kelamin</th>
+            <th class="text-center">Aksi</th>
           </tr>
         </thead>
         <tbody class="table-group-divider">
           <?php $i = 1 + ($itemPerPage * ($currentPage - 1)) ?>
           <?php if (empty($members)) : ?>
             <tr>
-              <td class="text-center" colspan="7"><b>Tidak ada data</b></td>
+              <td class="text-center" colspan="8"><b>Tidak ada data</b></td>
             </tr>
           <?php endif; ?>
-          <?php foreach ($members as $key => $member) : ?>
+          <?php foreach ($members as $member) : ?>
             <tr>
-              <th scope="row"><?= $i++; ?></th>
+              <th><?= $i++ ?></th>
               <td>
-                <a href="<?= base_url("admin/members/{$member['uid']}"); ?>" class="text-primary-emphasis text-decoration-underline">
-                  <b><?= $member['first_name'] . ' ' . $member['last_name']; ?></b>
+                <a href="<?= base_url("admin/members/{$member['uid']}") ?>"
+                   class="text-primary-emphasis text-decoration-underline">
+                  <b><?= esc($member['first_name'] . ' ' . $member['last_name']) ?></b>
                 </a>
               </td>
-              <td><?= $member['email']; ?></td>
-              <td><?= $member['phone']; ?></td>
-              <td><?= $member['address']; ?></td>
-              <td><?= $member['gender']; ?></td>
+              <td><?= esc($member['no_identitas']) ?></td>
+              <td>
+                <?php
+                  $tipeClass = match($member['tipe_anggota'] ?? 'Murid') {
+                    'Guru'  => 'bg-primary',
+                    'Staf'  => 'bg-warning text-dark',
+                    default => 'bg-success',
+                  };
+                ?>
+                <span class="badge <?= $tipeClass ?>">
+                  <?= esc($member['tipe_anggota'] ?? 'Murid') ?>
+                </span>
+              </td>
+              <td><?= esc($member['email']) ?></td>
+              <td><?= esc($member['phone']) ?></td>
+              <td><?= $member['gender'] === 'Male' ? 'Laki-laki' : 'Perempuan' ?></td>
               <td>
                 <div class="d-flex justify-content-center gap-2">
-                  <a href="<?= base_url("admin/members/{$member['uid']}/edit"); ?>" class="btn btn-primary mb-2">
-                    Edit
+                  <a href="<?= base_url("admin/members/{$member['uid']}/edit") ?>"
+                     class="btn btn-sm btn-primary">
+                    <i class="ti ti-edit"></i> Edit
                   </a>
-                  <form action="<?= base_url("admin/members/{$member['uid']}"); ?>" method="post">
-                    <?= csrf_field(); ?>
+                  <form action="<?= base_url("admin/members/{$member['uid']}") ?>" method="post">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
-                      Delete
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Hapus anggota ini?')">
+                      <i class="ti ti-trash"></i> Hapus
                     </button>
                   </form>
                 </div>
@@ -90,7 +105,7 @@
         </tbody>
       </table>
     </div>
-    <?= $pager->links('members', 'my_pager'); ?>
+    <?= $pager->links('members', 'my_pager') ?>
   </div>
 </div>
 <?= $this->endSection() ?>
