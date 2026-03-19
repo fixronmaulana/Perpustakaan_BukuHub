@@ -25,7 +25,7 @@
       <div class="col-12 col-md-6">
         <h5 class="card-title fw-semibold">Scan QR anggota</h5>
         <div>
-          <div id="reader" class="border border-2 border-primary my-4" style="max-width: 400px; min-height: 400px; border-radius: 10px; overflow: hidden;"></div>
+          <div id="reader" class="border-2 border-primary my-4" style="max-width: 400px; min-height: 400px; border-radius: 10px; overflow: hidden;"></div>
           <button class="btn btn-primary mb-3" style="display: none;" id="resumeBtn" onclick="html5QrcodeScanner.resume(); this.style.display = 'none';">
             Scan ulang
           </button>

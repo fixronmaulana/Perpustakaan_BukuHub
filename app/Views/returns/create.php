@@ -46,20 +46,24 @@ $daysLate = $now->today()->difference($loanDueDate)->getDays();
         <div class="col-12 col-md-6 mb-3">
           <div class="row">
             <div class="col-12 mb-3">
-              <label for="member_name" class="form-label">Nama peminjam</label>
-              <input type="text" class="form-control" id="member_name" name="member_name" value="<?= "{$loan['first_name']} {$loan['last_name']}"; ?>" disabled>
+              <label class="form-label">Nama Peminjam</label>
+              <input type="text" class="form-control" value="<?= "{$loan['first_name']} {$loan['last_name']}"; ?>" disabled>
             </div>
             <div class="col-12 mb-3">
-              <label for="member_email" class="form-label">Email</label>
-              <input type="text" class="form-control" id="member_email" name="member_email" value="<?= $loan['email']; ?>" disabled>
+              <label class="form-label">No. Identitas</label>
+              <input type="text" class="form-control" value="<?= $loan['no_identitas']; ?>" disabled>
             </div>
             <div class="col-12 mb-3">
-              <label for="member_phone" class="form-label">Nomor telepon</label>
-              <input type="text" class="form-control" id="member_phone" name="member_phone" value="<?= $loan['phone']; ?>" disabled>
+              <label class="form-label">Tipe Anggota</label>
+              <input type="text" class="form-control" value="<?= $loan['tipe_anggota']; ?>" disabled>
             </div>
             <div class="col-12 mb-3">
-              <label for="member_address" class="form-label">Alamat</label>
-              <input type="text" class="form-control" id="member_address" name="member_address" value="<?= $loan['address']; ?>" disabled>
+              <label class="form-label">Email</label>
+              <input type="text" class="form-control" value="<?= $loan['email']; ?>" disabled>
+            </div>
+            <div class="col-12 mb-3">
+              <label class="form-label">Nomor Telepon</label>
+              <input type="text" class="form-control" value="<?= $loan['phone']; ?>" disabled>
             </div>
           </div>
         </div>

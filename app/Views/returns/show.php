@@ -56,9 +56,10 @@ if (session()->getFlashdata('msg')) : ?>
     <?php
     $memberData = [
       'Nama Lengkap'  => [$loan['first_name'] . ' ' . $loan['last_name']],
+      'No. Identitas' => $loan['no_identitas'],
+      'Tipe Anggota'  => $loan['tipe_anggota'],
       'Email'         => $loan['email'],
-      'Nomor telepon' => $loan['phone'],
-      'Alamat'        => $loan['address'],
+      'Nomor Telepon' => $loan['phone'],
     ];
 
     $bookData = [

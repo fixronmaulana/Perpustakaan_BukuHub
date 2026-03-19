@@ -63,10 +63,11 @@ if (session()->getFlashdata('msg')) : ?>
     <h5 class="card-title fw-semibold mb-4">Detail Peminjaman</h5>
     <?php
     $memberData = [
-      'Nama Lengkap'  => [$loan['first_name'] . ' ' . $loan['last_name']],
-      'Email'         => $loan['email'],
-      'Nomor telepon' => $loan['phone'],
-      'Alamat'        => $loan['address'],
+      'Nama Lengkap'    => [$loan['first_name'] . ' ' . $loan['last_name']],
+      'No. Identitas'   => $loan['no_identitas'],
+      'Tipe Anggota'    => $loan['tipe_anggota'],
+      'Email'           => $loan['email'],
+      'Nomor Telepon'   => $loan['phone'],
     ];
 
     $bookData = [

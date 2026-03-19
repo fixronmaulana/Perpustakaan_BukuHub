@@ -32,11 +32,11 @@
 
           $tableData = [
             'Nama Lengkap'  => [$member['first_name'] . ' ' . $member['last_name']],
+            'No. Identitas' => $member['no_identitas'],
+            'Tipe Anggota'  => $member['tipe_anggota'],
             'Email'         => $member['email'],
-            'Nomor telepon' => $member['phone'],
-            'Alamat'        => $member['address'],
-            'Tanggal lahir' => Time::parse($member['date_of_birth'], locale: 'id')->toLocalizedString('d MMMM Y'),
-            'Jenis kelamin' => $member['gender'] == 'Male' ? 'Laki-laki' : 'Perempuan',
+            'No. Telepon'   => $member['phone'],
+            'Jenis Kelamin' => $member['gender'] == 'Male' ? 'Laki-laki' : 'Perempuan',
           ];
           ?>
           <table>

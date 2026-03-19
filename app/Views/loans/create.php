@@ -18,20 +18,24 @@
       <h5 class="card-title fw-semibold mb-3">Data Anggota</h5>
       <div class="row">
         <div class="col-12 col-md-6 mb-3">
-          <label for="member_name" class="form-label">Nama anggota</label>
-          <input type="text" class="form-control" id="member_name" name="member_name" value="<?= "{$member['first_name']} {$member['last_name']}"; ?>" disabled>
+          <label class="form-label">Nama Anggota</label>
+          <input type="text" class="form-control" value="<?= "{$member['first_name']} {$member['last_name']}"; ?>" disabled>
         </div>
         <div class="col-12 col-md-6 mb-3">
-          <label for="member_email" class="form-label">Email</label>
-          <input type="text" class="form-control" id="member_email" name="member_email" value="<?= $member['email']; ?>" disabled>
+          <label class="form-label">No. Identitas</label>
+          <input type="text" class="form-control" value="<?= $member['no_identitas']; ?>" disabled>
         </div>
         <div class="col-12 col-md-6 mb-3">
-          <label for="member_phone" class="form-label">Nomor telepon</label>
-          <input type="text" class="form-control" id="member_phone" name="member_phone" value="<?= $member['phone']; ?>" disabled>
+          <label class="form-label">Tipe Anggota</label>
+          <input type="text" class="form-control" value="<?= $member['tipe_anggota']; ?>" disabled>
         </div>
         <div class="col-12 col-md-6 mb-3">
-          <label for="member_address" class="form-label">Alamat</label>
-          <input type="text" class="form-control" id="member_address" name="member_address" value="<?= $member['address']; ?>" disabled>
+          <label class="form-label">Nomor Telepon</label>
+          <input type="text" class="form-control" value="<?= $member['phone']; ?>" disabled>
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+          <label class="form-label">Email</label>
+          <input type="text" class="form-control" value="<?= $member['email']; ?>" disabled>
         </div>
       </div>
     </div>
@@ -44,7 +48,7 @@
         <?php foreach ($books as $book) : ?>
           <input type="hidden" name="slugs[]" value="<?= $book['slug']; ?>">
           <div class="col-12">
-            <div class="card border border-2 border-primary overflow-hidden position-relative">
+            <div class="card border border-primary overflow-hidden position-relative">
               <div class="card-body">
                 <div class="position-absolute top-50 start-0 translate-middle-y border border-black me-4" style="background-image: url(<?= base_url(BOOK_COVER_URI) . $book['book_cover']; ?>); height: 160px; width: 120px; background-position: center; background-size: cover;">
                 </div>
