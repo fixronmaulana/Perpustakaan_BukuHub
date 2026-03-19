@@ -55,9 +55,10 @@ $routes->group('member', ['filter' => 'memberFilter'], static function (RouteCol
     $routes->get('daftarbuku', 'Member\MemberDashboardController::daftarbuku');
     $routes->get('poin',        'Member\MemberDashboardController::poin');
     $routes->get('leaderboard', 'Member\MemberDashboardController::leaderboard');
-    $routes->get('profil', 'Member\MemberDashboardController::profil');
-    $routes->post('profil/update',   'Member\MemberDashboardController::updateProfil');
-    $routes->post('profil/password', 'Member\MemberDashboardController::updatePassword');
+    // routes profil member
+    $routes->get('profil', 'Member\MemberProfilController::index');
+    $routes->post('profil/update', 'Member\MemberProfilController::update');
+    $routes->post('profil/password', 'Member\MemberProfilController::updatePassword');
 });
 
 $routes->group('admin', ['filter' => 'session'], static function (RouteCollection $routes) {

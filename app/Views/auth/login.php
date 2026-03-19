@@ -44,7 +44,7 @@
       <?= csrf_field() ?>
 
       <div class="grup-input">
-        <label for="username">No. Identitas</label>
+        <label for="username">Username</label>
         <input
           type="text" id="username" name="username"
           inputmode="text" autocomplete="username"
