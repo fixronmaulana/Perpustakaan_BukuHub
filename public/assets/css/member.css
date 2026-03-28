@@ -924,7 +924,7 @@ body {
 }
 
 .kartu-qr {
-  width: 90px; height: 90px;
+  width: 120px; height: 120px;
   background: #fff; border-radius: 3px; padding: 5px;
   flex-shrink: 0; margin-right: 10px;
   display: flex; align-items: center; justify-content: center;
