@@ -8,6 +8,7 @@ use App\Models\MemberModel;
 use App\Models\LoanModel;
 use App\Models\FineModel;
 use CodeIgniter\Controller;
+use CodeIgniter\I18n\Time;
 
 class MemberDashboardController extends Controller
 {
@@ -49,17 +50,86 @@ class MemberDashboardController extends Controller
 
     public function peminjaman()
     {
+        $member = $this->getMember();
+        $now    = Time::now();
+
+        // Ambil semua peminjaman aktif member ini
+        $loans = $this->loanModel
+            ->select('loans.*, books.title, books.author, books.year')
+            ->join('books', 'loans.book_id = books.id', 'LEFT')
+            ->where('loans.member_id', $member['id'])
+            ->where('loans.return_date', null)
+            ->where('loans.deleted_at', null)
+            ->orderBy('loans.loan_date', 'DESC')
+            ->findAll();
+
+        // Hitung statistik
+        $sedangDipinjam = count($loans);
+        $terlambat      = 0;
+
+        foreach ($loans as &$loan) {
+            $dueDate       = Time::parse($loan['due_date']);
+            $loan['is_late']     = $now->isAfter($dueDate);
+            $loan['is_due_today'] = $now->toDateString() === $dueDate->toDateString();
+            if ($loan['is_late']) $terlambat++;
+        }
+        unset($loan);
+
+        // Total semua peminjaman (termasuk yang sudah kembali)
+        $totalPeminjaman = $this->loanModel
+            ->where('member_id', $member['id'])
+            ->where('deleted_at', null)
+            ->countAllResults();
+
         return view('member/peminjaman', [
-            'member'    => $this->getMember(),
-            'activeNav' => 'peminjaman',
+            'member'          => $member,
+            'activeNav'       => 'peminjaman',
+            'loans'           => $loans,
+            'sedangDipinjam'  => $sedangDipinjam,
+            'totalPeminjaman' => $totalPeminjaman,
+            'terlambat'       => $terlambat,
         ]);
     }
 
     public function pengembalian()
     {
+        $member = $this->getMember();
+
+        // Ambil semua peminjaman yang sudah dikembalikan
+        $returns = $this->loanModel
+            ->select('loans.*, books.title, books.author, books.year, fines.fine_amount, fines.amount_paid')
+            ->join('books', 'loans.book_id = books.id', 'LEFT')
+            ->join('fines', 'fines.loan_id = loans.id', 'LEFT')
+            ->where('loans.member_id', $member['id'])
+            ->where('loans.deleted_at', null)
+            ->where('loans.return_date IS NOT NULL', null, false)
+            ->orderBy('loans.return_date', 'DESC')
+            ->findAll();
+
+        // Hitung statistik
+        $totalKembali = count($returns);
+        $tepatWaktu   = 0;
+        $terlambat    = 0;
+
+        foreach ($returns as &$ret) {
+            $dueDate    = Time::parse($ret['due_date']);
+            $returnDate = Time::parse($ret['return_date']);
+            $isLate     = $returnDate->isAfter($dueDate);
+            $ret['is_late']    = $isLate;
+            $ret['days_late']  = $isLate
+                ? abs($returnDate->difference($dueDate)->getDays())
+                : 0;
+            if ($isLate) $terlambat++; else $tepatWaktu++;
+        }
+        unset($ret);
+
         return view('member/pengembalian', [
-            'member'    => $this->getMember(),
-            'activeNav' => 'pengembalian',
+            'member'       => $member,
+            'activeNav'    => 'pengembalian',
+            'returns'      => $returns,
+            'totalKembali' => $totalKembali,
+            'tepatWaktu'   => $tepatWaktu,
+            'terlambat'    => $terlambat,
         ]);
     }
 
