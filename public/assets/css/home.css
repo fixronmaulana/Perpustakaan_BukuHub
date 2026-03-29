@@ -172,14 +172,15 @@ body {
 
 /* Saat navbar solid — tombol login ganti jadi biru */
 .bilah-navigasi.menggulir .tombol-masuk {
-  background: var(--biru-aksen);
+  background: var(--putih);
   border-color: var(--biru-aksen);
-  color: var(--putih);
+  color: var(--biru-aksen);
 }
 
 .bilah-navigasi.menggulir .tombol-masuk:hover {
-  background: #2450b5;
-  border-color: #2450b5;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
 }
 /* ════════════════════════════════════════
    HERO (Halaman Beranda)
