@@ -10,32 +10,32 @@
 <?php use CodeIgniter\I18n\Time; ?>
 
 <!-- Statistik -->
-<div class="grid-stat">
-  <div class="kartu-stat">
-    <div class="isi-stat">
-      <div class="label-stat">Total Dikembalikan</div>
-      <div class="angka-stat"><?= $totalKembali ?></div>
-    </div>
-    <div class="ikon-stat-wrap hijau">
-      <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
-    </div>
-  </div>
-  <div class="kartu-stat">
-    <div class="isi-stat">
-      <div class="label-stat">Tepat Waktu</div>
-      <div class="angka-stat"><?= $tepatWaktu ?></div>
-    </div>
-    <div class="ikon-stat-wrap biru">
-      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+<div class="grid-stat" style="margin-bottom:1.25rem">
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+      </div>
+      <div class="ksa-angka"><?= $totalKembali ?></div>
+      <div class="ksa-label">Total Dikembalikan</div>
     </div>
   </div>
-  <div class="kartu-stat">
-    <div class="isi-stat">
-      <div class="label-stat">Terlambat</div>
-      <div class="angka-stat"><?= $terlambat ?></div>
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <div class="ksa-angka"><?= $tepatWaktu ?></div>
+      <div class="ksa-label">Tepat Waktu</div>
     </div>
-    <div class="ikon-stat-wrap merah">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  </div>
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="ksa-angka"><?= $terlambat ?></div>
+      <div class="ksa-label">Terlambat</div>
     </div>
   </div>
 </div>
@@ -52,7 +52,7 @@
   </div>
 
   <div class="bungkus-tabel">
-    <table class="tabel-member" id="tabel-pengembalian">
+    <table class="tabel-admin-member" id="tabel-pengembalian">
       <thead>
         <tr>
           <th style="width:40px">#</th>
@@ -61,13 +61,13 @@
           <th>Tenggat</th>
           <th>Tgl Kembali</th>
           <th>Keterlambatan</th>
-          <th>Status</th>
+          <th class="teks-center">Status</th>
         </tr>
       </thead>
       <tbody>
         <?php if (empty($returns)): ?>
           <tr>
-            <td colspan="7" class="teks-center" style="padding:2rem">
+            <td colspan="7">
               <div class="kondisi-kosong">
                 <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
                 <p>Belum ada riwayat pengembalian</p>
@@ -76,8 +76,8 @@
           </tr>
         <?php else: ?>
           <?php $i = 1; foreach ($returns as $ret):
-            $isLate    = $ret['is_late'];
-            $daysLate  = $ret['days_late'];
+            $isLate   = $ret['is_late'];
+            $daysLate = $ret['days_late'];
             $statusKey = $isLate ? 'terlambat' : 'tepat-waktu';
           ?>
             <tr data-status="<?= $statusKey ?>">
@@ -86,11 +86,11 @@
                 <div class="judul-tabel"><?= esc($ret['title']) ?> (<?= esc($ret['year']) ?>)</div>
                 <div class="penulis-tabel">Author: <?= esc($ret['author']) ?></div>
               </td>
-              <td class="tgl-normal"><?= Time::parse($ret['loan_date'])->format('d/m/Y') ?></td>
-              <td class="<?= $isLate ? 'tgl-terlambat' : 'tgl-normal' ?>">
-                <?= Time::parse($ret['due_date'])->format('d/m/Y') ?>
+              <td><b><?= Time::parse($ret['loan_date'])->format('d/m/Y') ?></b></td>
+              <td class="<?= $isLate ? 'tgl-terlambat' : '' ?>">
+                <b><?= Time::parse($ret['due_date'])->format('d/m/Y') ?></b>
               </td>
-              <td class="tgl-normal"><?= Time::parse($ret['return_date'])->format('d/m/Y') ?></td>
+              <td><b><?= Time::parse($ret['return_date'])->format('d/m/Y') ?></b></td>
               <td>
                 <?php if ($isLate): ?>
                   <span class="tgl-terlambat">+<?= $daysLate ?> hari</span>
@@ -98,11 +98,11 @@
                   <span class="teks-redup-sm">—</span>
                 <?php endif; ?>
               </td>
-              <td>
+              <td class="teks-center">
                 <?php if ($isLate): ?>
-                  <span class="badge terlambat">Terlambat</span>
+                  <span class="badge-admin merah">Terlambat</span>
                 <?php else: ?>
-                  <span class="badge kembali">Tepat Waktu</span>
+                  <span class="badge-admin hijau">Tepat Waktu</span>
                 <?php endif; ?>
               </td>
             </tr>

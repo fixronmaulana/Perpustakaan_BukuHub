@@ -61,7 +61,7 @@ body {
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(30, 58, 138, 0.12); /* Navy subtle border */
-  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.07); /* Depth sync dengan topbar */
+  box-shadow: 1px 0 10px rgba(15, 23, 42, 0.07); /* Depth sync dengan topbar */
   z-index: 200;
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -591,7 +591,7 @@ body {
   stroke: #dc2626;
 }
 .area-halaman {
-  flex: 1; padding: 1.5rem 1.75rem 2.5rem;
+  flex: 1; padding: 1.5rem 2.5rem 2.5rem;
 }
 
 /* ════════════════════════════════════════
@@ -651,7 +651,7 @@ body {
   background: var(--putih);
   border: 1px solid var(--batas); border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(13, 27, 62, 0.03);;
   margin-bottom: 1.25rem;
 }
 
@@ -1834,3 +1834,112 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
   .kelas-podium   { display: none; }
   .avatar-podium  { width: 48px; height: 48px; font-size: 1.1rem; }
 }
+
+/* ════════════════════════════════════════
+   CARD STATISTIK — mirip admin
+   ════════════════════════════════════════ */
+.kartu-stat-admin {
+  background: var(--putih);
+  border: 1px solid var(--batas);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(13,27,62,0.07);
+  transition: box-shadow 0.18s;
+}
+
+.kartu-stat-admin:hover {
+  box-shadow: 0 2px 8px rgba(13,27,62,0.07);
+}
+
+.ksa-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ksa-icon {
+  margin-bottom: 0.4rem;
+}
+
+.ksa-icon svg {
+  stroke: var(--teks);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+}
+
+.ksa-angka {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--teks);
+  line-height: 1.1;
+}
+
+.ksa-label {
+  font-size: 0.8rem;
+  color: var(--teks-redup);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* ════════════════════════════════════════
+   TABEL — mirip admin
+   ════════════════════════════════════════ */
+.tabel-admin-member {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.855rem;
+}
+
+.tabel-admin-member thead tr {
+  background: #f8f9fa;
+}
+
+.tabel-admin-member th {
+  padding: 0.65rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--teks);
+  text-align: left;
+  border-bottom: 1px solid var(--batas);
+  white-space: nowrap;
+}
+
+.tabel-admin-member td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--batas);
+  vertical-align: middle;
+  color: var(--teks);
+}
+
+.tabel-admin-member tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabel-admin-member tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.tabel-admin-member tbody tr:hover {
+  background: #e9ecef;
+}
+
+/* ════════════════════════════════════════
+   BADGE — mirip admin
+   ════════════════════════════════════════ */
+.badge-admin {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-admin.biru   { background: #cfe2ff; color: #084298; }
+.badge-admin.hijau  { background: #d1e7dd; color: #0a3622; }
+.badge-admin.merah  { background: #f8d7da; color: #842029; }
+.badge-admin.kuning { background: #fff3cd; color: #664d03; }

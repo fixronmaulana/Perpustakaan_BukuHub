@@ -9,38 +9,38 @@
 <?= $this->section('content') ?>
 <?php use CodeIgniter\I18n\Time; $now = Time::now(); ?>
 
-<!-- Statistik -->
-<div class="grid-stat">
-  <div class="kartu-stat">
-    <div class="isi-stat">
-      <div class="label-stat">Sedang Dipinjam</div>
-      <div class="angka-stat"><?= $sedangDipinjam ?></div>
-    </div>
-    <div class="ikon-stat-wrap biru">
-      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-    </div>
-  </div>
-  <div class="kartu-stat">
-    <div class="isi-stat">
-      <div class="label-stat">Total Peminjaman</div>
-      <div class="angka-stat"><?= $totalPeminjaman ?></div>
-    </div>
-    <div class="ikon-stat-wrap hijau">
-      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+<!-- Statistik — mirip admin -->
+<div class="grid-stat" style="margin-bottom:1.25rem">
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      </div>
+      <div class="ksa-angka"><?= $sedangDipinjam ?></div>
+      <div class="ksa-label">Sedang Dipinjam</div>
     </div>
   </div>
-  <div class="kartu-stat">
-    <div class="isi-stat">
-      <div class="label-stat">Terlambat</div>
-      <div class="angka-stat"><?= $terlambat ?></div>
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <div class="ksa-angka"><?= $totalPeminjaman ?></div>
+      <div class="ksa-label">Total Peminjaman</div>
     </div>
-    <div class="ikon-stat-wrap merah">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  </div>
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="ksa-angka"><?= $terlambat ?></div>
+      <div class="ksa-label">Terlambat</div>
     </div>
   </div>
 </div>
 
-<!-- Tabel -->
+<!-- Tabel — mirip admin -->
 <div class="kotak-konten">
   <div class="kepala-kotak">
     <h3>Peminjaman Aktif</h3>
@@ -53,21 +53,21 @@
   </div>
 
   <div class="bungkus-tabel">
-    <table class="tabel-member" id="tabel-peminjaman">
+    <table class="tabel-admin-member" id="tabel-peminjaman">
       <thead>
         <tr>
           <th style="width:40px">#</th>
           <th>Judul Buku</th>
-          <th style="width:70px" class="teks-center">Jumlah</th>
+          <th style="width:80px" class="teks-center">Jumlah</th>
           <th>Tgl Pinjam</th>
           <th>Tenggat</th>
-          <th>Status</th>
+          <th class="teks-center">Status</th>
         </tr>
       </thead>
       <tbody>
         <?php if (empty($loans)): ?>
           <tr>
-            <td colspan="6" class="teks-center" style="padding:2rem">
+            <td colspan="6">
               <div class="kondisi-kosong">
                 <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
                 <p>Tidak ada peminjaman aktif</p>
@@ -76,13 +76,12 @@
           </tr>
         <?php else: ?>
           <?php $i = 1; foreach ($loans as $loan):
-            $dueDate  = Time::parse($loan['due_date']);
-            $isLate   = $loan['is_late'];
+            $dueDate    = Time::parse($loan['due_date']);
+            $isLate     = $loan['is_late'];
             $isDueToday = $loan['is_due_today'];
-
-            if ($isLate)      { $statusKey = 'terlambat';  $badgeClass = 'terlambat'; $badgeLabel = 'Terlambat'; }
-            elseif ($isDueToday) { $statusKey = 'jatuh-tempo'; $badgeClass = 'jatuh-tempo'; $badgeLabel = 'Jatuh Tempo'; }
-            else              { $statusKey = 'dipinjam';   $badgeClass = 'dipinjam';  $badgeLabel = 'Dipinjam'; }
+            if ($isLate)        { $statusKey = 'terlambat';  $badgeClass = 'badge-admin merah'; $badgeLabel = 'Terlambat'; }
+            elseif ($isDueToday){ $statusKey = 'jatuh-tempo';$badgeClass = 'badge-admin kuning';$badgeLabel = 'Jatuh Tempo'; }
+            else                { $statusKey = 'dipinjam';   $badgeClass = 'badge-admin biru';  $badgeLabel = 'Dipinjam'; }
           ?>
             <tr data-status="<?= $statusKey ?>">
               <td class="teks-redup-sm"><?= $i++ ?></td>
@@ -91,14 +90,16 @@
                 <div class="penulis-tabel">Author: <?= esc($loan['author']) ?></div>
               </td>
               <td class="teks-center"><?= $loan['quantity'] ?></td>
-              <td class="tgl-normal">
-                <?= Time::parse($loan['loan_date'])->format('d/m/Y') ?><br>
+              <td>
+                <b><?= Time::parse($loan['loan_date'])->format('d/m/Y') ?></b><br>
                 <span class="teks-redup-sm"><?= Time::parse($loan['loan_date'])->format('H:i:s') ?></span>
               </td>
-              <td class="<?= $isLate ? 'tgl-terlambat' : 'tgl-normal' ?>">
-                <?= $dueDate->format('d/m/Y') ?>
+              <td class="<?= $isLate ? 'tgl-terlambat' : '' ?>">
+                <b><?= $dueDate->format('d/m/Y') ?></b>
               </td>
-              <td><span class="badge <?= $badgeClass ?>"><?= $badgeLabel ?></span></td>
+              <td class="teks-center">
+                <span class="<?= $badgeClass ?>"><?= $badgeLabel ?></span>
+              </td>
             </tr>
           <?php endforeach; ?>
         <?php endif; ?>
