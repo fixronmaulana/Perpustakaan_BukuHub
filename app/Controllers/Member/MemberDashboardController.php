@@ -27,18 +27,63 @@ class MemberDashboardController extends Controller
         $this->categoryModel = new CategoryModel();
     }
 
+    public function index()
+    {
+        $member = $this->getMember();
+        $now    = Time::now();
+
+        $semuaPinjaman = $this->loanModel
+            ->select('loans.*, books.title, books.author, books.year')
+            ->join('books', 'loans.book_id = books.id', 'LEFT')
+            ->where('loans.member_id', $member['id'])
+            ->where('loans.return_date', null)
+            ->where('loans.deleted_at', null)
+            ->orderBy('loans.loan_date', 'DESC')
+            ->findAll();
+
+        $sedangDipinjam = count($semuaPinjaman);
+        $terlambat      = 0;
+        foreach ($semuaPinjaman as $loan) {
+            if ($now->isAfter(Time::parse($loan['due_date']))) $terlambat++;
+        }
+
+        $pinjamanAktif = array_slice($semuaPinjaman, 0, 5);
+
+        $semuaKembali = $this->loanModel
+            ->select('loans.*, books.title, books.author, books.year')
+            ->join('books', 'loans.book_id = books.id', 'LEFT')
+            ->where('loans.member_id', $member['id'])
+            ->where('loans.deleted_at', null)
+            ->where('loans.return_date IS NOT NULL', null, false)
+            ->orderBy('loans.return_date', 'DESC')
+            ->findAll();
+
+        $totalKembali = count($semuaKembali);
+        foreach ($semuaKembali as &$ret) {
+            $ret['is_late'] = Time::parse($ret['return_date'])
+                ->isAfter(Time::parse($ret['due_date']));
+        }
+        unset($ret);
+
+        $pengembalianTerakhir = array_slice($semuaKembali, 0, 5);
+
+        return view('member/dashboard', [
+            'member'               => $member,
+            'activeNav'            => 'dashboard',
+            'sedangDipinjam'       => $sedangDipinjam,
+            'terlambat'            => $terlambat,
+            'totalKembali'         => $totalKembali,
+            'pinjamanAktif'        => $pinjamanAktif,
+            'pengembalianTerakhir' => $pengembalianTerakhir,
+            'peringatan'           => $terlambat,
+        ]);
+    }
+
     private function getMember(): array|null
     {
         return $this->memberModel->where('user_id', auth()->id())->first();
     }
 
-    public function index()
-    {
-        return view('member/dashboard', [
-            'member'    => $this->getMember(),
-            'activeNav' => 'dashboard',
-        ]);
-    }
 
     public function kartu()
     {
