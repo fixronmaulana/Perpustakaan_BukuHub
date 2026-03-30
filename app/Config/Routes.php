@@ -70,6 +70,14 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
     $routes->resource('categories', ['controller' => 'Books\CategoriesController']);
     $routes->resource('racks', ['controller' => 'Books\RacksController']);
 
+    // Kunjungan
+    $routes->get('kunjungan',           'Admin\VisitsController::index');
+    $routes->get('kunjungan/new',       'Admin\VisitsController::create');
+    $routes->post('kunjungan',          'Admin\VisitsController::store');
+    $routes->post('kunjungan/scan',     'Admin\VisitsController::scanQr');
+    $routes->get('kunjungan/search',    'Admin\VisitsController::searchMember');
+    $routes->delete('kunjungan/(:num)', 'Admin\VisitsController::delete/$1');
+
     $routes->get('loans/new/members/search', 'Loans\LoansController::searchMember');
     $routes->get('loans/new/books/search', 'Loans\LoansController::searchBook');
     $routes->post('loans/new', 'Loans\LoansController::new');

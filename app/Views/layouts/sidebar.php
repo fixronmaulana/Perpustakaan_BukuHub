@@ -25,6 +25,11 @@ $sidebarNavs = [
     'link' => '/admin/fines',
     'icon' => 'ti ti-report-money'
   ],
+  [
+    'name' => 'Kunjungan',
+    'link' => '/admin/kunjungan',
+    'icon' => 'ti ti-door-enter'
+  ],
   'Master',
   [
     'name' => 'Anggota',
