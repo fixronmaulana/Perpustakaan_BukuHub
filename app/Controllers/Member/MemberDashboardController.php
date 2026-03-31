@@ -274,4 +274,25 @@ class MemberDashboardController extends Controller
             'itemPerPage' => $itemPerPage,
         ]);
     }
+
+    public function detailBuku($slug = null)
+    {
+        $book = $this->bookModel
+            ->select('books.*, book_stock.quantity, categories.name as category, racks.name as rack')
+            ->join('book_stock', 'books.id = book_stock.book_id', 'LEFT')
+            ->join('categories', 'books.category_id = categories.id', 'LEFT')
+            ->join('racks', 'books.rack_id = racks.id', 'LEFT')
+            ->where('books.slug', $slug)
+            ->first();
+
+        if (empty($book)) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Buku tidak ditemukan');
+        }
+
+        return view('member/detail_buku', [
+            'member'    => $this->getMember(),
+            'activeNav' => 'daftarbuku',
+            'book'      => $book,
+        ]);
+    }
 }
