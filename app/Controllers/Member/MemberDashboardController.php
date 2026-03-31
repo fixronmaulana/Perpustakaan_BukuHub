@@ -7,6 +7,7 @@ use App\Models\CategoryModel;
 use App\Models\MemberModel;
 use App\Models\LoanModel;
 use App\Models\FineModel;
+use App\Models\VisitModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 
@@ -196,9 +197,26 @@ class MemberDashboardController extends Controller
 
     public function kunjungan()
     {
+        $member    = $this->getMember();
+        $bulanIni  = (int) date('n');
+        $tahunIni  = (int) date('Y');
+
+        $visits = (new VisitModel())
+            ->where('member_id', $member['id'])
+            ->orderBy('visit_date', 'DESC')
+            ->findAll();
+
+        $kunjunganBulanIni = count(array_filter($visits, function($v) use ($bulanIni, $tahunIni) {
+            $d = \CodeIgniter\I18n\Time::parse($v['visit_date']);
+            return (int)$d->format('n') === $bulanIni && (int)$d->format('Y') === $tahunIni;
+        }));
+
         return view('member/kunjungan', [
-            'member'    => $this->getMember(),
-            'activeNav' => 'kunjungan',
+            'member'            => $member,
+            'activeNav'         => 'kunjungan',
+            'visits'            => $visits,
+            'totalKunjungan'    => count($visits),
+            'kunjunganBulanIni' => $kunjunganBulanIni,
         ]);
     }
 

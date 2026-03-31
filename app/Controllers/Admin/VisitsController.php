@@ -18,7 +18,6 @@ class VisitsController extends BaseController
         $this->memberModel = new MemberModel();
     }
 
-    // ── Daftar semua kunjungan ──────────────────────────────
     public function index()
     {
         $itemPerPage = 20;
@@ -31,25 +30,23 @@ class VisitsController extends BaseController
 
         if ($search) {
             $query->groupStart()
-                ->like('members.first_name', $search, insensitiveSearch: true)
+                ->like('members.first_name',   $search, insensitiveSearch: true)
                 ->orLike('members.last_name',  $search, insensitiveSearch: true)
                 ->orLike('members.no_identitas', $search, insensitiveSearch: true)
                 ->groupEnd();
         }
 
         $visits = $query->paginate($itemPerPage, 'visits');
-        $pager  = $this->visitModel->pager;
 
         return view('visits/index', [
             'visits'      => $visits,
-            'pager'       => $pager,
+            'pager'       => $this->visitModel->pager,
             'search'      => $search,
             'currentPage' => $this->request->getGet('page_visits') ?? 1,
             'itemPerPage' => $itemPerPage,
         ]);
     }
 
-    // ── Form kunjungan manual ───────────────────────────────
     public function create()
     {
         return view('visits/create', [
@@ -57,13 +54,12 @@ class VisitsController extends BaseController
         ]);
     }
 
-    // ── Simpan kunjungan manual ─────────────────────────────
     public function store()
     {
         if (!$this->validate([
-            'member_uid'  => 'required',
-            'visit_date'  => 'required|valid_date',
-            'notes'       => 'permit_empty|max_length[500]',
+            'member_uid' => 'required',
+            'visit_date' => 'required|valid_date',
+            'notes'      => 'permit_empty|max_length[500]',
         ])) {
             return view('visits/create', [
                 'validation' => \Config\Services::validation(),
@@ -77,11 +73,27 @@ class VisitsController extends BaseController
 
         if (empty($member)) {
             return view('visits/create', [
-                'validation' => \Config\Services::validation(),
-                'oldInput'   => $this->request->getPost(),
+                'validation'  => \Config\Services::validation(),
+                'oldInput'    => $this->request->getPost(),
                 'errorMember' => 'Anggota tidak ditemukan.',
             ]);
         }
+
+        // ── Validasi: cek kunjungan hari yang sama ──────────
+        $tanggalInput = date('Y-m-d', strtotime($this->request->getPost('visit_date')));
+        $sudahKunjungan = $this->visitModel
+            ->where('member_id', $member['id'])
+            ->where("DATE(visit_date)", $tanggalInput)
+            ->first();
+
+        if ($sudahKunjungan) {
+            return view('visits/create', [
+                'validation'  => \Config\Services::validation(),
+                'oldInput'    => $this->request->getPost(),
+                'errorMember' => esc($member['first_name']) . ' sudah tercatat berkunjung pada tanggal ' . date('d/m/Y', strtotime($tanggalInput)) . '. Satu anggota hanya bisa berkunjung sekali dalam sehari.',
+            ]);
+        }
+        // ────────────────────────────────────────────────────
 
         $this->visitModel->insert([
             'member_id'  => $member['id'],
@@ -94,7 +106,6 @@ class VisitsController extends BaseController
         return redirect()->to('admin/kunjungan');
     }
 
-    // ── Scan QR — dipanggil via AJAX ───────────────────────
     public function scanQr()
     {
         if (!$this->request->isAJAX()) {
@@ -119,7 +130,6 @@ class VisitsController extends BaseController
             ]);
         }
 
-        // Cek apakah sudah ada kunjungan hari ini
         $today = Time::now()->toDateString();
         $sudahKunjungan = $this->visitModel
             ->where('member_id', $member['id'])
@@ -129,7 +139,7 @@ class VisitsController extends BaseController
         if ($sudahKunjungan) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Anggota ' . $member['first_name'] . ' sudah tercatat berkunjung hari ini.',
+                'message' => $member['first_name'] . ' sudah tercatat berkunjung hari ini.',
                 'member'  => [
                     'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
                     'no_identitas' => $member['no_identitas'],
@@ -138,7 +148,6 @@ class VisitsController extends BaseController
             ]);
         }
 
-        // Simpan kunjungan
         $this->visitModel->insert([
             'member_id'  => $member['id'],
             'visit_date' => Time::now()->toDateTimeString(),
@@ -157,7 +166,6 @@ class VisitsController extends BaseController
         ]);
     }
 
-    // ── Hapus kunjungan ─────────────────────────────────────
     public function delete($id = null)
     {
         $visit = $this->visitModel->find($id);
@@ -173,7 +181,6 @@ class VisitsController extends BaseController
         return redirect()->to('admin/kunjungan');
     }
 
-    // ── Search member via AJAX (untuk form manual) ──────────
     public function searchMember()
     {
         if (!$this->request->isAJAX()) {
@@ -187,8 +194,8 @@ class VisitsController extends BaseController
         }
 
         $members = $this->memberModel
-            ->like('first_name',   $param, insensitiveSearch: true)
-            ->orLike('last_name',  $param, insensitiveSearch: true)
+            ->like('first_name',     $param, insensitiveSearch: true)
+            ->orLike('last_name',    $param, insensitiveSearch: true)
             ->orLike('no_identitas', $param, insensitiveSearch: true)
             ->where('deleted_at', null)
             ->findAll(10);
