@@ -11,16 +11,16 @@
   --emas-muda:    #f5e6b8;
   --biru:         #1e3a8a;
   --biru-muda:    #3b82f6;
-  --hijau:        #10b981;
-  --hijau-muda:   #d1fae5;
-  --merah:        #ef4444;
-  --merah-muda:   #fee2e2;
+  --hijau:        #0a3622;
+  --hijau-muda:   #d1e7dd;
+  --merah:        #842029;
+  --merah-muda:   #f8d7da;
   --putih:        #ffffff;
   --latar:        #f4f6fb;
   --latar-2:      #eef0f7;
   --teks:         #1a2340;
   --teks-redup:   #8492b4;
-  --batas:        #e4e8f4;
+  --batas:        #f1f2f8;
   --sidebar-w:    240px;
   --topbar-h:     64px;
   --radius:       12px;
@@ -649,7 +649,7 @@ body {
    ════════════════════════════════════════ */
 .kotak-konten {
   background: var(--putih);
-  border: 1px solid var(--batas); border-radius: var(--radius);
+  border: 1px solid var(--batas); border-radius: 5px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(13, 27, 62, 0.03);;
   margin-bottom: 1.25rem;
@@ -796,7 +796,7 @@ body {
 .kotak-kartu-wrapper {
   background: var(--putih);
   border: 1px solid var(--batas);
-  border-radius: 16px;
+  border-radius: 5px;
   padding: 2.5rem 2rem 2rem;
   width: 100%;
   max-width: 820px;
@@ -1841,9 +1841,9 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
 .kartu-stat-admin {
   background: var(--putih);
   border: 1px solid var(--batas);
-  border-radius: var(--radius);
+  border-radius: 5px;
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 2px 5px rgba(13,27,62,0.04);
+  box-shadow: 0 1px 7px rgba(13,27,62,0.03);
   transition: box-shadow 0.18s;
 }
 

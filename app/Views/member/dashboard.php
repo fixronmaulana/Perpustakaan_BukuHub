@@ -47,7 +47,7 @@
       <div class="ksa-icon">
         <svg viewBox="0 0 24 24" width="22" height="22"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       </div>
-      <div class="ksa-angka">11</div>
+      <div class="ksa-angka"><?= $kunjunganBulanIni ?></div>
       <div class="ksa-label">Kunjungan Bulan Ini</div>
     </div>
   </div>

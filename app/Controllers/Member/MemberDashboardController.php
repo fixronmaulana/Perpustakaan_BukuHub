@@ -18,6 +18,7 @@ class MemberDashboardController extends Controller
     protected FineModel     $fineModel;
     protected BookModel     $bookModel;
     protected CategoryModel $categoryModel;
+    protected VisitModel $visitModel;
 
     public function __construct()
     {
@@ -26,12 +27,25 @@ class MemberDashboardController extends Controller
         $this->fineModel     = new FineModel();
         $this->bookModel     = new BookModel();
         $this->categoryModel = new CategoryModel();
+        $this->visitModel = new VisitModel();
     }
 
     public function index()
     {
         $member = $this->getMember();
         $now    = Time::now();
+
+        $bulanIni = (int) date('n');
+        $tahunIni = (int) date('Y');
+
+        $visits = $this->visitModel
+            ->where('member_id', $member['id'])
+            ->findAll();
+
+        $kunjunganBulanIni = count(array_filter($visits, function($v) use ($bulanIni, $tahunIni) {
+            $d = \CodeIgniter\I18n\Time::parse($v['visit_date']);
+            return (int)$d->format('n') === $bulanIni && (int)$d->format('Y') === $tahunIni;
+        }));
 
         $semuaPinjaman = $this->loanModel
             ->select('loans.*, books.title, books.author, books.year')
@@ -77,6 +91,7 @@ class MemberDashboardController extends Controller
             'pinjamanAktif'        => $pinjamanAktif,
             'pengembalianTerakhir' => $pengembalianTerakhir,
             'peringatan'           => $terlambat,
+            'kunjunganBulanIni'    => $kunjunganBulanIni,
         ]);
     }
 
