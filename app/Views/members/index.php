@@ -31,6 +31,11 @@
               <button class="btn btn-outline-secondary" type="submit">Cari</button>
             </div>
           </form>
+          <!-- Tombol Import -->
+          <a href="<?= base_url('admin/members/import') ?>" 
+   class="btn btn-success text-nowrap">
+  <i class="ti ti-file-import"></i> Import
+</a>
           <a href="<?= base_url('admin/members/new'); ?>" class="btn btn-primary text-nowrap">
             <i class="ti ti-plus"></i> Tambah Anggota
           </a>

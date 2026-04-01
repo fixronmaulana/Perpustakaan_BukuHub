@@ -354,4 +354,10 @@ class MembersController extends ResourceController
         session()->setFlashdata(['msg' => 'Member deleted successfully']);
         return redirect()->to('admin/members');
     }
+
+    public function importForm()
+    {
+        return view('members/import');
+    }
+    
 }

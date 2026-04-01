@@ -66,12 +66,15 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
     $routes->get('/', 'Dashboard\DashboardController');
     $routes->get('dashboard', 'Dashboard\DashboardController::dashboard');
 
+    $routes->get('members/import',          'Members\MembersController::importForm');
+    $routes->post('members/import',         'Members\MembersController::importProcess');
+    $routes->get('members/import/template', 'Members\MembersController::importTemplate');
+
     $routes->resource('members', ['controller' => 'Members\MembersController']);
     $routes->resource('books', ['controller' => 'Books\BooksController']);
     $routes->resource('categories', ['controller' => 'Books\CategoriesController']);
     $routes->resource('racks', ['controller' => 'Books\RacksController']);
 
-    // Kunjungan
     $routes->get('kunjungan',           'Admin\VisitsController::index');
     $routes->get('kunjungan/new',       'Admin\VisitsController::create');
     $routes->post('kunjungan',          'Admin\VisitsController::store');

@@ -66,7 +66,6 @@
       <div><b>ISBN</b></div>
       <div>: <?= esc($book['isbn'] ?? '-') ?></div>
 
-      <!-- 🔥 STOK LEBIH JELAS -->
       <div><b>Stok Buku</b></div>
       <div>
         <span class="status-stok <?= $class ?>">
