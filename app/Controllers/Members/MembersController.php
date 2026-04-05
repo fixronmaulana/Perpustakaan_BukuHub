@@ -13,6 +13,9 @@ use CodeIgniter\I18n\Time;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\Shield\Entities\User;
 use CodeIgniter\Shield\Models\UserModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class MembersController extends ResourceController
 {
@@ -55,15 +58,13 @@ class MembersController extends ResourceController
             $members = $this->memberModel->paginate($itemPerPage, 'members');
         }
 
-        $data = [
+        return view('members/index', [
             'members'     => $members,
             'pager'       => $this->memberModel->pager,
             'currentPage' => $this->request->getVar('page_categories') ?? 1,
             'itemPerPage' => $itemPerPage,
             'search'      => $this->request->getGet('search'),
-        ];
-
-        return view('members/index', $data);
+        ]);
     }
 
     public function show($uid = null)
@@ -89,39 +90,29 @@ class MembersController extends ResourceController
             fn($carry, $item) => $carry + $item
         );
 
-        $return = array_filter($loans, fn($loan) => $loan['return_date'] != null);
-
+        $return    = array_filter($loans, fn($loan) => $loan['return_date'] != null);
         $lateLoans = array_filter($loans, fn($loan) =>
             $loan['return_date'] == null && Time::now()->isAfter(Time::parse($loan['due_date']))
         );
 
-        $totalFines = array_reduce(
-            array_map(fn($fine) => $fine['fine_amount'], $fines),
-            fn($carry, $item) => $carry + $item
-        );
-
-        $paidFines = array_reduce(
-            array_map(fn($fine) => $fine['amount_paid'], $fines),
-            fn($carry, $item) => $carry + $item
-        );
-
+        $totalFines  = array_reduce(array_map(fn($f) => $f['fine_amount'],  $fines), fn($c, $i) => $c + $i);
+        $paidFines   = array_reduce(array_map(fn($f) => $f['amount_paid'],  $fines), fn($c, $i) => $c + $i);
         $unpaidFines = $totalFines - $paidFines;
 
         if (!file_exists(MEMBERS_QR_CODE_PATH . $member['qr_code']) || empty($member['qr_code'])) {
-            $qrGenerator  = new QRGenerator();
-            $qrCodeLabel  = $member['first_name'] . ($member['last_name'] ? ' ' . $member['last_name'] : '');
-            $qrCode       = $qrGenerator->generateQRCode(
+            $qrGenerator = new QRGenerator();
+            $qrCodeLabel = $member['first_name'] . ($member['last_name'] ? ' ' . $member['last_name'] : '');
+            $qrCode      = $qrGenerator->generateQRCode(
                 $member['uid'],
                 labelText: $qrCodeLabel,
                 dir: MEMBERS_QR_CODE_PATH,
                 filename: $qrCodeLabel
             );
-
             $this->memberModel->update($member['id'], ['qr_code' => $qrCode]);
             $member = $this->memberModel->where('uid', $uid)->first();
         }
 
-        $data = [
+        return view('members/show', [
             'member'         => $member,
             'totalBooksLent' => $totakBooksLent,
             'loanCount'      => count($loans),
@@ -129,9 +120,7 @@ class MembersController extends ResourceController
             'lateCount'      => count($lateLoans),
             'unpaidFines'    => $unpaidFines,
             'paidFines'      => $paidFines,
-        ];
-
-        return view('members/show', $data);
+        ]);
     }
 
     public function new()
@@ -158,31 +147,26 @@ class MembersController extends ResourceController
             ]);
         }
 
-        $firstName    = $this->request->getVar('first_name');
-        $lastName     = $this->request->getVar('last_name');
-        $noIdentitas  = $this->request->getVar('no_identitas');
-        $tipeAnggota  = $this->request->getVar('tipe_anggota');
-        $email        = $this->request->getVar('email') ?? '';
-        $phone        = $this->request->getVar('phone') ?? '';
-        $gender       = $this->request->getVar('gender');
+        $firstName   = $this->request->getVar('first_name');
+        $lastName    = $this->request->getVar('last_name');
+        $noIdentitas = $this->request->getVar('no_identitas');
+        $tipeAnggota = $this->request->getVar('tipe_anggota');
+        $email       = $this->request->getVar('email') ?? '';
+        $phone       = $this->request->getVar('phone') ?? '';
+        $gender      = $this->request->getVar('gender');
 
-        // ── Buat akun Shield ──────────────────────────────────────────
-        // Username = no_identitas, password = no_identitas
         $shieldUser = new User([
             'username' => $noIdentitas,
-            'email'    => $email ?: $noIdentitas . '@member.local', // email dummy jika kosong
+            'email'    => $email ?: $noIdentitas . '@member.local',
             'password' => $noIdentitas,
         ]);
-
         $this->userModel->save($shieldUser);
         $shieldUser = $this->userModel->findById($this->userModel->getInsertID());
         $shieldUser->addGroup('member');
         $shieldUser->activate();
         $userId = $shieldUser->id;
-        // ─────────────────────────────────────────────────────────────
 
-        $uid = sha1($firstName . $noIdentitas . rand(0, 1000) . md5($gender));
-
+        $uid         = sha1($firstName . $noIdentitas . rand(0, 1000) . md5($gender));
         $qrGenerator = new QRGenerator();
         $qrCodeLabel = $firstName . ($lastName ? ' ' . $lastName : '');
         $qrCode      = $qrGenerator->generateQRCode(
@@ -204,9 +188,7 @@ class MembersController extends ResourceController
             'gender'       => $gender,
             'qr_code'      => $qrCode,
         ])) {
-            // Rollback: hapus Shield user
             $this->userModel->delete($userId, purge: true);
-
             session()->setFlashdata(['msg' => 'Insert failed']);
             return view('members/create', [
                 'validation' => \Config\Services::validation(),
@@ -221,10 +203,7 @@ class MembersController extends ResourceController
     public function edit($uid = null)
     {
         $member = $this->memberModel->where('uid', $uid)->first();
-
-        if (empty($member)) {
-            throw new PageNotFoundException('Member not found');
-        }
+        if (empty($member)) throw new PageNotFoundException('Member not found');
 
         return view('members/edit', [
             'member'     => $member,
@@ -235,10 +214,7 @@ class MembersController extends ResourceController
     public function update($uid = null)
     {
         $member = $this->memberModel->where('uid', $uid)->first();
-
-        if (empty($member)) {
-            throw new PageNotFoundException('Member not found');
-        }
+        if (empty($member)) throw new PageNotFoundException('Member not found');
 
         if (!$this->validate([
             'first_name'   => 'required|alpha_numeric_punct|max_length[100]',
@@ -264,38 +240,24 @@ class MembersController extends ResourceController
         $phone       = $this->request->getVar('phone') ?? '';
         $gender      = $this->request->getVar('gender');
 
-        // Cek apakah data yang mempengaruhi uid berubah
-        $isChanged = ($firstName    != $member['first_name']
-            || $noIdentitas != $member['no_identitas']);
-
-        $newUid = $isChanged
+        $isChanged = ($firstName != $member['first_name'] || $noIdentitas != $member['no_identitas']);
+        $newUid    = $isChanged
             ? sha1($firstName . $noIdentitas . rand(0, 1000) . md5($gender))
             : $member['uid'];
 
         if ($isChanged) {
             $qrGenerator = new QRGenerator();
             $qrCodeLabel = $firstName . ($lastName ? ' ' . $lastName : '');
-            $qrCode      = $qrGenerator->generateQRCode(
-                $newUid,
-                labelText: $qrCodeLabel,
-                dir: MEMBERS_QR_CODE_PATH,
-                filename: $qrCodeLabel
-            );
+            $qrCode      = $qrGenerator->generateQRCode($newUid, labelText: $qrCodeLabel, dir: MEMBERS_QR_CODE_PATH, filename: $qrCodeLabel);
             deleteMembersQRCode($member['qr_code']);
         } else {
             $qrCode = $member['qr_code'];
         }
 
-        // ── Update akun Shield jika no_identitas berubah ──────────────
-        // no_identitas tidak boleh diubah dari sisi anggota,
-        // tapi admin tetap bisa update jika diperlukan
         if (!empty($member['user_id'])) {
             $shieldUser = $this->userModel->findById($member['user_id']);
             if ($shieldUser) {
-                $updateData = [
-                    'email' => $email ?: $noIdentitas . '@member.local',
-                ];
-                // Jika no_identitas berubah, update username Shield juga
+                $updateData = ['email' => $email ?: $noIdentitas . '@member.local'];
                 if ($noIdentitas != $member['no_identitas']) {
                     $updateData['username'] = $noIdentitas;
                     $updateData['password'] = $noIdentitas;
@@ -304,7 +266,6 @@ class MembersController extends ResourceController
                 $this->userModel->save($shieldUser);
             }
         }
-        // ─────────────────────────────────────────────────────────────
 
         if (!$this->memberModel->save([
             'id'           => $member['id'],
@@ -333,16 +294,25 @@ class MembersController extends ResourceController
     public function delete($uid = null)
     {
         $member = $this->memberModel->where('uid', $uid)->first();
+        if (empty($member)) throw new PageNotFoundException('Member not found');
 
-        if (empty($member)) {
-            throw new PageNotFoundException('Member not found');
+        // Cek peminjaman aktif
+        $pinjamanAktif = $this->loanModel->where([
+            'member_id'   => $member['id'],
+            'return_date' => null,
+        ])->countAllResults();
+
+        if ($pinjamanAktif > 0) {
+            session()->setFlashdata([
+                'msg'   => 'Anggota tidak dapat dihapus karena masih memiliki ' . $pinjamanAktif . ' peminjaman aktif.',
+                'error' => true,
+            ]);
+            return redirect()->back();
         }
 
-        // ── Hapus akun Shield sekaligus ───────────────────────────────
         if (!empty($member['user_id'])) {
             $this->userModel->delete($member['user_id'], purge: true);
         }
-        // ─────────────────────────────────────────────────────────────
 
         if (!$this->memberModel->delete($member['id'])) {
             session()->setFlashdata(['msg' => 'Failed to delete member', 'error' => true]);
@@ -355,9 +325,222 @@ class MembersController extends ResourceController
         return redirect()->to('admin/members');
     }
 
+    // ══════════════════════════════════════════════════════
+    // IMPORT ANGGOTA
+    // ══════════════════════════════════════════════════════
+
     public function importForm()
     {
         return view('members/import');
     }
-    
+
+    public function importTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Anggota');
+
+        // Header
+        $headers = ['first_name', 'last_name', 'no_identitas', 'tipe_anggota', 'gender', 'email', 'phone'];
+        foreach ($headers as $col => $header) {
+            $sheet->setCellValueByColumnAndRow($col + 1, 1, $header);
+        }
+
+        // Style header
+        $headerStyle = [
+            'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill'      => ['fillType' => 'solid', 'startColor' => ['rgb' => '1E3A8A']],
+            'alignment' => ['horizontal' => 'center'],
+        ];
+        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+
+        // Lebar kolom
+        foreach (range('A', 'G') as $col) {
+            $sheet->getColumnDimension($col)->setWidth(20);
+        }
+
+        // Contoh data baris 2
+        $contoh = ['Budi', 'Santoso', '12345678', 'Murid', 'Male', 'budi@email.com', '081234567890'];
+        foreach ($contoh as $col => $val) {
+            $sheet->setCellValueByColumnAndRow($col + 1, 2, $val);
+        }
+
+        // Download
+        $writer   = new Xlsx($spreadsheet);
+        $filename = 'template_import_anggota.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function importProcess()
+    {
+        $file = $this->request->getFile('file_excel');
+
+        if (!$file || !$file->isValid()) {
+            return view('members/import', [
+                'hasilImport' => [
+                    'total'    => 0,
+                    'berhasil' => 0,
+                    'gagal'    => 0,
+                    'errors'   => [['baris' => '-', 'no_identitas' => '-', 'pesan' => 'File tidak valid atau tidak ditemukan.']],
+                ],
+            ]);
+        }
+
+        // Pindah file ke temp
+        $tmpPath = WRITEPATH . 'uploads/' . $file->getRandomName();
+        $file->move(WRITEPATH . 'uploads/', basename($tmpPath));
+
+        $spreadsheet = IOFactory::load($tmpPath);
+        $sheet       = $spreadsheet->getActiveSheet();
+        $rows        = $sheet->toArray();
+
+        // Hapus file temp
+        @unlink($tmpPath);
+
+        // Skip header baris 1
+        array_shift($rows);
+
+        $total    = 0;
+        $berhasil = 0;
+        $gagal    = 0;
+        $errors   = [];
+
+        foreach ($rows as $nomor => $row) {
+            $baris = $nomor + 2; // +2 karena baris 1 header
+
+            // Skip baris kosong
+            if (empty(array_filter($row))) continue;
+
+            $total++;
+
+            $firstName   = trim($row[0] ?? '');
+            $lastName    = trim($row[1] ?? '');
+            $noIdentitas = trim($row[2] ?? '');
+            $tipeAnggota = trim($row[3] ?? '');
+            $gender      = trim($row[4] ?? '');
+            $email       = trim($row[5] ?? '');
+            $phone       = trim($row[6] ?? '');
+
+            // Validasi kolom wajib
+            if (empty($firstName) || empty($noIdentitas) || empty($tipeAnggota) || empty($gender)) {
+                $gagal++;
+                $errors[] = [
+                    'baris'        => $baris,
+                    'no_identitas' => $noIdentitas ?: '—',
+                    'pesan'        => 'Kolom wajib (first_name, no_identitas, tipe_anggota, gender) tidak boleh kosong.',
+                ];
+                continue;
+            }
+
+            // Validasi tipe_anggota
+            if (!in_array($tipeAnggota, ['Murid', 'Guru', 'Staf'])) {
+                $gagal++;
+                $errors[] = [
+                    'baris'        => $baris,
+                    'no_identitas' => $noIdentitas,
+                    'pesan'        => "Tipe anggota '{$tipeAnggota}' tidak valid. Gunakan: Murid, Guru, atau Staf.",
+                ];
+                continue;
+            }
+
+            // Validasi gender
+            if (!in_array($gender, ['Male', 'Female'])) {
+                $gagal++;
+                $errors[] = [
+                    'baris'        => $baris,
+                    'no_identitas' => $noIdentitas,
+                    'pesan'        => "Gender '{$gender}' tidak valid. Gunakan: Male atau Female.",
+                ];
+                continue;
+            }
+
+            // Cek no_identitas duplikat di DB
+            $sudahAda = $this->memberModel->where('no_identitas', $noIdentitas)->first();
+            if ($sudahAda) {
+                $gagal++;
+                $errors[] = [
+                    'baris'        => $baris,
+                    'no_identitas' => $noIdentitas,
+                    'pesan'        => "No. Identitas '{$noIdentitas}' sudah terdaftar.",
+                ];
+                continue;
+            }
+
+            // Cek no_identitas duplikat di Shield
+            $sudahAda = $this->userModel->findByCredentials(['username' => $noIdentitas]);
+            if ($sudahAda) {
+                $gagal++;
+                $errors[] = [
+                    'baris'        => $baris,
+                    'no_identitas' => $noIdentitas,
+                    'pesan'        => "Username '{$noIdentitas}' sudah terdaftar di sistem.",
+                ];
+                continue;
+            }
+
+            try {
+                // Buat akun Shield
+                $shieldUser = new User([
+                    'username' => $noIdentitas,
+                    'email'    => $email ?: $noIdentitas . '@member.local',
+                    'password' => $noIdentitas,
+                ]);
+                $this->userModel->save($shieldUser);
+                $shieldUser = $this->userModel->findById($this->userModel->getInsertID());
+                $shieldUser->addGroup('member');
+                $shieldUser->activate();
+                $userId = $shieldUser->id;
+
+                // Generate UID dan QR
+                $uid         = sha1($firstName . $noIdentitas . rand(0, 1000) . md5($gender));
+                $qrGenerator = new QRGenerator();
+                $qrCodeLabel = $firstName . ($lastName ? ' ' . $lastName : '');
+                $qrCode      = $qrGenerator->generateQRCode(
+                    data: $uid,
+                    labelText: $qrCodeLabel,
+                    dir: MEMBERS_QR_CODE_PATH,
+                    filename: $qrCodeLabel
+                );
+
+                // Simpan member
+                $this->memberModel->save([
+                    'uid'          => $uid,
+                    'user_id'      => $userId,
+                    'first_name'   => $firstName,
+                    'last_name'    => $lastName,
+                    'no_identitas' => $noIdentitas,
+                    'tipe_anggota' => $tipeAnggota,
+                    'email'        => $email,
+                    'phone'        => $phone,
+                    'gender'       => $gender,
+                    'qr_code'      => $qrCode,
+                ]);
+
+                $berhasil++;
+
+            } catch (\Throwable $e) {
+                $gagal++;
+                $errors[] = [
+                    'baris'        => $baris,
+                    'no_identitas' => $noIdentitas,
+                    'pesan'        => 'Error: ' . $e->getMessage(),
+                ];
+            }
+        }
+
+        return view('members/import', [
+            'hasilImport' => [
+                'total'    => $total,
+                'berhasil' => $berhasil,
+                'gagal'    => $gagal,
+                'errors'   => $errors,
+            ],
+        ]);
+    }
 }
