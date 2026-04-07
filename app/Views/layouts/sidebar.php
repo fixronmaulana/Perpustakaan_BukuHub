@@ -42,6 +42,11 @@ $sidebarNavs = [
     'icon' => 'ti ti-book'
   ],
   [
+  'name' => 'Kuis',
+  'link' => '/admin/kuis',
+  'icon' => 'ti ti-help-circle'
+  ],
+  [
     'name' => 'Kategori',
     'link' => '/admin/categories',
     'icon' => 'ti ti-category-2'
