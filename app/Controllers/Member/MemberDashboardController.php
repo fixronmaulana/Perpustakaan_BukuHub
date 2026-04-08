@@ -8,17 +8,23 @@ use App\Models\MemberModel;
 use App\Models\LoanModel;
 use App\Models\FineModel;
 use App\Models\VisitModel;
+use App\Models\QuizModel;
+use App\Models\QuizQuestionModel;
+use App\Models\QuizAttemptModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 
 class MemberDashboardController extends Controller
 {
-    protected MemberModel   $memberModel;
-    protected LoanModel     $loanModel;
-    protected FineModel     $fineModel;
-    protected BookModel     $bookModel;
-    protected CategoryModel $categoryModel;
-    protected VisitModel $visitModel;
+    protected MemberModel       $memberModel;
+    protected LoanModel         $loanModel;
+    protected FineModel         $fineModel;
+    protected BookModel         $bookModel;
+    protected CategoryModel     $categoryModel;
+    protected VisitModel        $visitModel;
+    protected QuizModel         $quizModel;
+    protected QuizQuestionModel $questionModel;
+    protected QuizAttemptModel  $attemptModel;
 
     public function __construct()
     {
@@ -27,7 +33,10 @@ class MemberDashboardController extends Controller
         $this->fineModel     = new FineModel();
         $this->bookModel     = new BookModel();
         $this->categoryModel = new CategoryModel();
-        $this->visitModel = new VisitModel();
+        $this->visitModel    = new VisitModel();
+        $this->quizModel     = new QuizModel();
+        $this->questionModel = new QuizQuestionModel();
+        $this->attemptModel  = new QuizAttemptModel();
     }
 
     public function index()
@@ -100,7 +109,6 @@ class MemberDashboardController extends Controller
         return $this->memberModel->where('user_id', auth()->id())->first();
     }
 
-
     public function kartu()
     {
         return view('member/kartu', [
@@ -114,7 +122,6 @@ class MemberDashboardController extends Controller
         $member = $this->getMember();
         $now    = Time::now();
 
-        // Ambil semua peminjaman aktif member ini
         $loans = $this->loanModel
             ->select('loans.*, books.title, books.author, books.year')
             ->join('books', 'loans.book_id = books.id', 'LEFT')
@@ -124,19 +131,17 @@ class MemberDashboardController extends Controller
             ->orderBy('loans.loan_date', 'DESC')
             ->findAll();
 
-        // Hitung statistik
         $sedangDipinjam = count($loans);
         $terlambat      = 0;
 
         foreach ($loans as &$loan) {
-            $dueDate       = Time::parse($loan['due_date']);
-            $loan['is_late']     = $now->isAfter($dueDate);
+            $dueDate              = Time::parse($loan['due_date']);
+            $loan['is_late']      = $now->isAfter($dueDate);
             $loan['is_due_today'] = $now->toDateString() === $dueDate->toDateString();
             if ($loan['is_late']) $terlambat++;
         }
         unset($loan);
 
-        // Total semua peminjaman (termasuk yang sudah kembali)
         $totalPeminjaman = $this->loanModel
             ->where('member_id', $member['id'])
             ->where('deleted_at', null)
@@ -152,13 +157,13 @@ class MemberDashboardController extends Controller
         ]);
     }
 
+    // ── Pengembalian — ditambah info kuis per buku ───────────
     public function pengembalian()
     {
         $member = $this->getMember();
 
-        // Ambil semua peminjaman yang sudah dikembalikan
         $returns = $this->loanModel
-            ->select('loans.*, books.title, books.author, books.year, fines.fine_amount, fines.amount_paid')
+            ->select('loans.*, books.title, books.author, books.year, books.id as book_id_val, fines.fine_amount, fines.amount_paid')
             ->join('books', 'loans.book_id = books.id', 'LEFT')
             ->join('fines', 'fines.loan_id = loans.id', 'LEFT')
             ->where('loans.member_id', $member['id'])
@@ -167,7 +172,6 @@ class MemberDashboardController extends Controller
             ->orderBy('loans.return_date', 'DESC')
             ->findAll();
 
-        // Hitung statistik
         $totalKembali = count($returns);
         $tepatWaktu   = 0;
         $terlambat    = 0;
@@ -176,11 +180,34 @@ class MemberDashboardController extends Controller
             $dueDate    = Time::parse($ret['due_date']);
             $returnDate = Time::parse($ret['return_date']);
             $isLate     = $returnDate->isAfter($dueDate);
-            $ret['is_late']    = $isLate;
-            $ret['days_late']  = $isLate
+
+            $ret['is_late']   = $isLate;
+            $ret['days_late'] = $isLate
                 ? abs($returnDate->difference($dueDate)->getDays())
                 : 0;
+
             if ($isLate) $terlambat++; else $tepatWaktu++;
+
+            // ── Cek kuis untuk buku ini ──────────────────────
+            $quiz = $this->quizModel
+                ->where('book_id', $ret['book_id'])
+                ->where('is_active', 1)
+                ->first();
+
+            if (!$quiz) {
+                $ret['quiz_info']  = null;
+                $ret['sudah_kuis'] = false;
+                $ret['max_habis']  = false;
+            } else {
+                $attempts = $this->attemptModel
+                    ->where('quiz_id', $quiz['id'])
+                    ->where('member_id', $member['id'])
+                    ->countAllResults();
+
+                $ret['quiz_info']  = $quiz;
+                $ret['sudah_kuis'] = $attempts > 0;
+                $ret['max_habis']  = $attempts >= $quiz['max_attempts'];
+            }
         }
         unset($ret);
 
@@ -192,6 +219,109 @@ class MemberDashboardController extends Controller
             'tepatWaktu'   => $tepatWaktu,
             'terlambat'    => $terlambat,
         ]);
+    }
+
+    // ── Halaman kerjakan kuis ────────────────────────────────
+    public function kuis($quizId = null)
+    {
+        $member = $this->getMember();
+
+        $quiz = $this->quizModel
+            ->select('quizzes.*, books.title as book_title')
+            ->join('books', 'quizzes.book_id = books.id', 'LEFT')
+            ->where('quizzes.id', $quizId)
+            ->where('quizzes.is_active', 1)
+            ->first();
+
+        if (empty($quiz)) {
+            session()->setFlashdata(['msg' => 'Kuis tidak ditemukan atau tidak aktif.', 'error' => true]);
+            return redirect()->to('member/pengembalian');
+        }
+
+        // Cek batas percobaan
+        $attempts = $this->attemptModel
+            ->where('quiz_id', $quizId)
+            ->where('member_id', $member['id'])
+            ->countAllResults();
+
+        if ($attempts >= $quiz['max_attempts']) {
+            session()->setFlashdata(['msg' => 'Batas percobaan kuis sudah habis.', 'error' => true]);
+            return redirect()->to('member/pengembalian');
+        }
+
+        $questions = $this->questionModel
+            ->where('quiz_id', $quizId)
+            ->orderBy('id', 'ASC')
+            ->findAll();
+
+        if (empty($questions)) {
+            session()->setFlashdata(['msg' => 'Kuis ini belum memiliki soal.', 'error' => true]);
+            return redirect()->to('member/pengembalian');
+        }
+
+        return view('member/kuis', [
+            'member'    => $member,
+            'activeNav' => 'pengembalian',
+            'quiz'      => $quiz,
+            'questions' => $questions,
+        ]);
+    }
+
+    // ── Submit jawaban kuis ──────────────────────────────────
+    public function submitKuis($quizId = null)
+    {
+        $member = $this->getMember();
+
+        $quiz = $this->quizModel->find($quizId);
+        if (empty($quiz)) {
+            return $this->response->setJSON(['error' => 'Kuis tidak ditemukan']);
+        }
+
+        $questions   = $this->questionModel->where('quiz_id', $quizId)->findAll();
+        $jawaban     = $this->request->getPost('jawaban') ?? [];
+        $durasiDetik = (int) $this->request->getPost('durasi_detik');
+
+        $poin  = 0;
+        $benar = 0;
+        $salah = 0;
+        $total = count($questions);
+
+        foreach ($questions as $q) {
+            $jawabanMember = $jawaban[$q['id']] ?? null;
+            if ($jawabanMember === $q['correct_answer']) {
+                $benar++;
+                $poin += $q['points'];
+            } else {
+                $salah++;
+            }
+        }
+
+        $skor = $total > 0 ? round($benar / $total * 100) : 0;
+
+        // Simpan attempt
+        $this->attemptModel->insert([
+            'quiz_id'     => $quizId,
+            'member_id'   => $member['id'],
+            'score'       => $poin,
+            'total'       => $total,
+            'started_at'  => Time::now()->subSeconds($durasiDetik)->toDateTimeString(),
+            'finished_at' => Time::now()->toDateTimeString(),
+        ]);
+
+        // Kembalikan JSON jika AJAX
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'poin'  => $poin,
+                'benar' => $benar,
+                'salah' => $salah,
+                'total' => $total,
+                'skor'  => $skor,
+            ]);
+        }
+
+        // Fallback jika bukan AJAX
+        session()->setFlashdata(['msg' => "Kuis selesai! Kamu mendapat {$poin} poin."]);
+        return redirect()->to('member/pengembalian');
     }
 
     public function leaderboard()

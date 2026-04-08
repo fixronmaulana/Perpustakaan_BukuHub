@@ -62,12 +62,13 @@
           <th>Tgl Kembali</th>
           <th>Keterlambatan</th>
           <th class="teks-center">Status</th>
+          <th class="teks-center">Kuis</th>
         </tr>
       </thead>
       <tbody>
         <?php if (empty($returns)): ?>
           <tr>
-            <td colspan="7">
+            <td colspan="8">
               <div class="kondisi-kosong">
                 <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
                 <p>Belum ada riwayat pengembalian</p>
@@ -79,6 +80,11 @@
             $isLate   = $ret['is_late'];
             $daysLate = $ret['days_late'];
             $statusKey = $isLate ? 'terlambat' : 'tepat-waktu';
+
+            // Status kuis
+            $quizInfo   = $ret['quiz_info'] ?? null;   // null = belum ada kuis
+            $sudahKuis  = $ret['sudah_kuis'] ?? false; // sudah pernah mengerjakan
+            $maxHabis   = $ret['max_habis'] ?? false;  // sudah mencapai batas percobaan
           ?>
             <tr data-status="<?= $statusKey ?>">
               <td class="teks-redup-sm"><?= $i++ ?></td>
@@ -103,6 +109,28 @@
                   <span class="badge-admin merah">Terlambat</span>
                 <?php else: ?>
                   <span class="badge-admin hijau">Tepat Waktu</span>
+                <?php endif; ?>
+              </td>
+              <td class="teks-center">
+                <?php if (!$quizInfo): ?>
+                  <!-- Belum ada kuis -->
+                  <span class="badge-admin" style="background:#f1f5f9;color:#94a3b8;cursor:default"
+                        title="Kuis belum tersedia untuk buku ini">
+                    Belum ada kuis
+                  </span>
+                <?php elseif ($maxHabis): ?>
+                  <!-- Sudah habis percobaan -->
+                  <span class="badge-admin" style="background:#fef9c3;color:#854d0e"
+                        title="Batas percobaan sudah habis">
+                    Sudah selesai
+                  </span>
+                <?php else: ?>
+                  <!-- Bisa kerjakan -->
+                  <a href="<?= base_url("member/kuis/{$quizInfo['id']}") ?>"
+                     class="badge-admin biru"
+                     style="text-decoration:none;cursor:pointer">
+                    <?= $sudahKuis ? '🔁 Ulangi Kuis' : '✏️ Kerjakan Kuis' ?>
+                  </a>
                 <?php endif; ?>
               </td>
             </tr>

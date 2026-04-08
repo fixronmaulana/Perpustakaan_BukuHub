@@ -86,7 +86,7 @@
                   <div class="d-flex justify-content-center gap-1">
                     <a href="<?= base_url("admin/kuis/{$quiz['id']}") ?>"
                        class="btn btn-sm btn-primary">
-                      <i class="ti ti-list"></i> Kelola
+                      <i class="ti ti-list"></i> Kelola soal
                     </a>
                     <form action="<?= base_url("admin/kuis/{$quiz['id']}/toggle") ?>" method="post">
                       <?= csrf_field() ?>
