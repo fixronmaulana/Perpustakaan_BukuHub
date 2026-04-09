@@ -122,14 +122,16 @@
                   <!-- Sudah habis percobaan -->
                   <span class="badge-admin" style="background:#f1f5f9;color:#94a3b8"
                         title="Batas percobaan sudah habis">
-                    Sudah selesai
+                    Selesai
                   </span>
                 <?php else: ?>
                   <!-- Bisa kerjakan -->
                   <a href="<?= base_url("member/kuis/{$quizInfo['id']}") ?>"
                      class="badge-admin biru"
-                     style="text-decoration:none;cursor:pointer">
-                    <?= $sudahKuis ? '🔁 Ulangi Kuis' : '✏️ Kerjakan Kuis' ?>
+                     style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;
+                                padding:5px 12px;border-radius:7px;font-size:.78rem;font-weight:600"
+                         title="Kerjakan kuis untuk buku ini">
+                    <?= $sudahKuis ? 'Ulangi Kuis' : 'Kerjakan Kuis' ?>
                   </a>
                 <?php endif; ?>
               </td>

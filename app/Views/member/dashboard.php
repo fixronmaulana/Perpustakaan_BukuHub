@@ -53,30 +53,28 @@
   </div>
 
   <div class="kartu-stat-admin">
-  <div class="ksa-body">
-    <div class="ksa-icon">
-      <!-- Icon Poin (Bintang) -->
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-        <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-0.9L12 2z"/>
-      </svg>
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-0.9L12 2z"/>
+        </svg>
+      </div>
+      <div class="ksa-angka">132</div>
+      <div class="ksa-label">Poin Bulan Ini</div>
     </div>
-    <div class="ksa-angka">132</div>
-    <div class="ksa-label">Poin Bulan Ini</div>
   </div>
-</div>
 
-<div class="kartu-stat-admin">
-  <div class="ksa-body">
-    <div class="ksa-icon">
-      <!-- Icon Peringkat (Trophy) -->
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-        <path d="M18 2h-2V1H8v1H6a1 1 0 00-1 1v3a5 5 0 004 4.9V13H7v2h10v-2h-2v-2.1A5 5 0 0019 6V3a1 1 0 00-1-1zm-1 4a3 3 0 01-2 2.83V4h2v2zm-10 0V4h2v4.83A3 3 0 017 6z"/>
-      </svg>
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M18 2h-2V1H8v1H6a1 1 0 00-1 1v3a5 5 0 004 4.9V13H7v2h10v-2h-2v-2.1A5 5 0 0019 6V3a1 1 0 00-1-1zm-1 4a3 3 0 01-2 2.83V4h2v2zm-10 0V4h2v4.83A3 3 0 017 6z"/>
+        </svg>
+      </div>
+      <div class="ksa-angka">5</div>
+      <div class="ksa-label">Peringkat Bulan Ini</div>
     </div>
-    <div class="ksa-angka">5</div>
-    <div class="ksa-label">Peringkat Bulan Ini</div>
   </div>
-</div>
 
 </div>
 
@@ -138,9 +136,9 @@
                 $dueDate    = Time::parse($loan['due_date']);
                 $isLate     = $now->isAfter($dueDate);
                 $isDueToday = $now->toDateString() === $dueDate->toDateString();
-                if ($isLate)        { $badgeClass = 'badge-admin merah'; $badgeLabel = 'Terlambat'; }
-                elseif ($isDueToday){ $badgeClass = 'badge-admin kuning'; $badgeLabel = 'Jatuh Tempo'; }
-                else                { $badgeClass = 'badge-admin biru';  $badgeLabel = 'Dipinjam'; }
+                if ($isLate)         { $badgeClass = 'badge-admin merah';  $badgeLabel = 'Terlambat'; }
+                elseif ($isDueToday) { $badgeClass = 'badge-admin kuning'; $badgeLabel = 'Jatuh Tempo'; }
+                else                 { $badgeClass = 'badge-admin biru';   $badgeLabel = 'Dipinjam'; }
               ?>
                 <tr>
                   <td>
@@ -211,13 +209,34 @@
                   </td>
                   <td class="teks-center">
                     <?php if (!$quizInfo): ?>
-                      <span style="font-size:.75rem;color:#94a3b8">—</span>
+                      <!-- Belum ada kuis -->
+                      <span class="badge-admin"
+                            style="background:#f1f5f9;color:#94a3b8;padding:5px 10px;font-size:.78rem;cursor:default"
+                            title="Kuis belum tersedia untuk buku ini">
+                        Belum ada kuis
+                      </span>
                     <?php elseif ($habis): ?>
-                      <span class="badge-admin" style="background:#f1f5f9;color:#94a3b8;font-size:.72rem">Selesai</span>
-                    <?php else: ?>
+                      <!-- Sudah selesai semua percobaan -->
+                      <span class="badge-admin"
+                            style="background:#f1f5f9;color:#94a3b8;padding:5px 10px;font-size:.78rem;cursor:default"
+                            title="Batas percobaan sudah habis">
+                        Selesai
+                      </span>
+                    <?php elseif ($sudah): ?>
+                      <!-- Sudah pernah, masih bisa ulangi -->
                       <a href="<?= base_url("member/kuis/{$quizInfo['id']}") ?>"
-                         class="badge-admin biru" style="text-decoration:none;font-size:.72rem">
-                        <?= $sudah ? '🔁 Ulangi' : '✏️ Kerjakan' ?>
+                         style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;
+                                padding:5px 12px;border-radius:7px;font-size:.78rem;font-weight:600"
+                         title="Kerjakan ulang kuis ini">
+                        Ulangi Kuis
+                      </a>
+                    <?php else: ?>
+                      <!-- Belum pernah dikerjakan -->
+                      <a href="<?= base_url("member/kuis/{$quizInfo['id']}") ?>"
+                         style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;
+                                padding:5px 12px;border-radius:7px;font-size:.78rem;font-weight:600"
+                         title="Kerjakan kuis untuk buku ini">
+                      Kerjakan Kuis
                       </a>
                     <?php endif; ?>
                   </td>
@@ -228,7 +247,7 @@
         </table>
       </div>
     </div>
- 
+
   </div><!-- /kolom kiri -->
 
   <!-- Kolom kanan: Riwayat Poin (dummy) -->

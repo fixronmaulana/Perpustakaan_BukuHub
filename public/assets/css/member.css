@@ -639,11 +639,15 @@ body {
    ════════════════════════════════════════ */
 .grid-konten-dashboard {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.75fr 1fr;
   gap: 1.25rem;
   margin-bottom: 1.25rem;
 }
-
+@media (max-width: 768px) {
+  .grid-konten-dashboard {
+    grid-template-columns: 1fr !important;
+  }
+}
 /* ════════════════════════════════════════
    KOTAK KONTEN
    ════════════════════════════════════════ */
