@@ -89,12 +89,25 @@
 </div>
 <?php endif; ?>
 
+<!-- ── Notifikasi kuis belum dikerjakan ── -->
+<?php if (!empty($kuisBelumDikerjakan) && $kuisBelumDikerjakan > 0): ?>
+<div class="profil-alert" style="margin-bottom:1.25rem;background:#eff4ff;border-color:#c7d7fe;color:#1e3a8a">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+       stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+    <line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+  Kamu memiliki <strong><?= $kuisBelumDikerjakan ?> kuis</strong> yang belum dikerjakan dari buku yang sudah dikembalikan.
+  <a href="<?= base_url('member/pengembalian') ?>" style="margin-left:8px;font-weight:700;color:inherit;text-decoration:underline">Kerjakan Sekarang →</a>
+</div>
+<?php endif; ?>
+
 <!-- ── Grid 2 kolom ── -->
 <div class="grid-konten-dashboard">
 
   <!-- Kolom kiri -->
   <div>
-
     <!-- Peminjaman Aktif -->
     <div class="kotak-konten">
       <div class="kepala-kotak">
@@ -148,7 +161,7 @@
       </div>
     </div>
 
-    <!-- Pengembalian Terakhir -->
+    <!-- Pengembalian Terakhir + Kuis -->
     <div class="kotak-konten">
       <div class="kepala-kotak">
         <h3>Pengembalian Terakhir</h3>
@@ -161,12 +174,13 @@
               <th>Judul Buku</th>
               <th>Tgl Kembali</th>
               <th class="teks-center">Status</th>
+              <th class="teks-center">Kuis</th>
             </tr>
           </thead>
           <tbody>
             <?php if (empty($pengembalianTerakhir)): ?>
               <tr>
-                <td colspan="3">
+                <td colspan="4">
                   <div class="kondisi-kosong">
                     <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
                     <p>Belum ada riwayat pengembalian</p>
@@ -175,7 +189,10 @@
               </tr>
             <?php else: ?>
               <?php foreach ($pengembalianTerakhir as $ret):
-                $isLate = $ret['is_late'];
+                $isLate   = $ret['is_late'];
+                $quizInfo = $ret['quiz_info']  ?? null;
+                $sudah    = $ret['sudah_kuis'] ?? false;
+                $habis    = $ret['max_habis']  ?? false;
               ?>
                 <tr>
                   <td>
@@ -192,6 +209,18 @@
                       <span class="badge-admin hijau">Tepat Waktu</span>
                     <?php endif; ?>
                   </td>
+                  <td class="teks-center">
+                    <?php if (!$quizInfo): ?>
+                      <span style="font-size:.75rem;color:#94a3b8">—</span>
+                    <?php elseif ($habis): ?>
+                      <span class="badge-admin" style="background:#f1f5f9;color:#94a3b8;font-size:.72rem">Selesai</span>
+                    <?php else: ?>
+                      <a href="<?= base_url("member/kuis/{$quizInfo['id']}") ?>"
+                         class="badge-admin biru" style="text-decoration:none;font-size:.72rem">
+                        <?= $sudah ? '🔁 Ulangi' : '✏️ Kerjakan' ?>
+                      </a>
+                    <?php endif; ?>
+                  </td>
                 </tr>
               <?php endforeach; ?>
             <?php endif; ?>
@@ -199,7 +228,7 @@
         </table>
       </div>
     </div>
-
+ 
   </div><!-- /kolom kiri -->
 
   <!-- Kolom kanan: Riwayat Poin (dummy) -->

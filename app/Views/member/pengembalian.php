@@ -120,7 +120,7 @@
                   </span>
                 <?php elseif ($maxHabis): ?>
                   <!-- Sudah habis percobaan -->
-                  <span class="badge-admin" style="background:#fef9c3;color:#854d0e"
+                  <span class="badge-admin" style="background:#f1f5f9;color:#94a3b8"
                         title="Batas percobaan sudah habis">
                     Sudah selesai
                   </span>

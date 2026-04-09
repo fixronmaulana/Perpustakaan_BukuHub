@@ -89,7 +89,33 @@ class MemberDashboardController extends Controller
         }
         unset($ret);
 
+        // Tambah info kuis untuk 5 pengembalian terakhir di dashboard
         $pengembalianTerakhir = array_slice($semuaKembali, 0, 5);
+        foreach ($pengembalianTerakhir as &$ret) {
+            $quiz = $this->quizModel
+                ->where('book_id', $ret['book_id'])
+                ->where('is_active', 1)
+                ->first();
+            if (!$quiz) {
+                $ret['quiz_info']  = null;
+                $ret['sudah_kuis'] = false;
+                $ret['max_habis']  = false;
+            } else {
+                $attempts = $this->attemptModel
+                    ->where('quiz_id', $quiz['id'])
+                    ->where('member_id', $member['id'])
+                    ->countAllResults();
+                $ret['quiz_info']  = $quiz;
+                $ret['sudah_kuis'] = $attempts > 0;
+                $ret['max_habis']  = $attempts >= $quiz['max_attempts'];
+            }
+        }
+        unset($ret);
+
+        // Hitung kuis yang belum dikerjakan dari pengembalian terakhir
+        $kuisBelumDikerjakan = count(array_filter($pengembalianTerakhir, function($ret) {
+            return $ret['quiz_info'] !== null && !$ret['max_habis'] && !$ret['sudah_kuis'];
+        }));
 
         return view('member/dashboard', [
             'member'               => $member,
@@ -101,6 +127,7 @@ class MemberDashboardController extends Controller
             'pengembalianTerakhir' => $pengembalianTerakhir,
             'peringatan'           => $terlambat,
             'kunjunganBulanIni'    => $kunjunganBulanIni,
+            'kuisBelumDikerjakan'  => $kuisBelumDikerjakan,
         ]);
     }
 
