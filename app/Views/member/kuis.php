@@ -163,61 +163,174 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px);
   z-index: 9999;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
 }
 .modal-hasil-overlay.tampil { display: flex; }
+
+@keyframes popIn {
+  from { transform: scale(0.8) translateY(20px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
 .modal-hasil {
   background: #fff;
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 440px;
-  width: 90%;
+  border-radius: 20px;
+  max-width: 420px;
+  width: 100%;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-  animation: popIn 0.3s ease;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+  animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
+  overflow: hidden;
 }
-@keyframes popIn {
-  from { transform: scale(0.85); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
+
+/* Header berwarna dinamis */
+.modal-hasil-header {
+  padding: 2rem 1.5rem 1.5rem;
+  position: relative;
 }
-.hasil-ikon { font-size: 3.5rem; margin-bottom: 0.75rem; }
-.hasil-judul { font-size: 1.2rem; font-weight: 800; color: #0d1b3e; margin-bottom: 0.5rem; }
-.hasil-poin  {
-  font-size: 2.5rem;
+.modal-hasil-header.bagus  { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.modal-hasil-header.cukup  { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.modal-hasil-header.kurang { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+
+/* Icon centang */
+.hasil-centang {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  border: 3px solid rgba(255,255,255,0.5);
+}
+.hasil-centang svg { stroke: #fff; }
+
+.hasil-judul {
+  font-size: 1.3rem;
   font-weight: 800;
-  color: var(--navy-main);
-  margin: 0.75rem 0;
+  color: #fff;
+  margin-bottom: 0.25rem;
 }
-.hasil-poin span { font-size: 1rem; font-weight: 600; color: var(--teks-redup); display: block; }
+.hasil-subjudul {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* Nama kuis */
+.hasil-nama-kuis {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Body modal */
+.modal-hasil-body {
+  padding: 1.5rem;
+}
+
+/* Poin utama */
+.hasil-poin-wrap {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #bbf7d0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.hasil-poin-label {
+  font-size: 0.78rem;
+  color: #16a34a;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 0.5rem;
+}
+.hasil-poin-angka {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #15803d;
+  line-height: 1;
+}
+.hasil-poin-satuan {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #16a34a;
+}
+.hasil-poin-total {
+  font-size: 0.78rem;
+  color: #4ade80;
+  margin-top: 0.4rem;
+}
+
+/* Grid statistik */
 .hasil-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin: 1rem 0 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
 }
 .hasil-stat {
   background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 0.75rem;
+  padding: 0.6rem 0.5rem;
 }
-.hasil-stat-angka { font-size: 1.4rem; font-weight: 700; }
-.hasil-stat-label { font-size: 0.75rem; color: var(--teks-redup); margin-top: 2px; }
+.hasil-stat-angka {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.hasil-stat-angka.hijau { color: #16a34a; }
+.hasil-stat-angka.merah { color: #dc2626; }
+.hasil-stat-angka.biru  { color: #2563eb; }
+.hasil-stat-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Info member */
+.hasil-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+.hasil-info-row span { font-weight: 600; color: #1e293b; }
+
+/* Tombol selesai */
 .btn-selesai {
   display: block;
   width: 100%;
-  padding: 0.75rem;
-  background: var(--navy-main);
+  padding: 0.85rem;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
   text-decoration: none;
+  transition: opacity 0.15s;
+  letter-spacing: 0.3px;
 }
+.btn-selesai:hover { opacity: 0.9; color: #fff; }
 </style>
 <?= $this->endSection() ?>
 
@@ -312,32 +425,67 @@
 <!-- Modal Hasil -->
 <div class="modal-hasil-overlay" id="modalHasil">
   <div class="modal-hasil">
-    <div class="hasil-ikon" id="hasilIkon">🎉</div>
-    <div class="hasil-judul" id="hasilJudul">Kuis Selesai!</div>
-    <div class="hasil-poin" id="hasilPoin">
-      0 <span>poin diperoleh</span>
+
+    <!-- Header dinamis -->
+    <div class="modal-hasil-header" id="modalHeader">
+      <div class="hasil-centang" id="hasilCentang">
+        <!-- icon berubah via JS -->
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="hasil-judul" id="hasilJudul">Kuis Selesai!</div>
+      <div class="hasil-subjudul" id="hasilSubjudul">Kerja bagus, terus semangat!</div>
+      <div class="hasil-nama-kuis"><?= esc($quiz['name']) ?></div>
     </div>
-    <div class="hasil-grid">
-      <div class="hasil-stat">
-        <div class="hasil-stat-angka text-success" id="hasilBenar">0</div>
-        <div class="hasil-stat-label">Jawaban Benar</div>
+
+    <!-- Body -->
+    <div class="modal-hasil-body">
+
+      <!-- Poin utama -->
+      <div class="hasil-poin-wrap">
+        <div class="hasil-poin-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#16a34a">
+            <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-.9L12 2z"/>
+          </svg>
+          Poin yang kamu dapatkan
+        </div>
+        <div>
+          <span class="hasil-poin-angka" id="hasilPoinAngka">0</span>
+          <span class="hasil-poin-satuan"> poin</span>
+        </div>
+        <div class="hasil-poin-total" id="hasilPoinTotal">dari total 0 poin</div>
       </div>
-      <div class="hasil-stat">
-        <div class="hasil-stat-angka text-danger" id="hasilSalah">0</div>
-        <div class="hasil-stat-label">Jawaban Salah</div>
+
+      <!-- Statistik 3 kolom -->
+      <div class="hasil-grid">
+        <div class="hasil-stat">
+          <div class="hasil-stat-angka hijau" id="hasilBenar">0</div>
+          <div class="hasil-stat-label">✓ Benar</div>
+        </div>
+        <div class="hasil-stat">
+          <div class="hasil-stat-angka merah" id="hasilSalah">0</div>
+          <div class="hasil-stat-label">✗ Salah</div>
+        </div>
+        <div class="hasil-stat">
+          <div class="hasil-stat-angka biru" id="hasilSkor">0%</div>
+          <div class="hasil-stat-label">Skor</div>
+        </div>
       </div>
-      <div class="hasil-stat">
-        <div class="hasil-stat-angka" id="hasilTotal">0</div>
-        <div class="hasil-stat-label">Total Soal</div>
+
+      <!-- Info buku & member -->
+      <div class="hasil-info-row">
+        <div>Buku <span><?= esc($quiz['book_title']) ?></span></div>
+        <div>Anggota <span><?= esc(trim($member['first_name'] . ' ' . $member['last_name'])) ?></span></div>
       </div>
-      <div class="hasil-stat">
-        <div class="hasil-stat-angka text-primary" id="hasilSkor">0%</div>
-        <div class="hasil-stat-label">Skor</div>
-      </div>
+
+      <!-- Tombol -->
+      <a href="<?= base_url('member/pengembalian') ?>" class="btn-selesai">
+        Selesai & Kembali →
+      </a>
+
     </div>
-    <a href="<?= base_url('member/pengembalian') ?>" class="btn-selesai" id="btnSelesai">
-      Kembali ke Pengembalian
-    </a>
   </div>
 </div>
 
@@ -346,6 +494,7 @@
 <?= $this->section('scripts') ?>
 <script>
 const TOTAL_SOAL   = <?= $totalSoal ?>;
+const TOTAL_POIN   = <?= $totalPoin ?>;
 const DURASI_DETIK = <?= $quiz['duration_minutes'] * 60 ?>;
 const QUIZ_ID      = <?= $quiz['id'] ?>;
 
@@ -430,23 +579,38 @@ function submitKuis() {
 
 // ── Tampil modal hasil ───────────────────────────────────
 function tampilHasil(data) {
-  document.getElementById('hasilPoin').innerHTML =
-    `${data.poin} <span>poin diperoleh</span>`;
-  document.getElementById('hasilBenar').textContent = data.benar;
-  document.getElementById('hasilSalah').textContent = data.salah;
-  document.getElementById('hasilTotal').textContent = data.total;
-  document.getElementById('hasilSkor').textContent  = data.skor + '%';
+  // Isi statistik
+  document.getElementById('hasilPoinAngka').textContent = data.poin;
+  document.getElementById('hasilPoinTotal').textContent = `dari total ${TOTAL_POIN} poin`;
+  document.getElementById('hasilBenar').textContent     = data.benar;
+  document.getElementById('hasilSalah').textContent     = data.salah;
+  document.getElementById('hasilSkor').textContent      = data.skor + '%';
+
+  const header = document.getElementById('modalHeader');
 
   if (data.skor >= 70) {
-    document.getElementById('hasilIkon').textContent  = '🎉';
-    document.getElementById('hasilJudul').textContent = 'Luar Biasa!';
+    header.className        = 'modal-hasil-header bagus';
+    document.getElementById('hasilJudul').textContent    = 'Luar Biasa!';
+    document.getElementById('hasilSubjudul').textContent = 'Kamu berhasil menjawab dengan sangat baik!';
   } else if (data.skor >= 40) {
-    document.getElementById('hasilIkon').textContent  = '👍';
-    document.getElementById('hasilJudul').textContent = 'Cukup Baik!';
+    header.className        = 'modal-hasil-header cukup';
+    document.getElementById('hasilJudul').textContent    = 'Cukup Baik! 👍';
+    document.getElementById('hasilSubjudul').textContent = 'Tingkatkan lagi di percobaan berikutnya!';
   } else {
-    document.getElementById('hasilIkon').textContent  = '📚';
-    document.getElementById('hasilJudul').textContent = 'Terus Belajar!';
+    header.className        = 'modal-hasil-header kurang';
+    document.getElementById('hasilJudul').textContent    = 'Terus Belajar! 📚';
+    document.getElementById('hasilSubjudul').textContent = 'Jangan menyerah, coba lagi ya!';
   }
+
+  // Animasi angka poin (count up)
+  let current = 0;
+  const target  = data.poin;
+  const step    = Math.ceil(target / 30);
+  const counter = setInterval(() => {
+    current = Math.min(current + step, target);
+    document.getElementById('hasilPoinAngka').textContent = current;
+    if (current >= target) clearInterval(counter);
+  }, 30);
 
   document.getElementById('modalHasil').classList.add('tampil');
 }
