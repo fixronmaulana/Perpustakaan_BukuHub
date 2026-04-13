@@ -377,6 +377,7 @@
   <form id="formKuis" action="<?= base_url("member/kuis/{$quiz['id']}/submit") ?>" method="post">
     <?= csrf_field() ?>
     <input type="hidden" name="durasi_detik" id="durasiDetik" value="0">
+    <input type="hidden" name="loan_id" value="<?= (int)($loanId ?? 0) ?>">
 
     <?php foreach ($questions as $idx => $q): ?>
       <div class="kartu-soal soal-panel" id="soal-<?= $idx ?>"
@@ -590,7 +591,7 @@ function tampilHasil(data) {
 
   if (data.skor >= 70) {
     header.className        = 'modal-hasil-header bagus';
-    document.getElementById('hasilJudul').textContent    = 'Luar Biasa!';
+    document.getElementById('hasilJudul').textContent    = 'Luar Biasa! 🎉';
     document.getElementById('hasilSubjudul').textContent = 'Kamu berhasil menjawab dengan sangat baik!';
   } else if (data.skor >= 40) {
     header.className        = 'modal-hasil-header cukup';

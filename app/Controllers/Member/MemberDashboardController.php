@@ -101,13 +101,14 @@ class MemberDashboardController extends Controller
                 $ret['sudah_kuis'] = false;
                 $ret['max_habis']  = false;
             } else {
-                $attempts = $this->attemptModel
+                $attemptsLoan = $this->attemptModel
                     ->where('quiz_id', $quiz['id'])
                     ->where('member_id', $member['id'])
+                    ->where('loan_id', $ret['id'])
                     ->countAllResults();
                 $ret['quiz_info']  = $quiz;
-                $ret['sudah_kuis'] = $attempts > 0;
-                $ret['max_habis']  = $attempts >= $quiz['max_attempts'];
+                $ret['sudah_kuis'] = $attemptsLoan > 0;
+                $ret['max_habis']  = $attemptsLoan >= $quiz['max_attempts'];
             }
         }
         unset($ret);
@@ -215,7 +216,7 @@ class MemberDashboardController extends Controller
 
             if ($isLate) $terlambat++; else $tepatWaktu++;
 
-            // ── Cek kuis untuk buku ini ──────────────────────
+            // ── Cek kuis untuk buku ini (per transaksi loan) ────
             $quiz = $this->quizModel
                 ->where('book_id', $ret['book_id'])
                 ->where('is_active', 1)
@@ -226,14 +227,16 @@ class MemberDashboardController extends Controller
                 $ret['sudah_kuis'] = false;
                 $ret['max_habis']  = false;
             } else {
-                $attempts = $this->attemptModel
+                // Cek attempt berdasarkan loan_id spesifik
+                $attemptsLoan = $this->attemptModel
                     ->where('quiz_id', $quiz['id'])
                     ->where('member_id', $member['id'])
+                    ->where('loan_id', $ret['id'])
                     ->countAllResults();
 
                 $ret['quiz_info']  = $quiz;
-                $ret['sudah_kuis'] = $attempts > 0;
-                $ret['max_habis']  = $attempts >= $quiz['max_attempts'];
+                $ret['sudah_kuis'] = $attemptsLoan > 0;
+                $ret['max_habis']  = $attemptsLoan >= $quiz['max_attempts'];
             }
         }
         unset($ret);
@@ -253,6 +256,9 @@ class MemberDashboardController extends Controller
     {
         $member = $this->getMember();
 
+        // Ambil loan_id dari query string
+        $loanId = (int) $this->request->getGet('loan_id');
+
         $quiz = $this->quizModel
             ->select('quizzes.*, books.title as book_title')
             ->join('books', 'quizzes.book_id = books.id', 'LEFT')
@@ -265,14 +271,17 @@ class MemberDashboardController extends Controller
             return redirect()->to('member/pengembalian');
         }
 
-        // Cek batas percobaan
-        $attempts = $this->attemptModel
-            ->where('quiz_id', $quizId)
-            ->where('member_id', $member['id'])
-            ->countAllResults();
+        // Cek batas percobaan per loan_id
+        $attemptsLoan = $loanId
+            ? $this->attemptModel
+                ->where('quiz_id', $quizId)
+                ->where('member_id', $member['id'])
+                ->where('loan_id', $loanId)
+                ->countAllResults()
+            : 0;
 
-        if ($attempts >= $quiz['max_attempts']) {
-            session()->setFlashdata(['msg' => 'Batas percobaan kuis sudah habis.', 'error' => true]);
+        if ($attemptsLoan >= $quiz['max_attempts']) {
+            session()->setFlashdata(['msg' => 'Batas percobaan kuis untuk peminjaman ini sudah habis.', 'error' => true]);
             return redirect()->to('member/pengembalian');
         }
 
@@ -291,6 +300,7 @@ class MemberDashboardController extends Controller
             'activeNav' => 'pengembalian',
             'quiz'      => $quiz,
             'questions' => $questions,
+            'loanId'    => $loanId,
         ]);
     }
 
@@ -325,10 +335,12 @@ class MemberDashboardController extends Controller
 
         $skor = $total > 0 ? round($benar / $total * 100) : 0;
 
-        // Simpan attempt
+        // Simpan attempt — sertakan loan_id agar per transaksi
+        $loanId = (int) $this->request->getPost('loan_id');
         $this->attemptModel->insert([
             'quiz_id'     => $quizId,
             'member_id'   => $member['id'],
+            'loan_id'     => $loanId ?: null,
             'score'       => $poin,
             'total'       => $total,
             'started_at'  => Time::now()->subSeconds($durasiDetik)->toDateTimeString(),

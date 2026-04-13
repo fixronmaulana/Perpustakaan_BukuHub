@@ -113,25 +113,44 @@
               </td>
               <td class="teks-center">
                 <?php if (!$quizInfo): ?>
-                  <!-- Belum ada kuis -->
-                  <span class="badge-admin" style="background:#f1f5f9;color:#94a3b8;cursor:default"
-                        title="Kuis belum tersedia untuk buku ini">
+                  <span style="
+                    display:inline-flex;align-items:center;gap:5px;
+                    padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;
+                    background:#f8fafc;color:#cbd5e1;border:1px solid #e2e8f0;
+                    cursor:default;white-space:nowrap">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                     Belum ada kuis
                   </span>
                 <?php elseif ($maxHabis): ?>
-                  <!-- Sudah habis percobaan -->
-                  <span class="badge-admin" style="background:#f1f5f9;color:#94a3b8"
-                        title="Batas percobaan sudah habis">
+                  <span style="
+                    display:inline-flex;align-items:center;gap:5px;
+                    padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;
+                    background:#f8fafc;color:#cbd5e1;border:1px solid #e2e8f0;
+                    cursor:default;white-space:nowrap">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     Selesai
                   </span>
+                <?php elseif ($sudahKuis): ?>
+                  <a href="<?= base_url("member/kuis/{$quizInfo['id']}?loan_id={$ret['id']}") ?>"
+                    style="
+                      display:inline-flex;align-items:center;gap:5px;
+                      padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:600;
+                      background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;
+                      text-decoration:none;white-space:nowrap;
+                      transition:background .15s">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+                    Ulangi Kuis
+                  </a>
                 <?php else: ?>
-                  <!-- Bisa kerjakan -->
-                  <a href="<?= base_url("member/kuis/{$quizInfo['id']}") ?>"
-                     class="badge-admin biru"
-                     style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;
-                                padding:5px 12px;border-radius:7px;font-size:.78rem;font-weight:600"
-                         title="Kerjakan kuis untuk buku ini">
-                    <?= $sudahKuis ? 'Ulangi Kuis' : 'Kerjakan Kuis' ?>
+                  <a href="<?= base_url("member/kuis/{$quizInfo['id']}?loan_id={$ret['id']}") ?>"
+                    style="
+                      display:inline-flex;align-items:center;gap:5px;
+                      padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:600;
+                      background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;
+                      text-decoration:none;white-space:nowrap;
+                      transition:opacity .15s">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    Kerjakan Kuis
                   </a>
                 <?php endif; ?>
               </td>

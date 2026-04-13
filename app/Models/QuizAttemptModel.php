@@ -15,6 +15,7 @@ class QuizAttemptModel extends Model
     protected $allowedFields    = [
         'quiz_id',
         'member_id',
+        'loan_id',
         'score',
         'total',
         'started_at',

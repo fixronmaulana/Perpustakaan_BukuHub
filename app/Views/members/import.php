@@ -10,7 +10,7 @@
   <a href="<?= base_url('admin/members') ?>" class="btn btn-outline-primary">
     <i class="ti ti-arrow-left"></i> Kembali
   </a>
-  <h5 class="mb-0 fw-semibold">Import Anggota</h5>
+
 </div>
 
 <div class="row">
@@ -20,7 +20,7 @@
     <div class="card">
       <div class="card-body">
 
-        <h6 class="fw-semibold mb-1">Import dari Excel</h6>
+        <h5 class="fw-semibold mb-1">Import Anggota dari Excel</h5>
         <p class="text-muted small mb-4">Upload file Excel untuk pendaftaran anggota massal</p>
 
         <!-- Download Template -->
