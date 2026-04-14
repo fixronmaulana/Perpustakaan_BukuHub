@@ -106,9 +106,16 @@ class MemberDashboardController extends Controller
                     ->where('member_id', $member['id'])
                     ->where('loan_id', $ret['id'])
                     ->countAllResults();
-                $ret['quiz_info']  = $quiz;
-                $ret['sudah_kuis'] = $attemptsLoan > 0;
-                $ret['max_habis']  = $attemptsLoan >= $quiz['max_attempts'];
+
+                $returnDate      = Time::parse($ret['return_date']);
+                $jamSejemKembali = $now->difference($returnDate)->getHours();
+                $masihAktif      = abs($jamSejemKembali) <= 24;
+
+                $ret['quiz_info']    = $quiz;
+                $ret['sudah_kuis']   = $attemptsLoan > 0;
+                $ret['max_habis']    = $attemptsLoan >= $quiz['max_attempts']
+                                    || (!$masihAktif && $attemptsLoan === 0);
+                $ret['kuis_expired'] = !$masihAktif && $attemptsLoan === 0;
             }
         }
         unset($ret);
@@ -189,6 +196,7 @@ class MemberDashboardController extends Controller
     public function pengembalian()
     {
         $member = $this->getMember();
+        $now    = Time::now();
 
         $returns = $this->loanModel
             ->select('loans.*, books.title, books.author, books.year, books.id as book_id_val, fines.fine_amount, fines.amount_paid')
@@ -227,16 +235,24 @@ class MemberDashboardController extends Controller
                 $ret['sudah_kuis'] = false;
                 $ret['max_habis']  = false;
             } else {
-                // Cek attempt berdasarkan loan_id spesifik
                 $attemptsLoan = $this->attemptModel
                     ->where('quiz_id', $quiz['id'])
                     ->where('member_id', $member['id'])
                     ->where('loan_id', $ret['id'])
                     ->countAllResults();
 
+                // Cek apakah masih dalam 24 jam sejak pengembalian
+                $returnDate   = Time::parse($ret['return_date']);
+                $jamSejemKembali = $now->difference($returnDate)->getHours();
+                $masihAktif   = abs($jamSejemKembali) <= 24;
+
                 $ret['quiz_info']  = $quiz;
                 $ret['sudah_kuis'] = $attemptsLoan > 0;
-                $ret['max_habis']  = $attemptsLoan >= $quiz['max_attempts'];
+                // Habis jika: sudah melebihi percobaan ATAU lewat 24 jam dan belum dikerjakan
+                $ret['max_habis']  = $attemptsLoan >= $quiz['max_attempts']
+                                  || (!$masihAktif && $attemptsLoan === 0);
+                // Tidak bisa dikerjakan jika sudah lewat 24 jam
+                $ret['kuis_expired'] = !$masihAktif && $attemptsLoan === 0;
             }
         }
         unset($ret);

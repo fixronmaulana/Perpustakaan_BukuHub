@@ -207,6 +207,12 @@
                     <?php endif; ?>
                   </td>
                   <td class="teks-center">
+                    <?php
+                      $quizInfo = $ret['quiz_info']   ?? null;
+                      $sudah    = $ret['sudah_kuis']  ?? false;
+                      $habis    = $ret['max_habis']   ?? false;
+                      $expired  = $ret['kuis_expired'] ?? false;
+                    ?>
                     <?php if (!$quizInfo): ?>
                       <span style="display:inline-flex;align-items:center;gap:5px;
                                    padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;
@@ -215,10 +221,19 @@
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                         Belum ada kuis
                       </span>
+                    <?php elseif ($expired): ?>
+                      <span style="display:inline-flex;align-items:center;gap:5px;
+                                   padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;
+                                   background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;
+                                   cursor:default;white-space:nowrap"
+                            title="Waktu pengerjaan sudah habis (>24 jam)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Kedaluwarsa
+                      </span>
                     <?php elseif ($habis): ?>
                       <span style="display:inline-flex;align-items:center;gap:5px;
                                    padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;
-                                   background:#f8fafc;color:#cbd5e1;border:1px solid #e2e8f0;
+                                   background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;
                                    cursor:default;white-space:nowrap">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         Selesai
