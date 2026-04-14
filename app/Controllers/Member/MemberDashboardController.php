@@ -108,8 +108,9 @@ class MemberDashboardController extends Controller
                     ->countAllResults();
 
                 $returnDate      = Time::parse($ret['return_date']);
-                $jamSejemKembali = $now->difference($returnDate)->getHours();
-                $masihAktif      = abs($jamSejemKembali) <= 24;
+                $selisihDetik = abs($now->getTimestamp() - Time::parse($ret['return_date'])->getTimestamp());
+                $selisihJam   = $selisihDetik / 3600;
+                $masihAktif   = $selisihJam <= 24; 
 
                 $ret['quiz_info']    = $quiz;
                 $ret['sudah_kuis']   = $attemptsLoan > 0;
@@ -243,8 +244,9 @@ class MemberDashboardController extends Controller
 
                 // Cek apakah masih dalam 24 jam sejak pengembalian
                 $returnDate   = Time::parse($ret['return_date']);
-                $jamSejemKembali = $now->difference($returnDate)->getHours();
-                $masihAktif   = abs($jamSejemKembali) <= 24;
+                $selisihDetik = abs($now->getTimestamp() - Time::parse($ret['return_date'])->getTimestamp());
+                $selisihJam   = $selisihDetik / 3600;
+                $masihAktif   = $selisihJam <= 24;
 
                 $ret['quiz_info']  = $quiz;
                 $ret['sudah_kuis'] = $attemptsLoan > 0;
