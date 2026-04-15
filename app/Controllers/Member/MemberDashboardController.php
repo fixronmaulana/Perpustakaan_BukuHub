@@ -39,6 +39,48 @@ class MemberDashboardController extends Controller
         $this->attemptModel  = new QuizAttemptModel();
     }
 
+    // ── Helper: cek info kuis per transaksi ──────────────────
+    private function getKuisInfo(array $ret, int $memberId, float $batasJam = 24): array
+    {
+        $quiz = $this->quizModel
+            ->where('book_id', $ret['book_id'])
+            ->where('is_active', 1)
+            ->first();
+
+        if (!$quiz) {
+            return [
+                'quiz_info'    => null,
+                'sudah_kuis'   => false,
+                'max_habis'    => false,
+                'kuis_expired' => false,
+            ];
+        }
+
+        $attemptsLoan = $this->attemptModel
+            ->where('quiz_id', $quiz['id'])
+            ->where('member_id', $memberId)
+            ->where('loan_id', $ret['id'])
+            ->countAllResults();
+
+        // Hitung selisih jam sejak pengembalian
+        $returnTimestamp = Time::parse($ret['return_date'])->getTimestamp();
+        $nowTimestamp    = Time::now()->getTimestamp();
+        $selisihJam      = abs($nowTimestamp - $returnTimestamp) / 3600;
+        $masihAktif      = $selisihJam <= $batasJam;
+
+        // Expired: lewat 24 jam DAN belum pernah dikerjakan sama sekali
+        // Kalau sudah dikerjakan (sudah_kuis = true), tetap tampil Selesai
+        $sudahDikerjakan = $attemptsLoan > 0;
+$expired = !$masihAktif && $attemptsLoan < $quiz['max_attempts'];
+
+        return [
+            'quiz_info'    => $quiz,
+            'sudah_kuis'   => $sudahDikerjakan,
+            'max_habis'    => $attemptsLoan >= $quiz['max_attempts'],
+            'kuis_expired' => $expired,
+        ];
+    }
+
     public function index()
     {
         $member = $this->getMember();
@@ -47,12 +89,10 @@ class MemberDashboardController extends Controller
         $bulanIni = (int) date('n');
         $tahunIni = (int) date('Y');
 
-        $visits = $this->visitModel
-            ->where('member_id', $member['id'])
-            ->findAll();
+        $visits = $this->visitModel->where('member_id', $member['id'])->findAll();
 
         $kunjunganBulanIni = count(array_filter($visits, function($v) use ($bulanIni, $tahunIni) {
-            $d = \CodeIgniter\I18n\Time::parse($v['visit_date']);
+            $d = Time::parse($v['visit_date']);
             return (int)$d->format('n') === $bulanIni && (int)$d->format('Y') === $tahunIni;
         }));
 
@@ -70,11 +110,10 @@ class MemberDashboardController extends Controller
         foreach ($semuaPinjaman as $loan) {
             if ($now->isAfter(Time::parse($loan['due_date']))) $terlambat++;
         }
-
         $pinjamanAktif = array_slice($semuaPinjaman, 0, 5);
 
         $semuaKembali = $this->loanModel
-            ->select('loans.*, books.title, books.author, books.year')
+            ->select('loans.*, books.title, books.author, books.year, books.id as book_id')
             ->join('books', 'loans.book_id = books.id', 'LEFT')
             ->where('loans.member_id', $member['id'])
             ->where('loans.deleted_at', null)
@@ -89,41 +128,20 @@ class MemberDashboardController extends Controller
         }
         unset($ret);
 
-        // Tambah info kuis untuk 5 pengembalian terakhir di dashboard
+        // 5 terbaru + info kuis
         $pengembalianTerakhir = array_slice($semuaKembali, 0, 5);
         foreach ($pengembalianTerakhir as &$ret) {
-            $quiz = $this->quizModel
-                ->where('book_id', $ret['book_id'])
-                ->where('is_active', 1)
-                ->first();
-            if (!$quiz) {
-                $ret['quiz_info']  = null;
-                $ret['sudah_kuis'] = false;
-                $ret['max_habis']  = false;
-            } else {
-                $attemptsLoan = $this->attemptModel
-                    ->where('quiz_id', $quiz['id'])
-                    ->where('member_id', $member['id'])
-                    ->where('loan_id', $ret['id'])
-                    ->countAllResults();
-
-                $returnDate      = Time::parse($ret['return_date']);
-                $selisihDetik = abs($now->getTimestamp() - Time::parse($ret['return_date'])->getTimestamp());
-                $selisihJam   = $selisihDetik / 3600;
-                $masihAktif   = $selisihJam <= 24; 
-
-                $ret['quiz_info']    = $quiz;
-                $ret['sudah_kuis']   = $attemptsLoan > 0;
-                $ret['max_habis']    = $attemptsLoan >= $quiz['max_attempts']
-                                    || (!$masihAktif && $attemptsLoan === 0);
-                $ret['kuis_expired'] = !$masihAktif && $attemptsLoan === 0;
-            }
+            $kuisInfo = $this->getKuisInfo($ret, $member['id']);
+            $ret      = array_merge($ret, $kuisInfo);
         }
         unset($ret);
 
-        // Hitung kuis yang belum dikerjakan dari pengembalian terakhir
+        // Hitung kuis yang masih bisa dikerjakan (belum expired, belum selesai)
         $kuisBelumDikerjakan = count(array_filter($pengembalianTerakhir, function($ret) {
-            return $ret['quiz_info'] !== null && !$ret['max_habis'] && !$ret['sudah_kuis'];
+            return $ret['quiz_info'] !== null
+                && !$ret['kuis_expired']
+                && !$ret['max_habis']
+                && !$ret['sudah_kuis'];
         }));
 
         return view('member/dashboard', [
@@ -169,7 +187,6 @@ class MemberDashboardController extends Controller
 
         $sedangDipinjam = count($loans);
         $terlambat      = 0;
-
         foreach ($loans as &$loan) {
             $dueDate              = Time::parse($loan['due_date']);
             $loan['is_late']      = $now->isAfter($dueDate);
@@ -193,14 +210,13 @@ class MemberDashboardController extends Controller
         ]);
     }
 
-    // ── Pengembalian — ditambah info kuis per buku ───────────
     public function pengembalian()
     {
         $member = $this->getMember();
         $now    = Time::now();
 
         $returns = $this->loanModel
-            ->select('loans.*, books.title, books.author, books.year, books.id as book_id_val, fines.fine_amount, fines.amount_paid')
+            ->select('loans.*, books.title, books.author, books.year, books.id as book_id, fines.fine_amount, fines.amount_paid')
             ->join('books', 'loans.book_id = books.id', 'LEFT')
             ->join('fines', 'fines.loan_id = loans.id', 'LEFT')
             ->where('loans.member_id', $member['id'])
@@ -225,37 +241,9 @@ class MemberDashboardController extends Controller
 
             if ($isLate) $terlambat++; else $tepatWaktu++;
 
-            // ── Cek kuis untuk buku ini (per transaksi loan) ────
-            $quiz = $this->quizModel
-                ->where('book_id', $ret['book_id'])
-                ->where('is_active', 1)
-                ->first();
-
-            if (!$quiz) {
-                $ret['quiz_info']  = null;
-                $ret['sudah_kuis'] = false;
-                $ret['max_habis']  = false;
-            } else {
-                $attemptsLoan = $this->attemptModel
-                    ->where('quiz_id', $quiz['id'])
-                    ->where('member_id', $member['id'])
-                    ->where('loan_id', $ret['id'])
-                    ->countAllResults();
-
-                // Cek apakah masih dalam 24 jam sejak pengembalian
-                $returnDate   = Time::parse($ret['return_date']);
-                $selisihDetik = abs($now->getTimestamp() - Time::parse($ret['return_date'])->getTimestamp());
-                $selisihJam   = $selisihDetik / 3600;
-                $masihAktif   = $selisihJam <= 24;
-
-                $ret['quiz_info']  = $quiz;
-                $ret['sudah_kuis'] = $attemptsLoan > 0;
-                // Habis jika: sudah melebihi percobaan ATAU lewat 24 jam dan belum dikerjakan
-                $ret['max_habis']  = $attemptsLoan >= $quiz['max_attempts']
-                                  || (!$masihAktif && $attemptsLoan === 0);
-                // Tidak bisa dikerjakan jika sudah lewat 24 jam
-                $ret['kuis_expired'] = !$masihAktif && $attemptsLoan === 0;
-            }
+            // Gunakan helper getKuisInfo
+            $kuisInfo = $this->getKuisInfo($ret, $member['id']);
+            $ret      = array_merge($ret, $kuisInfo);
         }
         unset($ret);
 
@@ -269,12 +257,9 @@ class MemberDashboardController extends Controller
         ]);
     }
 
-    // ── Halaman kerjakan kuis ────────────────────────────────
     public function kuis($quizId = null)
     {
         $member = $this->getMember();
-
-        // Ambil loan_id dari query string
         $loanId = (int) $this->request->getGet('loan_id');
 
         $quiz = $this->quizModel
@@ -289,7 +274,18 @@ class MemberDashboardController extends Controller
             return redirect()->to('member/pengembalian');
         }
 
-        // Cek batas percobaan per loan_id
+        // Cek expired lewat loan
+        if ($loanId) {
+            $loan = $this->loanModel->find($loanId);
+            if ($loan && !empty($loan['return_date'])) {
+                $selisihJam = abs(Time::now()->getTimestamp() - Time::parse($loan['return_date'])->getTimestamp()) / 3600;
+                if ($selisihJam > 24) {
+                    session()->setFlashdata(['msg' => 'Waktu pengerjaan kuis sudah habis (lebih dari 24 jam sejak pengembalian).', 'error' => true]);
+                    return redirect()->to('member/pengembalian');
+                }
+            }
+        }
+
         $attemptsLoan = $loanId
             ? $this->attemptModel
                 ->where('quiz_id', $quizId)
@@ -299,7 +295,7 @@ class MemberDashboardController extends Controller
             : 0;
 
         if ($attemptsLoan >= $quiz['max_attempts']) {
-            session()->setFlashdata(['msg' => 'Batas percobaan kuis untuk peminjaman ini sudah habis.', 'error' => true]);
+            session()->setFlashdata(['msg' => 'Batas percobaan kuis sudah habis.', 'error' => true]);
             return redirect()->to('member/pengembalian');
         }
 
@@ -322,7 +318,6 @@ class MemberDashboardController extends Controller
         ]);
     }
 
-    // ── Submit jawaban kuis ──────────────────────────────────
     public function submitKuis($quizId = null)
     {
         $member = $this->getMember();
@@ -335,6 +330,7 @@ class MemberDashboardController extends Controller
         $questions   = $this->questionModel->where('quiz_id', $quizId)->findAll();
         $jawaban     = $this->request->getPost('jawaban') ?? [];
         $durasiDetik = (int) $this->request->getPost('durasi_detik');
+        $loanId      = (int) $this->request->getPost('loan_id');
 
         $poin  = 0;
         $benar = 0;
@@ -353,8 +349,6 @@ class MemberDashboardController extends Controller
 
         $skor = $total > 0 ? round($benar / $total * 100) : 0;
 
-        // Simpan attempt — sertakan loan_id agar per transaksi
-        $loanId = (int) $this->request->getPost('loan_id');
         $this->attemptModel->insert([
             'quiz_id'     => $quizId,
             'member_id'   => $member['id'],
@@ -365,7 +359,6 @@ class MemberDashboardController extends Controller
             'finished_at' => Time::now()->toDateTimeString(),
         ]);
 
-        // Kembalikan JSON jika AJAX
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([
                 'poin'  => $poin,
@@ -376,32 +369,25 @@ class MemberDashboardController extends Controller
             ]);
         }
 
-        // Fallback jika bukan AJAX
         session()->setFlashdata(['msg' => "Kuis selesai! Kamu mendapat {$poin} poin."]);
         return redirect()->to('member/pengembalian');
     }
 
     public function leaderboard()
     {
-        return view('member/leaderboard', [
-            'member'    => $this->getMember(),
-            'activeNav' => 'leaderboard',
-        ]);
+        return view('member/leaderboard', ['member' => $this->getMember(), 'activeNav' => 'leaderboard']);
     }
 
     public function poin()
     {
-        return view('member/poin', [
-            'member'    => $this->getMember(),
-            'activeNav' => 'poin',
-        ]);
+        return view('member/poin', ['member' => $this->getMember(), 'activeNav' => 'poin']);
     }
 
     public function kunjungan()
     {
-        $member    = $this->getMember();
-        $bulanIni  = (int) date('n');
-        $tahunIni  = (int) date('Y');
+        $member   = $this->getMember();
+        $bulanIni = (int) date('n');
+        $tahunIni = (int) date('Y');
 
         $visits = (new VisitModel())
             ->where('member_id', $member['id'])
@@ -409,7 +395,7 @@ class MemberDashboardController extends Controller
             ->findAll();
 
         $kunjunganBulanIni = count(array_filter($visits, function($v) use ($bulanIni, $tahunIni) {
-            $d = \CodeIgniter\I18n\Time::parse($v['visit_date']);
+            $d = Time::parse($v['visit_date']);
             return (int)$d->format('n') === $bulanIni && (int)$d->format('Y') === $tahunIni;
         }));
 
@@ -435,25 +421,22 @@ class MemberDashboardController extends Controller
 
         if ($search) {
             $query->groupStart()
-                  ->like('books.title',       $search, insensitiveSearch: true)
-                  ->orLike('books.author',    $search, insensitiveSearch: true)
-                  ->orLike('books.publisher', $search, insensitiveSearch: true)
-                  ->groupEnd();
+                ->like('books.title',       $search, insensitiveSearch: true)
+                ->orLike('books.author',    $search, insensitiveSearch: true)
+                ->orLike('books.publisher', $search, insensitiveSearch: true)
+                ->groupEnd();
         }
 
-        if ($categoryId) {
-            $query->where('books.category_id', $categoryId);
-        }
+        if ($categoryId) $query->where('books.category_id', $categoryId);
 
         $books      = $query->paginate($itemPerPage, 'books');
-        $pager      = $this->bookModel->pager;
         $categories = $this->categoryModel->findAll();
 
         return view('member/daftarbuku', [
             'member'      => $this->getMember(),
             'activeNav'   => 'daftarbuku',
             'books'       => $books,
-            'pager'       => $pager,
+            'pager'       => $this->bookModel->pager,
             'categories'  => $categories,
             'search'      => $search,
             'categoryId'  => $categoryId,
