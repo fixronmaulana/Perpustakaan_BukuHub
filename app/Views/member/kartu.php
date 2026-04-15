@@ -14,8 +14,7 @@
   if (!empty($member['last_name']))  $inisial .= strtoupper(substr($member['last_name'],  0, 1));
   $inisial = $inisial ?: 'AM';
 
-  $namaLengkap  = esc(trim(($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? ''))) ?: 'Nama Anggota';
-  $noIdentitas  = $member['no_identitas'] ?? '—';
+  $namaLengkap = esc(ucwords(strtolower(trim(($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? ''))))) ?: 'Nama Anggota';  $noIdentitas  = $member['no_identitas'] ?? '—';
   $tipeAnggota  = $member['tipe_anggota'] ?? 'Anggota';
   $gender       = ($member['gender'] ?? '') === 'Male' ? 'Laki-laki' : (($member['gender'] ?? '') === 'Female' ? 'Perempuan' : '—');
   $phone        = $member['phone'] ?? '—';
