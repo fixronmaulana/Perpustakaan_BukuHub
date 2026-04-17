@@ -20,7 +20,6 @@ class QuizQuestionModel extends Model
         'option_c',
         'option_d',
         'correct_answer',
-        'points',
     ];
     protected $useTimestamps = true;
     protected $createdField  = 'created_at';

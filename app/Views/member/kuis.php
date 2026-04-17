@@ -338,8 +338,7 @@
 
 <?= $this->section('content') ?>
 <?php
-  $totalSoal  = count($questions);
-  $totalPoin  = array_sum(array_column($questions, 'points'));
+  $totalSoal = count($questions);
 ?>
 
 <div class="kuis-wrapper">
@@ -349,7 +348,7 @@
     <div>
       <div class="kuis-judul"><?= esc($quiz['name']) ?></div>
       <div class="kuis-sub">
-        <?= esc($quiz['book_title']) ?> · <?= $totalSoal ?> soal · Total <?= $totalPoin ?> poin
+        <?= esc($quiz['book_title']) ?> · <?= $totalSoal ?> soal · Maks. 100 poin
       </div>
     </div>
     <div class="kuis-timer" id="timerBox">
@@ -410,11 +409,13 @@
         ← Sebelumnya
       </button>
       <button type="button" class="btn-next" id="btnNext"
-              onclick="pindahSoal(1)">
+              onclick="pindahSoal(1)"
+              style="display:<?= $totalSoal > 1 ? 'block' : 'none' ?>">
         Selanjutnya →
       </button>
       <button type="button" class="btn-submit" id="btnSubmit"
-              style="display:none" onclick="konfirmasiSubmit()">
+              style="display:<?= $totalSoal === 1 ? 'block' : 'none' ?>"
+              onclick="konfirmasiSubmit()">
         Selesai & Kirim ✓
       </button>
     </div>
@@ -495,7 +496,6 @@
 <?= $this->section('scripts') ?>
 <script>
 const TOTAL_SOAL   = <?= $totalSoal ?>;
-const TOTAL_POIN   = <?= $totalPoin ?>;
 const DURASI_DETIK = <?= $quiz['duration_minutes'] * 60 ?>;
 const QUIZ_ID      = <?= $quiz['id'] ?>;
 
@@ -582,7 +582,7 @@ function submitKuis() {
 function tampilHasil(data) {
   // Isi statistik
   document.getElementById('hasilPoinAngka').textContent = data.poin;
-  document.getElementById('hasilPoinTotal').textContent = `dari total ${TOTAL_POIN} poin`;
+  document.getElementById('hasilPoinTotal').textContent = `dari total 100 poin`;
   document.getElementById('hasilBenar').textContent     = data.benar;
   document.getElementById('hasilSalah').textContent     = data.salah;
   document.getElementById('hasilSkor').textContent      = data.skor + '%';

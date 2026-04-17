@@ -325,10 +325,7 @@ class MembersController extends ResourceController
         return redirect()->to('admin/members');
     }
 
-    // ══════════════════════════════════════════════════════
     // IMPORT ANGGOTA
-    // ══════════════════════════════════════════════════════
- 
     public function importForm()
     {
         return view('members/import');

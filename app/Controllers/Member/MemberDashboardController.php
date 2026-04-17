@@ -71,7 +71,7 @@ class MemberDashboardController extends Controller
         // Expired: lewat 24 jam DAN belum pernah dikerjakan sama sekali
         // Kalau sudah dikerjakan (sudah_kuis = true), tetap tampil Selesai
         $sudahDikerjakan = $attemptsLoan > 0;
-$expired = !$masihAktif && $attemptsLoan < $quiz['max_attempts'];
+        $expired = !$masihAktif && !$sudahDikerjakan;
 
         return [
             'quiz_info'    => $quiz,
@@ -332,7 +332,6 @@ $expired = !$masihAktif && $attemptsLoan < $quiz['max_attempts'];
         $durasiDetik = (int) $this->request->getPost('durasi_detik');
         $loanId      = (int) $this->request->getPost('loan_id');
 
-        $poin  = 0;
         $benar = 0;
         $salah = 0;
         $total = count($questions);
@@ -341,13 +340,14 @@ $expired = !$masihAktif && $attemptsLoan < $quiz['max_attempts'];
             $jawabanMember = $jawaban[$q['id']] ?? null;
             if ($jawabanMember === $q['correct_answer']) {
                 $benar++;
-                $poin += $q['points'];
             } else {
                 $salah++;
             }
         }
 
+        // Poin berbasis persentase 100 — bukan per soal
         $skor = $total > 0 ? round($benar / $total * 100) : 0;
+        $poin = $skor; // maks 100
 
         $this->attemptModel->insert([
             'quiz_id'     => $quizId,

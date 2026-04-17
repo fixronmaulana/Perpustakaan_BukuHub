@@ -27,8 +27,7 @@ class QuizzesController extends BaseController
 
         $query = $this->quizModel
             ->select('quizzes.*, books.title as book_title, books.author,
-                      (SELECT COUNT(*) FROM quiz_questions WHERE quiz_questions.quiz_id = quizzes.id) as total_soal,
-                      (SELECT COALESCE(SUM(points),0) FROM quiz_questions WHERE quiz_questions.quiz_id = quizzes.id) as total_poin')
+                      (SELECT COUNT(*) FROM quiz_questions WHERE quiz_questions.quiz_id = quizzes.id) as total_soal')
             ->join('books', 'quizzes.book_id = books.id', 'LEFT')
             ->orderBy('quizzes.created_at', 'DESC');
 
@@ -78,8 +77,7 @@ class QuizzesController extends BaseController
     public function show($id = null)
     {
         $quiz = $this->quizModel
-            ->select('quizzes.*, books.title as book_title, books.author,
-                      (SELECT COALESCE(SUM(points),0) FROM quiz_questions WHERE quiz_questions.quiz_id = quizzes.id) as total_poin')
+            ->select('quizzes.*, books.title as book_title, books.author')
             ->join('books', 'quizzes.book_id = books.id', 'LEFT')
             ->where('quizzes.id', $id)
             ->first();
@@ -91,9 +89,14 @@ class QuizzesController extends BaseController
             ->orderBy('id', 'ASC')
             ->findAll();
 
+        // Hitung poin per soal otomatis (100 / jumlah soal)
+        $totalSoal    = count($questions);
+        $poinPerSoal  = $totalSoal > 0 ? round(100 / $totalSoal, 1) : 0;
+
         return view('quizzes/show', [
-            'quiz'      => $quiz,
-            'questions' => $questions,
+            'quiz'         => $quiz,
+            'questions'    => $questions,
+            'poinPerSoal'  => $poinPerSoal,
         ]);
     }
 
@@ -109,7 +112,6 @@ class QuizzesController extends BaseController
             'option_c'       => 'required|max_length[500]',
             'option_d'       => 'required|max_length[500]',
             'correct_answer' => 'required|in_list[A,B,C,D]',
-            'points'         => 'required|integer|greater_than[0]',
         ])) {
             session()->setFlashdata(['msg' => implode(' ', $this->validator->getErrors()), 'error' => true]);
             return redirect()->back();
@@ -123,14 +125,12 @@ class QuizzesController extends BaseController
             'option_c'       => $this->request->getPost('option_c'),
             'option_d'       => $this->request->getPost('option_d'),
             'correct_answer' => $this->request->getPost('correct_answer'),
-            'points'         => $this->request->getPost('points'),
         ]);
 
         session()->setFlashdata(['msg' => 'Soal berhasil ditambahkan.']);
         return redirect()->to("admin/kuis/{$quizId}");
     }
 
-    // ── Edit soal — pakai POST biasa (bukan PUT) ────────────
     public function updateQuestion($quizId = null, $questionId = null)
     {
         $question = $this->questionModel
@@ -146,7 +146,6 @@ class QuizzesController extends BaseController
             'option_c'       => 'required|max_length[500]',
             'option_d'       => 'required|max_length[500]',
             'correct_answer' => 'required|in_list[A,B,C,D]',
-            'points'         => 'required|integer|greater_than[0]',
         ])) {
             session()->setFlashdata(['msg' => implode(' ', $this->validator->getErrors()), 'error' => true]);
             return redirect()->back();
@@ -159,7 +158,6 @@ class QuizzesController extends BaseController
             'option_c'       => $this->request->getPost('option_c'),
             'option_d'       => $this->request->getPost('option_d'),
             'correct_answer' => $this->request->getPost('correct_answer'),
-            'points'         => $this->request->getPost('points'),
         ]);
 
         session()->setFlashdata(['msg' => 'Soal berhasil diperbarui.']);

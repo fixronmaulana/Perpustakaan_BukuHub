@@ -31,7 +31,9 @@
           <span class="mx-2">·</span>
           <i class="ti ti-refresh me-1"></i>Maks. <?= $quiz['max_attempts'] ?>x
           <span class="mx-2">·</span>
-          <i class="ti ti-star me-1"></i>Total poin: <b><?= $quiz['total_poin'] ?? 0 ?></b>
+          <i class="ti ti-star me-1"></i>Poin per soal:
+          <b><?= $poinPerSoal ?></b>
+          <span class="text-muted small">(100 ÷ <?= count($questions) ?: '?' ?> soal)</span>
           <span class="mx-2">·</span>
           <?php if ($quiz['is_active']): ?>
             <span class="badge bg-success">Aktif</span>
@@ -78,7 +80,6 @@
                 <span class="badge bg-<?= ['A'=>'success','B'=>'primary','C'=>'warning','D'=>'danger'][$q['correct_answer']] ?> ms-2">
                   Jawaban: <?= $q['correct_answer'] ?>
                 </span>
-                <span class="badge bg-info ms-1"><?= $q['points'] ?> poin</span>
               </button>
             </h2>
             <div id="soal<?= $q['id'] ?>" class="accordion-collapse collapse">
@@ -101,7 +102,7 @@
                     </div>
                   <?php endforeach; ?>
                 </div>
-                <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex gap-2">
                   <button class="btn btn-sm btn-primary"
                           onclick="bukaEditSoal(<?= htmlspecialchars(json_encode($q), ENT_QUOTES) ?>)">
                     <i class="ti ti-edit"></i> Edit
@@ -125,7 +126,7 @@
   </div>
 </div>
 
-<!-- ── Modal Tambah Soal ── -->
+<!-- ── Modal Tambah Soal (tanpa input poin) ── -->
 <div class="modal fade" id="modalTambahSoal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -136,6 +137,10 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
+          <div class="alert alert-info py-2 small mb-3">
+            <i class="ti ti-info-circle me-1"></i>
+            Poin per soal dihitung otomatis: <b>100 ÷ jumlah soal</b>. Setelah soal ini ditambah poin akan dihitung ulang.
+          </div>
           <div class="mb-3">
             <label class="form-label fw-semibold">Pertanyaan <span class="text-danger">*</span></label>
             <textarea name="question" class="form-control" rows="3"
@@ -150,23 +155,15 @@
               </div>
             <?php endforeach; ?>
           </div>
-          <div class="row g-3">
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Jawaban Benar <span class="text-danger">*</span></label>
-              <select name="correct_answer" class="form-select" required>
-                <option value="">-- Pilih --</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-              </select>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Poin <span class="text-danger">*</span></label>
-              <input type="number" name="points" class="form-control"
-                     value="10" min="1" max="100" required>
-              <div class="form-text">Poin yang didapat jika jawaban benar</div>
-            </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Jawaban Benar <span class="text-danger">*</span></label>
+            <select name="correct_answer" class="form-select" required>
+              <option value="">-- Pilih --</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+            </select>
           </div>
         </div>
         <div class="modal-footer">
@@ -180,7 +177,7 @@
   </div>
 </div>
 
-<!-- ── Modal Edit Soal ── -->
+<!-- ── Modal Edit Soal (tanpa input poin) ── -->
 <div class="modal fade" id="modalEditSoal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -204,21 +201,14 @@
               </div>
             <?php endforeach; ?>
           </div>
-          <div class="row g-3">
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Jawaban Benar</label>
-              <select name="correct_answer" id="editCorrect" class="form-select" required>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-              </select>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Poin</label>
-              <input type="number" name="points" id="editPoints"
-                     class="form-control" min="1" max="100" required>
-            </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Jawaban Benar</label>
+            <select name="correct_answer" id="editCorrect" class="form-select" required>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+            </select>
           </div>
         </div>
         <div class="modal-footer">
@@ -243,14 +233,9 @@ function bukaEditSoal(q) {
   document.getElementById('editOptionC').value   = q.option_c;
   document.getElementById('editOptionD').value   = q.option_d;
   document.getElementById('editCorrect').value   = q.correct_answer;
-  document.getElementById('editPoints').value    = q.points;
-
-  // Set action form ke endpoint edit soal — pakai POST biasa
   document.getElementById('formEditSoal').action =
     '<?= base_url("admin/kuis/{$quiz['id']}/soal/") ?>' + q.id + '/edit';
-
-  const modal = new bootstrap.Modal(document.getElementById('modalEditSoal'));
-  modal.show();
+  new bootstrap.Modal(document.getElementById('modalEditSoal')).show();
 }
 </script>
 <?= $this->endSection() ?>
