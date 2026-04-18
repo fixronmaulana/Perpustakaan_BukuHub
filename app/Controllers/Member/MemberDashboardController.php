@@ -71,7 +71,7 @@ class MemberDashboardController extends Controller
         // Expired: lewat 24 jam DAN belum pernah dikerjakan sama sekali
         // Kalau sudah dikerjakan (sudah_kuis = true), tetap tampil Selesai
         $sudahDikerjakan = $attemptsLoan > 0;
-        $expired = !$masihAktif && !$sudahDikerjakan;
+        $expired = !$masihAktif && ($attemptsLoan < $quiz['max_attempts']);
 
         return [
             'quiz_info'    => $quiz,
