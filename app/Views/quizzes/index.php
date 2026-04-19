@@ -156,7 +156,7 @@
             <div class="col-6 mb-3">
               <label class="form-label">Maks. Percobaan <span class="text-danger">*</span></label>
               <input type="number" name="max_attempts" class="form-control"
-                     value="3" min="1" max="10" required>
+                     value="1" min="1" max="10" required>
             </div>
           </div>
         </div>
