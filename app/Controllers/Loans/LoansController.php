@@ -23,7 +23,7 @@ class LoansController extends ResourceController
         $this->memberModel = new MemberModel;
         $this->bookModel = new BookModel;
 
-        helper('upload');
+        helper(['upload', 'point']);
     }
 
     /**
@@ -101,9 +101,7 @@ class LoansController extends ResourceController
                 filename: $qrCodeLabel
             );
 
-            // delete former qr code
             deleteLoansQRCode($loan['qr_code']);
-
             $this->loanModel->update($loan['id'], ['qr_code' => $qrCode]);
 
             $loan = $this->loanModel
@@ -120,7 +118,7 @@ class LoansController extends ResourceController
         }
 
         $data = [
-            'loan'         => $loan,
+            'loan' => $loan,
         ];
 
         return view('loans/show', $data);
@@ -247,7 +245,6 @@ class LoansController extends ResourceController
             ->first();
 
         $books = [];
-
         $bookSlugs = $this->request->getVar('slugs');
 
         if (empty($bookSlugs)) {
@@ -298,7 +295,6 @@ class LoansController extends ResourceController
         }
 
         $memberUid = $this->request->getVar('member_uid') or die();
-
         $member = $this->memberModel->where('uid', $memberUid)->first();
 
         if (empty($member)) {
@@ -306,25 +302,22 @@ class LoansController extends ResourceController
             return redirect()->to('admin/loans/new/members/search');
         }
 
-        $newLoanIds = [];
+        $newLoanIds     = [];
+        $poinPeminjaman = get_poin_setting('loan');
 
         foreach ($bookSlugs as $slug) {
             $duration = $this->request->getVar('duration-' . $slug);
             $quantity = $this->request->getVar('quantity-' . $slug);
-
-            $book = $this->bookModel->where('slug', $slug)->first();
+            $book     = $this->bookModel->where('slug', $slug)->first();
 
             if (empty($duration) || empty($quantity) || empty($book)) {
                 continue;
             }
 
-            $loanUid = sha1($book['slug'] . $member['uid'] . time());
-
+            $loanUid     = sha1($book['slug'] . $member['uid'] . time());
             $qrGenerator = new QRGenerator();
-
             $qrCodeLabel = substr($member['first_name'] . ($member['last_name'] ? " {$member['last_name']}" : ''), 0, 12) . '_' . substr($book['title'], 0, 12);
-
-            $qrCode = $qrGenerator->generateQRCode(
+            $qrCode      = $qrGenerator->generateQRCode(
                 data: $loanUid,
                 labelText: $qrCodeLabel,
                 dir: LOANS_QR_CODE_PATH,
@@ -332,18 +325,29 @@ class LoansController extends ResourceController
             );
 
             $newLoan = [
-                'book_id' => $book['id'],
-                'quantity' => $quantity,
+                'book_id'   => $book['id'],
+                'quantity'  => $quantity,
                 'member_id' => $member['id'],
-                'uid' => $loanUid,
+                'uid'       => $loanUid,
                 'loan_date' => Time::now()->toDateTimeString(),
-                'due_date' => Time::now()->addDays(intval($duration))->toDateTimeString(),
-                'qr_code' => $qrCode,
+                'due_date'  => Time::now()->addDays(intval($duration))->toDateTimeString(),
+                'qr_code'   => $qrCode,
             ];
 
             $this->loanModel->insert($newLoan);
+            $loanId = $this->loanModel->getInsertID();
+            array_push($newLoanIds, $loanId);
 
-            array_push($newLoanIds, $this->loanModel->getInsertID());
+            // ── Catat poin peminjaman ───────────────────────
+            catat_poin(
+                $member['id'],
+                'loan',
+                $poinPeminjaman,
+                'Peminjaman buku: ' . $book['title'],
+                $loanId,
+                'loan'
+            );
+            // ────────────────────────────────────────────────
         }
 
         $newLoans = array_map(function ($id) {
@@ -354,29 +358,9 @@ class LoansController extends ResourceController
         }, $newLoanIds);
 
         return view('loans/result', [
-            'newLoans'  => $newLoans
+            'newLoans' => $newLoans
         ]);
     }
-
-    /**
-     * Return the editable properties of a resource object
-     *
-     * @return mixed
-     */
-    // public function edit($uid = null)
-    // {
-    //! Not implemented
-    // }
-
-    /**
-     * Add or update a model resource, from "posted" properties
-     *
-     * @return mixed
-     */
-    // public function update($uid = null)
-    // {
-    //! Not implemented
-    // }
 
     /**
      * Delete the designated resource object from the model

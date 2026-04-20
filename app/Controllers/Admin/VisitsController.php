@@ -16,6 +16,7 @@ class VisitsController extends BaseController
     {
         $this->visitModel  = new VisitModel();
         $this->memberModel = new MemberModel();
+        helper(['upload', 'point']);
     }
 
     public function index()
@@ -30,8 +31,8 @@ class VisitsController extends BaseController
 
         if ($search) {
             $query->groupStart()
-                ->like('members.first_name',   $search, insensitiveSearch: true)
-                ->orLike('members.last_name',  $search, insensitiveSearch: true)
+                ->like('members.first_name',     $search, insensitiveSearch: true)
+                ->orLike('members.last_name',    $search, insensitiveSearch: true)
                 ->orLike('members.no_identitas', $search, insensitiveSearch: true)
                 ->groupEnd();
         }
@@ -79,8 +80,7 @@ class VisitsController extends BaseController
             ]);
         }
 
-        // ── Validasi: cek kunjungan hari yang sama ──────────
-        $tanggalInput = date('Y-m-d', strtotime($this->request->getPost('visit_date')));
+        $tanggalInput   = date('Y-m-d', strtotime($this->request->getPost('visit_date')));
         $sudahKunjungan = $this->visitModel
             ->where('member_id', $member['id'])
             ->where("DATE(visit_date)", $tanggalInput)
@@ -93,7 +93,6 @@ class VisitsController extends BaseController
                 'errorMember' => esc($member['first_name']) . ' sudah tercatat berkunjung pada tanggal ' . date('d/m/Y', strtotime($tanggalInput)) . '. Satu anggota hanya bisa berkunjung sekali dalam sehari.',
             ]);
         }
-        // ────────────────────────────────────────────────────
 
         $this->visitModel->insert([
             'member_id'  => $member['id'],
@@ -101,6 +100,19 @@ class VisitsController extends BaseController
             'method'     => 'manual',
             'notes'      => $this->request->getPost('notes') ?? null,
         ]);
+        $visitId = $this->visitModel->getInsertID();
+
+        // ── Catat poin kunjungan ────────────────────────────
+        $poinKunjungan = get_poin_setting('visit');
+        catat_poin(
+            $member['id'],
+            'visit',
+            $poinKunjungan,
+            'Kunjungan perpustakaan (manual)',
+            $visitId,
+            'visit'
+        );
+        // ────────────────────────────────────────────────────
 
         session()->setFlashdata(['msg' => 'Kunjungan berhasil dicatat.']);
         return redirect()->to('admin/kunjungan');
@@ -115,10 +127,7 @@ class VisitsController extends BaseController
         $uid = $this->request->getPost('uid');
 
         if (empty($uid)) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'UID tidak ditemukan.',
-            ]);
+            return $this->response->setJSON(['success' => false, 'message' => 'UID tidak ditemukan.']);
         }
 
         $member = $this->memberModel->where('uid', $uid)->first();
@@ -130,7 +139,7 @@ class VisitsController extends BaseController
             ]);
         }
 
-        $today = Time::now()->toDateString();
+        $today          = Time::now()->toDateString();
         $sudahKunjungan = $this->visitModel
             ->where('member_id', $member['id'])
             ->where("DATE(visit_date) = '{$today}'")
@@ -154,10 +163,23 @@ class VisitsController extends BaseController
             'method'     => 'scan',
             'notes'      => null,
         ]);
+        $visitId = $this->visitModel->getInsertID();
+
+        // ── Catat poin kunjungan scan ───────────────────────
+        $poinKunjungan = get_poin_setting('visit');
+        catat_poin(
+            $member['id'],
+            'visit',
+            $poinKunjungan,
+            'Kunjungan perpustakaan (scan QR)',
+            $visitId,
+            'visit'
+        );
+        // ────────────────────────────────────────────────────
 
         return $this->response->setJSON([
             'success' => true,
-            'message' => 'Kunjungan ' . $member['first_name'] . ' berhasil dicatat.',
+            'message' => 'Kunjungan ' . $member['first_name'] . ' berhasil dicatat. +' . $poinKunjungan . ' poin.',
             'member'  => [
                 'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
                 'no_identitas' => $member['no_identitas'],

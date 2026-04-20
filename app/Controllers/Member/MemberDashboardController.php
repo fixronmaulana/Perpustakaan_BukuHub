@@ -37,6 +37,7 @@ class MemberDashboardController extends Controller
         $this->quizModel     = new QuizModel();
         $this->questionModel = new QuizQuestionModel();
         $this->attemptModel  = new QuizAttemptModel();
+        helper(['point']);
     }
 
     // ── Helper: cek info kuis per transaksi ──────────────────
@@ -71,12 +72,17 @@ class MemberDashboardController extends Controller
         // Expired: lewat 24 jam DAN belum pernah dikerjakan sama sekali
         // Kalau sudah dikerjakan (sudah_kuis = true), tetap tampil Selesai
         $sudahDikerjakan = $attemptsLoan > 0;
-        $expired = !$masihAktif && ($attemptsLoan < $quiz['max_attempts']);
+        $percobaanHabis  = $attemptsLoan >= $quiz['max_attempts'];
+
+        // Expired: lewat 24 jam DAN percobaan belum habis
+        // Berlaku untuk semua kondisi — belum maupun sudah dikerjakan tapi masih bisa ulangi
+        // Yang tidak expired: percobaan sudah habis (tampil Selesai)
+        $expired = !$masihAktif && !$percobaanHabis;
 
         return [
             'quiz_info'    => $quiz,
             'sudah_kuis'   => $sudahDikerjakan,
-            'max_habis'    => $attemptsLoan >= $quiz['max_attempts'],
+            'max_habis'    => $percobaanHabis,
             'kuis_expired' => $expired,
         ];
     }
@@ -358,6 +364,20 @@ class MemberDashboardController extends Controller
             'started_at'  => Time::now()->subSeconds($durasiDetik)->toDateTimeString(),
             'finished_at' => Time::now()->toDateTimeString(),
         ]);
+        $attemptId = $this->attemptModel->getInsertID();
+
+        // ── Catat poin kuis ─────────────────────────────────
+        if ($poin > 0) {
+            catat_poin(
+                $member['id'],
+                'quiz',
+                $poin,
+                'Kuis: ' . ($quiz['name'] ?? 'Kuis Buku') . ' — Skor ' . $skor . '%',
+                $attemptId,
+                'quiz_attempt'
+            );
+        }
+        // ────────────────────────────────────────────────────
 
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([

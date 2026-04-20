@@ -26,7 +26,7 @@ class ReturnsController extends ResourceController
         $this->memberModel = new MemberModel;
         $this->bookModel = new BookModel;
 
-        helper('upload');
+        helper(['upload', 'point']);
     }
 
     /**
@@ -65,10 +65,10 @@ class ReturnsController extends ResourceController
         });
 
         $data = [
-            'loans'         => $loans,
-            'pager'         => $this->loanModel->pager,
-            'currentPage'   => $this->request->getVar('page_returns') ?? 1,
-            'itemPerPage'   => $itemPerPage,
+            'loans'       => $loans,
+            'pager'       => $this->loanModel->pager,
+            'currentPage' => $this->request->getVar('page_returns') ?? 1,
+            'itemPerPage' => $itemPerPage,
         ];
 
         return view('returns/index', $data);
@@ -107,9 +107,7 @@ class ReturnsController extends ResourceController
                 filename: $qrCodeLabel
             );
 
-            // delete former qr code
             deleteLoansQRCode($loan['qr_code']);
-
             $this->loanModel->update($loan['id'], ['qr_code' => $qrCode]);
 
             $loan = $this->loanModel
@@ -126,7 +124,7 @@ class ReturnsController extends ResourceController
         }
 
         $data = [
-            'loan'         => $loan,
+            'loan' => $loan,
         ];
 
         return view('returns/show', $data);
@@ -212,18 +210,19 @@ class ReturnsController extends ResourceController
      */
     public function create()
     {
-        $date = Time::parse($this->request->getVar('date') ?? 'now', locale: 'id');
+        $date    = Time::parse($this->request->getVar('date') ?? 'now', locale: 'id');
         $loanUid = $this->request->getVar('loan_uid');
-
-        $loan = $this->loanModel->where('uid', $loanUid)->first();
+        $loan    = $this->loanModel->where('uid', $loanUid)->first();
 
         if (empty($loan)) {
             throw new PageNotFoundException('Loan not found');
         }
 
         $loanDueDate = Time::parse($loan['due_date'], locale: 'id');
+        $isLate      = $date->isAfter($loanDueDate);
 
-        $isLate = $date->isAfter($loanDueDate);
+        // Ambil data member untuk poin
+        $member = $this->memberModel->find($loan['member_id']);
 
         if ($isLate) {
             if (!$this->loanModel->update($loan['id'], [
@@ -234,50 +233,59 @@ class ReturnsController extends ResourceController
             }
 
             $finePerDay = FinesPerDayModel::getAmount();
-            $daysLate = $date->today()->difference($loanDueDate)->getDays();
-            $totalFine = abs($daysLate) * $loan['quantity'] * $finePerDay;
+            $daysLate   = $date->today()->difference($loanDueDate)->getDays();
+            $totalFine  = abs($daysLate) * $loan['quantity'] * $finePerDay;
 
             if (!$this->fineModel->save([
-                'loan_id' => $loan['id'],
+                'loan_id'     => $loan['id'],
                 'fine_amount' => $totalFine,
             ])) {
                 session()->setFlashdata(['msg' => 'Update failed', 'error' => true]);
                 return redirect()->to('admin/returns/new?loan-uid=' . $loan['uid']);
             }
+
+            // ── Catat poin pengembalian terlambat ───────────
+            if ($member) {
+                $poin = get_poin_setting('return_late'); // nilai negatif
+                catat_poin(
+                    $member['id'],
+                    'return_late',
+                    $poin,
+                    'Pengembalian terlambat ' . abs($daysLate) . ' hari',
+                    $loan['id'],
+                    'loan'
+                );
+            }
+            // ────────────────────────────────────────────────
+
         } else {
             deleteLoansQRCode($loan['qr_code']);
             if (!$this->loanModel->update($loan['id'], [
                 'return_date' => $date->toDateTimeString(),
-                'qr_code' => null
+                'qr_code'     => null
             ])) {
                 session()->setFlashdata(['msg' => 'Update failed', 'error' => true]);
                 return redirect()->to('admin/returns/new?loan-uid=' . $loan['uid']);
             }
+
+            // ── Catat poin pengembalian tepat waktu ─────────
+            if ($member) {
+                $poin = get_poin_setting('return_ontime');
+                catat_poin(
+                    $member['id'],
+                    'return_ontime',
+                    $poin,
+                    'Pengembalian tepat waktu',
+                    $loan['id'],
+                    'loan'
+                );
+            }
+            // ────────────────────────────────────────────────
         }
 
         session()->setFlashdata(['msg' => 'Success', 'error' => false]);
         return redirect()->to('admin/returns');
     }
-
-    /**
-     * Return the editable properties of a resource object
-     *
-     * @return mixed
-     */
-    // public function edit($uid = null)
-    // {
-    //! Not implemented
-    // }
-
-    /**
-     * Add or update a model resource, from "posted" properties
-     *
-     * @return mixed
-     */
-    // public function update($uid = null)
-    // {
-    //! Not implemented
-    // }
 
     /**
      * Delete the designated resource object from the model
@@ -303,9 +311,7 @@ class ReturnsController extends ResourceController
         }
 
         $qrGenerator = new QRGenerator();
-
         $qrCodeLabel = substr($loan['first_name'] . ($loan['last_name'] ? " {$loan['last_name']}" : ''), 0, 12) . '_' . substr($loan['title'], 0, 12);
-
         $qrCode = $qrGenerator->generateQRCode(
             data: $loan['uid'],
             labelText: $qrCodeLabel,
@@ -315,10 +321,9 @@ class ReturnsController extends ResourceController
 
         if (!$this->loanModel->update($loan['id'], [
             'return_date' => null,
-            'qr_code' => $qrCode
+            'qr_code'     => $qrCode
         ])) {
             deleteLoansQRCode($qrCode);
-
             session()->setFlashdata(['msg' => 'Update failed', 'error' => true]);
             return redirect()->to('admin/returns/' . $loan['uid']);
         }
