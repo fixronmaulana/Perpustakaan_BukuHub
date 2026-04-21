@@ -99,6 +99,9 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
     $routes->post('kuis/(:num)/toggle',         'Admin\QuizzesController::toggleActive/$1');
     $routes->delete('kuis/(:num)',              'Admin\QuizzesController::delete/$1');
 
+    $routes->get('pengaturan-poin',  'Admin\PointSettingsController::index');
+    $routes->post('pengaturan-poin', 'Admin\PointSettingsController::update');
+
     $routes->get('returns/new/search', 'Loans\ReturnsController::searchLoan');
     $routes->resource('returns', ['controller' => 'Loans\ReturnsController']);
 

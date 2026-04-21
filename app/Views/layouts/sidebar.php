@@ -56,6 +56,12 @@ $sidebarNavs = [
     'link' => '/admin/racks',
     'icon' => 'ti ti-columns'
   ],
+  'Gamifikasi',
+  [
+    'name' => 'Point Settings',
+    'link' => '/admin/pengaturan-poin',
+    'icon' => 'ti ti-star'
+  ],
 ];
 
 if (auth()->user()->inGroup('superadmin') ?? false) {
