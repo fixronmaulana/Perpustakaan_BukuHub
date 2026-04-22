@@ -11,6 +11,8 @@ use App\Models\VisitModel;
 use App\Models\QuizModel;
 use App\Models\QuizQuestionModel;
 use App\Models\QuizAttemptModel;
+use App\Models\PointTransactionModel;
+use App\Models\LeaderboardSnapshotModel;
 use CodeIgniter\Controller;
 use CodeIgniter\I18n\Time;
 
@@ -24,7 +26,9 @@ class MemberDashboardController extends Controller
     protected VisitModel        $visitModel;
     protected QuizModel         $quizModel;
     protected QuizQuestionModel $questionModel;
-    protected QuizAttemptModel  $attemptModel;
+    protected QuizAttemptModel       $attemptModel;
+    protected PointTransactionModel  $pointModel;
+    protected LeaderboardSnapshotModel $leaderboardModel;
 
     public function __construct()
     {
@@ -36,7 +40,9 @@ class MemberDashboardController extends Controller
         $this->visitModel    = new VisitModel();
         $this->quizModel     = new QuizModel();
         $this->questionModel = new QuizQuestionModel();
-        $this->attemptModel  = new QuizAttemptModel();
+        $this->attemptModel      = new QuizAttemptModel();
+        $this->pointModel        = new PointTransactionModel();
+        $this->leaderboardModel  = new LeaderboardSnapshotModel();
         helper(['point']);
     }
 
@@ -395,12 +401,125 @@ class MemberDashboardController extends Controller
 
     public function leaderboard()
     {
-        return view('member/leaderboard', ['member' => $this->getMember(), 'activeNav' => 'leaderboard']);
+        $member   = $this->getMember();
+        $bulanIni = (int) date('n');
+        $tahunIni = (int) date('Y');
+
+        // Bulan yang dipilih (default bulan ini)
+        $bulan = (int) ($this->request->getGet('bulan') ?? $bulanIni);
+        $tahun = (int) ($this->request->getGet('tahun') ?? $tahunIni);
+
+        if ($bulan === $bulanIni && $tahun === $tahunIni) {
+            // Bulan berjalan — kalkulasi real-time
+            $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
+        } else {
+            // Bulan lalu — pakai lazy snapshot
+            if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
+                $this->leaderboardModel->buatSnapshot($bulan, $tahun);
+            }
+            $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun);
+        }
+
+        // Rank member yang login di bulan yang dipilih
+        $rankSaya = 0;
+        foreach ($leaderboard as $i => $row) {
+            if ($row['member_id'] == $member['id']) {
+                $rankSaya = $i + 1;
+                break;
+            }
+        }
+
+        // Daftar bulan untuk dropdown (6 bulan ke belakang)
+        $daftarBulan = [];
+        for ($i = 0; $i < 6; $i++) {
+            $ts = mktime(0, 0, 0, $bulanIni - $i, 1, $tahunIni);
+            $daftarBulan[] = [
+                'bulan' => (int) date('n', $ts),
+                'tahun' => (int) date('Y', $ts),
+                'label' => strftime('%B %Y', $ts),
+            ];
+        }
+
+        return view('member/leaderboard', [
+            'member'       => $member,
+            'activeNav'    => 'leaderboard',
+            'leaderboard'  => $leaderboard,
+            'rankSaya'     => $rankSaya,
+            'bulan'        => $bulan,
+            'tahun'        => $tahun,
+            'daftarBulan'  => $daftarBulan,
+            'bulanIni'     => $bulanIni,
+            'tahunIni'     => $tahunIni,
+        ]);
+    }
+
+    // ── Helper: hitung leaderboard real-time bulan ini ───────
+    private function _getLeaderboardRealtime(int $bulan, int $tahun): array
+    {
+        $members = $this->memberModel->where('deleted_at', null)->findAll();
+        $data    = [];
+
+        foreach ($members as $m) {
+            $total    = $this->pointModel->getTotalPoin($m['id'], $bulan, $tahun);
+            $data[]   = [
+                'member_id'    => $m['id'],
+                'first_name'   => $m['first_name'],
+                'last_name'    => $m['last_name'],
+                'no_identitas' => $m['no_identitas'],
+                'tipe_anggota' => $m['tipe_anggota'],
+                'foto_profil'  => $m['foto_profil'],
+                'total_points' => $total,
+            ];
+        }
+
+        usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
+        return $data;
+    }
+
+    // ── Helper: hitung rank member real-time ─────────────────
+    private function _hitungRankRealtime(int $memberId, int $bulan, int $tahun): int
+    {
+        $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
+        foreach ($leaderboard as $i => $row) {
+            if ($row['member_id'] == $memberId) return $i + 1;
+        }
+        return 0;
     }
 
     public function poin()
     {
-        return view('member/poin', ['member' => $this->getMember(), 'activeNav' => 'poin']);
+        $member      = $this->getMember();
+        $bulan       = (int) ($this->request->getGet('bulan') ?? date('n'));
+        $tahun       = (int) ($this->request->getGet('tahun') ?? date('Y'));
+
+        // Riwayat poin dengan pagination
+        $riwayat = $this->pointModel
+            ->where('member_id', $member['id'])
+            ->orderBy('created_at', 'DESC')
+            ->paginate(15, 'poin');
+
+        $pager = $this->pointModel->pager;
+
+        // Total poin bulan ini
+        $totalBulanIni = $this->pointModel->getTotalPoinBulanIni($member['id']);
+
+        // Total poin all time
+        $totalAllTime = $this->pointModel->getTotalPoinAllTime($member['id']);
+
+        // Rank bulan ini — hitung real-time dari semua member
+        $bulanIni = (int) date('n');
+        $tahunIni = (int) date('Y');
+        $rankBulanIni = $this->_hitungRankRealtime($member['id'], $bulanIni, $tahunIni);
+
+        return view('member/poin', [
+            'member'        => $member,
+            'activeNav'     => 'poin',
+            'riwayat'       => $riwayat,
+            'pager'         => $pager,
+            'totalBulanIni' => $totalBulanIni,
+            'totalAllTime'  => $totalAllTime,
+            'rankBulanIni'  => $rankBulanIni,
+        ]);
     }
 
     public function kunjungan()

@@ -7,270 +7,136 @@
 <?= $this->section('pageTitle') ?>Poin Saya<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?php use CodeIgniter\I18n\Time; ?>
 
 <?php
-  $namaAnggota = isset($member['first_name'])
-    ? esc(trim($member['first_name'] . ' ' . ($member['last_name'] ?? '')))
-    : 'Anggota';
-  $nisn    = !empty($member['uid']) ? esc(strtoupper($member['uid'])) : '—';
-  $inisial = '';
-  if (!empty($member['first_name'])) $inisial .= strtoupper(substr($member['first_name'], 0, 1));
-  if (!empty($member['last_name']))  $inisial .= strtoupper(substr($member['last_name'],  0, 1));
-  $inisial = $inisial ?: 'AA';
+$labelAktivitas = [
+    'visit'         => 'Kunjungan Perpustakaan',
+    'loan'          => 'Peminjaman Buku',
+    'return_ontime' => 'Pengembalian Tepat Waktu',
+    'return_late'   => 'Pengembalian Terlambat',
+    'quiz'          => 'Kuis Buku',
+];
+$ikonAktivitas = [
+    'visit'         => 'ti-door-enter',
+    'loan'          => 'ti-book',
+    'return_ontime' => 'ti-check',
+    'return_late'   => 'ti-clock-exclamation',
+    'quiz'          => 'ti-help-circle',
+];
 ?>
 
-<!-- ══ Header profil + peringkat ══ -->
-<div class="header-poin">
-  <div class="header-poin-kiri">
-    <div class="avatar-poin"><?= $inisial ?></div>
-    <div>
-      <h2 class="nama-header-poin">Halo, <?= $namaAnggota ?>!</h2>
-      <p class="nisn-header-poin">NISN <?= $nisn ?></p>
+<!-- Statistik -->
+<div class="grid-stat" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.25rem">
+
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-.9L12 2z"/>
+        </svg>
+      </div>
+      <div class="ksa-angka <?= $totalBulanIni < 0 ? 'tgl-terlambat' : '' ?>">
+        <?= ($totalBulanIni >= 0 ? '+' : '') . $totalBulanIni ?>
+      </div>
+      <div class="ksa-label">Poin Bulan Ini</div>
     </div>
   </div>
-  <div class="badge-peringkat-poin">
-    <span class="badge-peringkat-angka"># 10</span>
-    <span class="badge-peringkat-label">Peringkat Anda</span>
-  </div>
-</div>
 
-<!-- ══ 5 Kartu Statistik Poin ══ -->
-<div class="grid-stat-poin">
-
-  <!-- Total Poin — navy+emas -->
-  <div class="kartu-stat-poin unggulan">
-    <div class="ikon-stat-poin">
-      <!-- Polygon wajib punya fill="none" eksplisit, tidak cukup inherit -->
-      <svg width="18" height="18" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                 fill="none" stroke="currentColor"/>
-      </svg>
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-.9L12 2z"/>
+        </svg>
+      </div>
+      <div class="ksa-angka"><?= $totalAllTime ?></div>
+      <div class="ksa-label">Total Poin</div>
     </div>
-    <div class="angka-stat-poin">900</div>
-    <div class="label-stat-poin">Total Poin</div>
   </div>
 
-  <!-- Kunjungan -->
-  <div class="kartu-stat-poin">
-    <div class="ikon-stat-poin">
-      <svg width="18" height="18" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" fill="none"/>
-        <circle cx="9" cy="7" r="4" fill="none"/>
-      </svg>
+  <div class="kartu-stat-admin">
+    <div class="ksa-body">
+      <div class="ksa-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M18 2h-2V1H8v1H6a1 1 0 00-1 1v3a5 5 0 004 4.9V13H7v2h10v-2h-2v-2.1A5 5 0 0019 6V3a1 1 0 00-1-1zm-1 4a3 3 0 01-2 2.83V4h2v2zm-10 0V4h2v4.83A3 3 0 017 6z"/>
+        </svg>
+      </div>
+      <div class="ksa-angka"><?= $rankBulanIni > 0 ? '#' . $rankBulanIni : '—' ?></div>
+      <div class="ksa-label">Peringkat Bulan Ini</div>
     </div>
-    <div class="angka-stat-poin">35</div>
-    <div class="label-stat-poin">Kunjungan</div>
-  </div>
-
-  <!-- Peminjaman -->
-  <div class="kartu-stat-poin">
-    <div class="ikon-stat-poin">
-      <svg width="18" height="18" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 19.5A2.5 2.5 0 016.5 17H20" fill="none"/>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" fill="none"/>
-      </svg>
-    </div>
-    <div class="angka-stat-poin">22</div>
-    <div class="label-stat-poin">Peminjaman</div>
-  </div>
-
-  <!-- Tepat Waktu — hijau -->
-  <div class="kartu-stat-poin">
-    <div class="ikon-stat-poin hijau">
-      <svg width="18" height="18" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 11 12 14 22 4" fill="none"/>
-        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" fill="none"/>
-      </svg>
-    </div>
-    <div class="angka-stat-poin">22</div>
-    <div class="label-stat-poin">Tepat Waktu</div>
-  </div>
-
-  <!-- Terlambat — merah -->
-  <div class="kartu-stat-poin">
-    <div class="ikon-stat-poin merah">
-      <svg width="18" height="18" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10" fill="none"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-    </div>
-    <div class="angka-stat-poin">0</div>
-    <div class="label-stat-poin">Terlambat</div>
   </div>
 
 </div>
 
-<!-- ══ Riwayat Poin ══ -->
+<!-- Riwayat Poin -->
 <div class="kotak-konten">
   <div class="kepala-kotak">
-    <h3>Riwayat Point</h3>
-    <div class="filter-status">
-      <button class="pil-filter aktif" onclick="filterPoin(this,'semua')">Semua</button>
-      <button class="pil-filter" onclick="filterPoin(this,'mar-2026')">Mar 2026</button>
-      <button class="pil-filter" onclick="filterPoin(this,'feb-2026')">Feb 2026</button>
-      <button class="pil-filter" onclick="filterPoin(this,'jan-2026')">Jan 2026</button>
-    </div>
+    <h3>Riwayat Poin</h3>
   </div>
 
-  <!-- Ringkasan total bulan (muncul saat filter aktif) -->
-  <div id="ringkasan-bulan" style="display:none; padding:0.6rem 1.25rem; background:var(--latar); border-bottom:1px solid var(--batas); font-size:0.78rem; color:var(--teks-redup);">
-    <span id="teks-ringkasan"></span>
+  <div class="bungkus-tabel">
+    <table class="tabel-admin-member">
+      <thead>
+        <tr>
+          <th>Aktivitas</th>
+          <th>Keterangan</th>
+          <th>Tanggal</th>
+          <th class="teks-center">Poin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (empty($riwayat)): ?>
+          <tr>
+            <td colspan="4">
+              <div class="kondisi-kosong">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <p>Belum ada riwayat poin</p>
+              </div>
+            </td>
+          </tr>
+        <?php else: ?>
+          <?php foreach ($riwayat as $item):
+            $isPositif = $item['points'] >= 0;
+            $ikon      = $ikonAktivitas[$item['activity_type']] ?? 'ti-star';
+            $label     = $labelAktivitas[$item['activity_type']] ?? $item['activity_type'];
+          ?>
+            <tr>
+              <td>
+                <div style="display:inline-flex;align-items:center;gap:8px">
+                  <span style="width:32px;height:32px;border-radius:8px;
+                               background:<?= $isPositif ? '#d1fae5' : '#fee2e2' ?>;
+                               display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="ti <?= $ikon ?>"
+                       style="color:<?= $isPositif ? '#16a34a' : '#dc2626' ?>;font-size:.9rem"></i>
+                  </span>
+                  <span class="judul-tabel"><?= esc($label) ?></span>
+                </div>
+              </td>
+              <td class="penulis-tabel"><?= esc($item['description'] ?? '—') ?></td>
+              <td class="tgl-normal">
+                <?= Time::parse($item['created_at'])->format('d/m/Y') ?>
+                <br><span class="teks-redup-sm"><?= Time::parse($item['created_at'])->format('H:i') ?></span>
+              </td>
+              <td class="teks-center">
+                <span style="font-weight:700;font-size:.95rem;
+                             color:<?= $isPositif ? '#16a34a' : '#dc2626' ?>">
+                  <?= ($isPositif ? '+' : '') . $item['points'] ?>
+                </span>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </tbody>
+    </table>
   </div>
 
-  <div class="daftar-riwayat-poin" id="daftar-poin">
-
-    <div class="item-riwayat-poin" data-bulan="mar-2026" data-nilai="10">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Peminjaman Buku</div>
-        <div class="detail-poin">Laskar Pelangi — 21 Mar 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 10</span>
+  <!-- Pagination -->
+  <?php if ($pager): ?>
+    <div style="padding:1rem 1.25rem">
+      <?= $pager->links('poin', 'member_pager') ?>
     </div>
-
-    <div class="item-riwayat-poin" data-bulan="mar-2026" data-nilai="15">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Pengembalian Tepat Waktu</div>
-        <div class="detail-poin">Atomic Habits — 18 Mar 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 15</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="mar-2026" data-nilai="5">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Kunjungan Perpustakaan</div>
-        <div class="detail-poin">15 Mar 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 5</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="mar-2026" data-nilai="20">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Partisipasi Kuis</div>
-        <div class="detail-poin">Kuis Laskar Pelangi — 10 Mar 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 20</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="feb-2026" data-nilai="-10">
-      <div class="ikon-poin-wrap negatif">−</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Keterlambatan Pengembalian</div>
-        <div class="detail-poin">Bumi Manusia — 20 Feb 2026</div>
-      </div>
-      <span class="badge-poin negatif">− 10</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="feb-2026" data-nilai="10">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Peminjaman Buku</div>
-        <div class="detail-poin">Filosofi Teras — 10 Feb 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 10</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="feb-2026" data-nilai="5">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Kunjungan Perpustakaan</div>
-        <div class="detail-poin">5 Feb 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 5</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="jan-2026" data-nilai="15">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Pengembalian Tepat Waktu</div>
-        <div class="detail-poin">Tentang Hidup dan Mati — 28 Jan 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 15</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="jan-2026" data-nilai="20">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Partisipasi Kuis</div>
-        <div class="detail-poin">Kuis Atomic Habits — 15 Jan 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 20</span>
-    </div>
-
-    <div class="item-riwayat-poin" data-bulan="jan-2026" data-nilai="10">
-      <div class="ikon-poin-wrap positif">+</div>
-      <div class="info-riwayat-poin">
-        <div class="aksi-poin">Peminjaman Buku</div>
-        <div class="detail-poin">Atomic Habits — 3 Jan 2026</div>
-      </div>
-      <span class="badge-poin positif">+ 10</span>
-    </div>
-
-  </div>
-
-  <!-- Empty state -->
-  <div class="kondisi-kosong" id="kondisi-kosong-poin" style="display:none">
-    <svg width="40" height="40" viewBox="0 0 24 24"
-         fill="none" stroke="#e4e8f4"
-         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-               fill="none"/>
-    </svg>
-    <p>Tidak ada riwayat poin bulan ini</p>
-  </div>
-
+  <?php endif; ?>
 </div>
 
-<?= $this->endSection() ?>
-
-<?= $this->section('scripts') ?>
-<script>
-function filterPoin(btn, bulan) {
-  document.querySelectorAll('.pil-filter').forEach(b => b.classList.remove('aktif'));
-  btn.classList.add('aktif');
-
-  const items = document.querySelectorAll('#daftar-poin .item-riwayat-poin');
-  let n = 0, masuk = 0, keluar = 0;
-
-  items.forEach(item => {
-    const ok = bulan === 'semua' || item.dataset.bulan === bulan;
-    item.style.display = ok ? '' : 'none';
-    if (ok) {
-      n++;
-      const v = parseInt(item.dataset.nilai) || 0;
-      if (v >= 0) masuk += v; else keluar += Math.abs(v);
-    }
-  });
-
-  // Tampilkan ringkasan saat filter per bulan aktif
-  const ringkasan = document.getElementById('ringkasan-bulan');
-  if (bulan !== 'semua' && n > 0) {
-    document.getElementById('teks-ringkasan').innerHTML =
-      `Poin masuk <strong style="color:var(--hijau)">+${masuk}</strong>
-       &nbsp;·&nbsp;
-       Poin keluar <strong style="color:var(--merah)">−${keluar}</strong>
-       &nbsp;·&nbsp;
-       Total bulan ini <strong style="color:var(--navy)">${masuk - keluar}</strong>`;
-    ringkasan.style.display = 'block';
-  } else {
-    ringkasan.style.display = 'none';
-  }
-
-  document.getElementById('kondisi-kosong-poin').style.display = n === 0 ? 'flex' : 'none';
-}
-</script>
 <?= $this->endSection() ?>
