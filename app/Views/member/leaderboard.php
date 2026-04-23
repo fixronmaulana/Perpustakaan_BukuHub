@@ -30,18 +30,18 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
         <span class="badge-admin hijau" style="font-size:.72rem;margin-left:4px">Live</span>
       <?php endif; ?>
     </h3>
-    <!-- Dropdown pilih bulan -->
     <form method="get" action="" style="display:flex;gap:8px;align-items:center">
       <select name="bulan" class="form-select form-select-sm" style="width:auto"
               onchange="this.form.submit()">
         <?php foreach ($daftarBulan as $db): ?>
           <option value="<?= $db['bulan'] ?>"
+                  data-tahun="<?= $db['tahun'] ?>"
                   <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
             <?= esc($db['label']) ?>
           </option>
         <?php endforeach; ?>
       </select>
-      <input type="hidden" name="tahun" value="<?= $tahun ?>">
+      <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
     </form>
   </div>
 </div>
@@ -58,55 +58,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
   <?php else: ?>🏅
   <?php endif; ?>
   Peringkat kamu bulan ini: <strong>#<?= $rankSaya ?></strong> dari <?= count($leaderboard) ?> anggota.
-</div>
-<?php endif; ?>
-
-<!-- Podium top 3 -->
-<?php if (count($leaderboard) >= 3): ?>
-<div style="display:flex;justify-content:center;align-items:flex-end;gap:1rem;margin-bottom:1.5rem">
-
-  <?php
-  $podium = [
-    ['idx' => 1, 'urutan' => 2, 'tinggi' => '90px', 'bg' => '#e2e8f0', 'warna' => '#64748b', 'medal' => '🥈'],
-    ['idx' => 0, 'urutan' => 1, 'tinggi' => '120px', 'bg' => '#fef9c3', 'warna' => '#b45309', 'medal' => '🥇'],
-    ['idx' => 2, 'urutan' => 3, 'tinggi' => '70px', 'bg' => '#fed7aa', 'warna' => '#92400e', 'medal' => '🥉'],
-  ];
-  foreach ($podium as $p):
-    $row = $leaderboard[$p['idx']] ?? null;
-    if (!$row) continue;
-    $nama = ucwords(strtolower(trim($row['first_name'] . ' ' . $row['last_name'])));
-    $isMe = ($row['member_id'] == $member['id']);
-  ?>
-    <div style="text-align:center;flex:1;max-width:140px">
-      <!-- Avatar -->
-      <?php
-        $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
-        $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
-      ?>
-      <div style="width:56px;height:56px;border-radius:50%;margin:0 auto 6px;
-                  <?= $adaFoto ? 'overflow:hidden' : 'background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:#64748b' ?>;
-                  border:3px solid <?= $isMe ? '#1e3a8a' : $p['warna'] ?>">
-        <?php if ($adaFoto): ?>
-          <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>"
-               style="width:100%;height:100%;object-fit:cover">
-        <?php else: ?>
-          <?= $inisial ?>
-        <?php endif; ?>
-      </div>
-      <div style="font-size:.82rem;font-weight:700;color:<?= $isMe ? '#1e3a8a' : '#1e293b' ?>;
-                  margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
-        <?= $isMe ? 'Kamu' : esc(mb_strimwidth($nama, 0, 14, '...')) ?>
-      </div>
-      <div style="font-size:.78rem;color:#64748b;margin-bottom:6px">
-        <?= $row['total_points'] ?> poin
-      </div>
-      <!-- Podium -->
-      <div style="height:<?= $p['tinggi'] ?>;background:<?= $p['bg'] ?>;border-radius:8px 8px 0 0;
-                  display:flex;align-items:center;justify-content:center;font-size:1.5rem">
-        <?= $p['medal'] ?>
-      </div>
-    </div>
-  <?php endforeach; ?>
 </div>
 <?php endif; ?>
 
@@ -138,9 +89,11 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
           </tr>
         <?php else: ?>
           <?php foreach ($leaderboard as $i => $row):
-            $rank  = $i + 1;
-            $isMe  = ($row['member_id'] == $member['id']);
-            $nama  = ucwords(strtolower(trim($row['first_name'] . ' ' . $row['last_name'])));
+            $rank    = $i + 1;
+            $isMe    = ($row['member_id'] == $member['id']);
+            $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
+            $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
+            $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
           ?>
             <tr style="<?= $isMe ? 'background:#eff4ff;font-weight:600' : '' ?>">
               <td class="teks-center">
@@ -155,13 +108,30 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                 <?php endif; ?>
               </td>
               <td>
-                <div class="judul-tabel">
-                  <?= esc($nama) ?>
-                  <?php if ($isMe): ?>
-                    <span class="badge-admin biru" style="font-size:.68rem;margin-left:4px">Kamu</span>
-                  <?php endif; ?>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <!-- Avatar -->
+                  <div style="width:34px;height:34px;border-radius:50%;flex-shrink:0;overflow:hidden;
+                              background:#e2e8f0;display:flex;align-items:center;justify-content:center;
+                              font-size:.72rem;font-weight:700;color:#64748b;
+                              border:2px solid <?= $isMe ? '#818cf8' : '#f1f5f9' ?>">
+                    <?php if ($adaFoto): ?>
+                      <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>"
+                           style="width:100%;height:100%;object-fit:cover" alt="">
+                    <?php else: ?>
+                      <?= esc($inisial) ?>
+                    <?php endif; ?>
+                  </div>
+                  <!-- Info -->
+                  <div>
+                    <div class="judul-tabel">
+                      <?= esc($nama) ?>
+                      <?php if ($isMe): ?>
+                        <span class="badge-admin biru" style="font-size:.68rem;margin-left:4px">Kamu</span>
+                      <?php endif; ?>
+                    </div>
+                    <div class="penulis-tabel"><?= esc($row['no_identitas']) ?></div>
+                  </div>
                 </div>
-                <div class="penulis-tabel"><?= esc($row['no_identitas']) ?></div>
               </td>
               <td>
                 <span class="badge-admin" style="background:#f1f5f9;color:#475569;font-size:.75rem">
@@ -180,5 +150,13 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     </table>
   </div>
 </div>
+
+<script>
+document.querySelector('select[name="bulan"]').addEventListener('change', function() {
+  const opt = this.options[this.selectedIndex];
+  document.getElementById('tahunInput').value = opt.dataset.tahun;
+  this.form.submit();
+});
+</script>
 
 <?= $this->endSection() ?>

@@ -59,7 +59,7 @@
           <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-0.9L12 2z"/>
         </svg>
       </div>
-      <div class="ksa-angka">132</div>
+      <div class="ksa-angka"><?= $totalPoinBulanIni ?? 0 ?></div>
       <div class="ksa-label">Poin Bulan Ini</div>
     </div>
   </div>
@@ -71,7 +71,7 @@
           <path d="M18 2h-2V1H8v1H6a1 1 0 00-1 1v3a5 5 0 004 4.9V13H7v2h10v-2h-2v-2.1A5 5 0 0019 6V3a1 1 0 00-1-1zm-1 4a3 3 0 01-2 2.83V4h2v2zm-10 0V4h2v4.83A3 3 0 017 6z"/>
         </svg>
       </div>
-      <div class="ksa-angka">5</div>
+      <div class="ksa-angka"><?= isset($rankBulanIni) && $rankBulanIni > 0 ? '#' . $rankBulanIni : '—' ?></div>
       <div class="ksa-label">Peringkat Bulan Ini</div>
     </div>
   </div>
@@ -213,6 +213,7 @@
                       $maxHabis  = $ret['max_habis']    ?? false;
                       $expired   = $ret['kuis_expired'] ?? false;
                     ?>
+                  <td class="teks-center">
                     <?php if (!$quizInfo): ?>
                       <span style="display:inline-flex;align-items:center;gap:5px;
                                    padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;
@@ -245,16 +246,16 @@
                                 background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;
                                 text-decoration:none;white-space:nowrap">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
-                        Ulangi Kuis
+                        Ulangi
                       </a>
                     <?php else: ?>
                       <a href="<?= base_url("member/kuis/{$quizInfo['id']}?loan_id={$ret['id']}") ?>"
                          style="display:inline-flex;align-items:center;gap:5px;
                                 padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:600;
-                                background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;
+                                background:#16a34a;color:#fff;border:1px solid #16a34a;
                                 text-decoration:none;white-space:nowrap">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                        Kerjakan Kuis
+                        Kerjakan
                       </a>
                     <?php endif; ?>
                   </td>
@@ -276,54 +277,58 @@
         <a href="<?= base_url('member/poin') ?>" class="tautan-lihat-semua">Lihat Semua →</a>
       </div>
 
-      <div class="daftar-riwayat-poin">
-
-        <div class="item-riwayat-poin">
-          <div class="ikon-poin-wrap positif">+</div>
-          <div class="info-riwayat-poin">
-            <div class="aksi-poin">Peminjaman Buku</div>
-            <div class="detail-poin">Laskar Pelangi — 21 Mar 2026</div>
-          </div>
-          <span class="badge-poin positif">+ 10</span>
+      <?php
+        $labelPoin = [
+          'visit'         => 'Kunjungan Perpustakaan',
+          'loan'          => 'Peminjaman Buku',
+          'return_ontime' => 'Pengembalian Tepat Waktu',
+          'return_late'   => 'Pengembalian Terlambat',
+          'quiz'          => 'Kuis Buku',
+        ];
+        $chipPoin = [
+          'visit'         => 'Kunjungan',
+          'loan'          => 'Peminjaman',
+          'return_ontime' => 'Pengembalian',
+          'return_late'   => 'Terlambat',
+          'quiz'          => 'Kuis',
+        ];
+      ?>
+      <?php if (empty($riwayatPoin)): ?>
+        <div class="kondisi-kosong" style="padding:1.5rem 0">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <p>Belum ada riwayat poin</p>
         </div>
-
-        <div class="item-riwayat-poin">
-          <div class="ikon-poin-wrap positif">+</div>
-          <div class="info-riwayat-poin">
-            <div class="aksi-poin">Pengembalian Tepat Waktu</div>
-            <div class="detail-poin">Atomic Habits — 18 Mar 2026</div>
-          </div>
-          <span class="badge-poin positif">+ 15</span>
+      <?php else: ?>
+        <div class="timeline-wrap">
+          <?php foreach ($riwayatPoin as $p):
+            $isPos = $p['points'] >= 0;
+            $label = $labelPoin[$p['activity_type']] ?? $p['activity_type'];
+            $chip  = $chipPoin[$p['activity_type']]  ?? $p['activity_type'];
+          ?>
+            <div class="tl-item">
+              <div class="tl-left">
+                <div class="tl-dot <?= $isPos ? 'pos' : 'neg' ?>"></div>
+                <div class="tl-line"></div>
+              </div>
+              <div class="tl-body">
+                <div class="tl-row">
+                  <div class="tl-label"><?= esc($label) ?></div>
+                  <div class="tl-poin <?= $isPos ? 'pos' : 'neg' ?>">
+                    <?= ($isPos ? '+' : '−') . abs($p['points']) ?>
+                  </div>
+                </div>
+                <div class="tl-meta">
+                  <span class="tl-chip <?= $isPos ? 'pos' : 'neg' ?>"><?= esc($chip) ?></span>
+                  <span class="tl-tgl"><?= Time::parse($p['created_at'])->format('d M Y, H:i') ?></span>
+                </div>
+                <?php if (!empty($p['description'])): ?>
+                  <div class="tl-desc"><?= esc($p['description']) ?></div>
+                <?php endif; ?>
+              </div>
+            </div>
+          <?php endforeach; ?>
         </div>
-
-        <div class="item-riwayat-poin">
-          <div class="ikon-poin-wrap positif">+</div>
-          <div class="info-riwayat-poin">
-            <div class="aksi-poin">Kunjungan Perpustakaan</div>
-            <div class="detail-poin">15 Mar 2026</div>
-          </div>
-          <span class="badge-poin positif">+ 5</span>
-        </div>
-
-        <div class="item-riwayat-poin">
-          <div class="ikon-poin-wrap negatif">−</div>
-          <div class="info-riwayat-poin">
-            <div class="aksi-poin">Keterlambatan Pengembalian</div>
-            <div class="detail-poin">Bumi Manusia — 5 Mar 2026</div>
-          </div>
-          <span class="badge-poin negatif">− 10</span>
-        </div>
-
-        <div class="item-riwayat-poin">
-          <div class="ikon-poin-wrap positif">+</div>
-          <div class="info-riwayat-poin">
-            <div class="aksi-poin">Peminjaman Buku</div>
-            <div class="detail-poin">Filosofi Teras — 1 Mar 2026</div>
-          </div>
-          <span class="badge-poin positif">+ 10</span>
-        </div>
-
-      </div>
+      <?php endif; ?>
     </div>
   </div><!-- /kolom kanan -->
 

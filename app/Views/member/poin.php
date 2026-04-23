@@ -17,16 +17,16 @@ $labelAktivitas = [
     'return_late'   => 'Pengembalian Terlambat',
     'quiz'          => 'Kuis Buku',
 ];
-$ikonAktivitas = [
-    'visit'         => 'ti-door-enter',
-    'loan'          => 'ti-book',
-    'return_ontime' => 'ti-check',
-    'return_late'   => 'ti-clock-exclamation',
-    'quiz'          => 'ti-help-circle',
+$warnaBorder = [
+    'visit'         => '#16a34a',
+    'loan'          => '#2563eb',
+    'return_ontime' => '#16a34a',
+    'return_late'   => '#dc2626',
+    'quiz'          => '#7c3aed',
 ];
 ?>
 
-<!-- Statistik -->
+<!-- Kartu statistik -->
 <div class="grid-stat" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.25rem">
 
   <div class="kartu-stat-admin">
@@ -74,7 +74,6 @@ $ikonAktivitas = [
   <div class="kepala-kotak">
     <h3>Riwayat Poin</h3>
   </div>
-
   <div class="bungkus-tabel">
     <table class="tabel-admin-member">
       <thead>
@@ -97,31 +96,23 @@ $ikonAktivitas = [
           </tr>
         <?php else: ?>
           <?php foreach ($riwayat as $item):
-            $isPositif = $item['points'] >= 0;
-            $ikon      = $ikonAktivitas[$item['activity_type']] ?? 'ti-star';
-            $label     = $labelAktivitas[$item['activity_type']] ?? $item['activity_type'];
+            $isPositif   = $item['points'] >= 0;
+            $label       = $labelAktivitas[$item['activity_type']] ?? $item['activity_type'];
+            $warnaBorderKiri = $warnaBorder[$item['activity_type']] ?? ($isPositif ? '#16a34a' : '#dc2626');
           ?>
-            <tr>
+            <tr style="border-left:3px solid <?= $warnaBorderKiri ?>">
               <td>
-                <div style="display:inline-flex;align-items:center;gap:8px">
-                  <span style="width:32px;height:32px;border-radius:8px;
-                               background:<?= $isPositif ? '#d1fae5' : '#fee2e2' ?>;
-                               display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <i class="ti <?= $ikon ?>"
-                       style="color:<?= $isPositif ? '#16a34a' : '#dc2626' ?>;font-size:.9rem"></i>
-                  </span>
-                  <span class="judul-tabel"><?= esc($label) ?></span>
-                </div>
+                <div class="judul-tabel"><?= esc($label) ?></div>
               </td>
               <td class="penulis-tabel"><?= esc($item['description'] ?? '—') ?></td>
               <td class="tgl-normal">
                 <?= Time::parse($item['created_at'])->format('d/m/Y') ?>
-                <br><span class="teks-redup-sm"><?= Time::parse($item['created_at'])->format('H:i') ?></span>
+                <br><span class="penulis-tabel"><?= Time::parse($item['created_at'])->format('H:i') ?></span>
               </td>
               <td class="teks-center">
-                <span style="font-weight:700;font-size:.95rem;
+                <span style="font-weight:700;font-size:.92rem;
                              color:<?= $isPositif ? '#16a34a' : '#dc2626' ?>">
-                  <?= ($isPositif ? '+' : '') . $item['points'] ?>
+                  <?= ($isPositif ? '+' : '−') . abs($item['points']) ?>
                 </span>
               </td>
             </tr>
@@ -133,7 +124,7 @@ $ikonAktivitas = [
 
   <!-- Pagination -->
   <?php if ($pager): ?>
-    <div style="padding:1rem 1.25rem">
+    <div style="padding:1rem 1.25rem;border-top:1px solid #f1f5f9">
       <?= $pager->links('poin', 'member_pager') ?>
     </div>
   <?php endif; ?>

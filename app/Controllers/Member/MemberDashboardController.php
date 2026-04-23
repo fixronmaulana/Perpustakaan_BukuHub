@@ -156,6 +156,17 @@ class MemberDashboardController extends Controller
                 && !$ret['sudah_kuis'];
         }));
 
+        // Poin real dari database
+        $totalPoinBulanIni = $this->pointModel->getTotalPoinBulanIni($member['id']);
+        $rankBulanIni      = $this->_hitungRankRealtime($member['id'], $bulanIni, $tahunIni);
+
+        // Riwayat poin 5 terbaru untuk dashboard
+        $riwayatPoin = $this->pointModel
+            ->where('member_id', $member['id'])
+            ->orderBy('created_at', 'DESC')
+            ->limit(5)
+            ->findAll();
+
         return view('member/dashboard', [
             'member'               => $member,
             'activeNav'            => 'dashboard',
@@ -167,6 +178,9 @@ class MemberDashboardController extends Controller
             'peringatan'           => $terlambat,
             'kunjunganBulanIni'    => $kunjunganBulanIni,
             'kuisBelumDikerjakan'  => $kuisBelumDikerjakan,
+            'totalPoinBulanIni'    => $totalPoinBulanIni,
+            'rankBulanIni'         => $rankBulanIni,
+            'riwayatPoin'          => $riwayatPoin,
         ]);
     }
 
