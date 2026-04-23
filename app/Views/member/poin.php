@@ -29,7 +29,7 @@ $warnaBorder = [
 <!-- Kartu statistik -->
 <div class="grid-stat" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.25rem">
 
-  <div class="kartu-stat-admin">
+  <div class="kartu-stat-admin" style="border-left:3.5px solid #1e3a8a">
     <div class="ksa-body">
       <div class="ksa-icon">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
@@ -43,7 +43,7 @@ $warnaBorder = [
     </div>
   </div>
 
-  <div class="kartu-stat-admin">
+  <div class="kartu-stat-admin" style="border-left:3.5px solid #fde68a">
     <div class="ksa-body">
       <div class="ksa-icon">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
@@ -55,7 +55,7 @@ $warnaBorder = [
     </div>
   </div>
 
-  <div class="kartu-stat-admin">
+  <div class="kartu-stat-admin" style="border-left:3.5px solid #3B6D11 ">
     <div class="ksa-body">
       <div class="ksa-icon">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
@@ -96,13 +96,21 @@ $warnaBorder = [
           </tr>
         <?php else: ?>
           <?php foreach ($riwayat as $item):
-            $isPositif   = $item['points'] >= 0;
-            $label       = $labelAktivitas[$item['activity_type']] ?? $item['activity_type'];
-            $warnaBorderKiri = $warnaBorder[$item['activity_type']] ?? ($isPositif ? '#16a34a' : '#dc2626');
+            $isPositif = $item['points'] >= 0;
+            $label     = $labelAktivitas[$item['activity_type']] ?? $item['activity_type'];
+            $ikon      = $ikonAktivitas[$item['activity_type']]  ?? 'ti-star';
           ?>
-            <tr style="border-left:3px solid <?= $warnaBorderKiri ?>">
+            <tr>
               <td>
-                <div class="judul-tabel"><?= esc($label) ?></div>
+                <div style="display:inline-flex;align-items:center;gap:8px">
+                  <span style="width:32px;height:32px;border-radius:8px;
+                               background:<?= $isPositif ? '#EAF3DE' : '#fee2e2' ?>;
+                               display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="ti <?= $ikon ?>"
+                       style="color:<?= $isPositif ? '#3B6D11' : '#dc2626' ?>;font-size:.9rem"></i>
+                  </span>
+                  <span class="judul-tabel"><?= esc($label) ?></span>
+                </div>
               </td>
               <td class="penulis-tabel"><?= esc($item['description'] ?? '—') ?></td>
               <td class="tgl-normal">
@@ -111,7 +119,7 @@ $warnaBorder = [
               </td>
               <td class="teks-center">
                 <span style="font-weight:700;font-size:.92rem;
-                             color:<?= $isPositif ? '#16a34a' : '#dc2626' ?>">
+                             color:<?= $isPositif ? '#3B6D11' : '#dc2626' ?>">
                   <?= ($isPositif ? '+' : '−') . abs($item['points']) ?>
                 </span>
               </td>

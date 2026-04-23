@@ -213,7 +213,6 @@
                       $maxHabis  = $ret['max_habis']    ?? false;
                       $expired   = $ret['kuis_expired'] ?? false;
                     ?>
-                  <td class="teks-center">
                     <?php if (!$quizInfo): ?>
                       <span style="display:inline-flex;align-items:center;gap:5px;
                                    padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:500;
@@ -246,16 +245,16 @@
                                 background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;
                                 text-decoration:none;white-space:nowrap">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
-                        Ulangi
+                        Ulangi Kuis
                       </a>
                     <?php else: ?>
                       <a href="<?= base_url("member/kuis/{$quizInfo['id']}?loan_id={$ret['id']}") ?>"
                          style="display:inline-flex;align-items:center;gap:5px;
                                 padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:600;
-                                background:#16a34a;color:#fff;border:1px solid #16a34a;
+                                background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;
                                 text-decoration:none;white-space:nowrap">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                        Kerjakan
+                        Kerjakan Kuis
                       </a>
                     <?php endif; ?>
                   </td>

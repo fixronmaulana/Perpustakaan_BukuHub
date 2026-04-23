@@ -23,15 +23,15 @@
       </a>
     </li>
     <li>
-      <a href="<?= base_url('layanan') ?>"
-        <?= (isset($activeNav) && $activeNav === 'layanan') ? 'class="aktif"' : '' ?>>
-        Layanan
-      </a>
-    </li>
-    <li>
       <a href="<?= base_url('leaderboard') ?>"
         <?= (isset($activeNav) && $activeNav === 'leaderboard') ? 'class="aktif"' : '' ?>>
         Leaderboard
+      </a>
+    </li>
+    <li>
+      <a href="<?= base_url('layanan') ?>"
+        <?= (isset($activeNav) && $activeNav === 'layanan') ? 'class="aktif"' : '' ?>>
+        Layanan
       </a>
     </li>
     <li>

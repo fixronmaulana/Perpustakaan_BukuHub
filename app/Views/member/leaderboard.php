@@ -46,21 +46,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
   </div>
 </div>
 
-<!-- Rank saya -->
-<?php if ($rankSaya > 0): ?>
-<div class="profil-alert" style="margin-bottom:1.25rem;
-     background:<?= $rankSaya <= 3 ? '#fefce8' : '#eff4ff' ?>;
-     border-color:<?= $rankSaya <= 3 ? '#fde047' : '#c7d7fe' ?>;
-     color:<?= $rankSaya <= 3 ? '#854d0e' : '#1e3a8a' ?>">
-  <?php if ($rankSaya === 1): ?>🥇
-  <?php elseif ($rankSaya === 2): ?>🥈
-  <?php elseif ($rankSaya === 3): ?>🥉
-  <?php else: ?>🏅
-  <?php endif; ?>
-  Peringkat kamu bulan ini: <strong>#<?= $rankSaya ?></strong> dari <?= count($leaderboard) ?> anggota.
-</div>
-<?php endif; ?>
-
 <!-- Tabel full leaderboard -->
 <div class="kotak-konten">
   <div class="kepala-kotak">
