@@ -1,255 +1,505 @@
 <?= $this->extend('layouts/home_layout') ?>
 
 <?= $this->section('head') ?>
-<title>Leaderboard — Perpustakaan SMK</title>
+<title>Leaderboard — Perpustakaan SMK Al-Munawwir</title>
+<style>
+/* ════════════════════════════════════════════
+   LEADERBOARD LANDING PAGE
+════════════════════════════════════════════ */
+/* ── Filter bulan ── */
+.lb-filter-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+.lb-filter-wrap form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 6rem;
+}
+.lb-filter-label {
+  font-size: .8rem;
+  color: #64748b;
+  font-weight: 500;
+}
+.lb-select {
+  font-size: .82rem;
+  padding: 7px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  outline: none;
+}
+.lb-select:focus { border-color: #94a3b8; }
+
+/* ── Podium ── */
+.lb-podium-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  margin-top: 2rem;
+}
+
+.lb-podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 160px;
+}
+
+/* Avatar podium */
+.lb-podium-avatar-wrap { position: relative; margin-bottom: .75rem; }
+.lb-podium-avatar {
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+  border: 3px solid;
+}
+.lb-podium-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.lb-podium-avatar.rank-1 { width: 80px; height: 80px; border-color: #d97706; background: linear-gradient(135deg,#92400e,#d97706); }
+.lb-podium-avatar.rank-2 { border-color: #94a3b8; background: linear-gradient(135deg,#475569,#94a3b8); }
+.lb-podium-avatar.rank-3 { border-color: #b45309; background: linear-gradient(135deg,#78350f,#d97706); }
+
+.lb-podium-badge {
+  position: absolute;
+  bottom: -4px; right: -4px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 800;
+  border: 2px solid #fff;
+}
+.lb-podium-badge.rank-1 { background: #d97706; color: #fff; }
+.lb-podium-badge.rank-2 { background: #64748b; color: #fff; }
+.lb-podium-badge.rank-3 { background: #b45309; color: #fff; }
+
+.lb-mahkota { font-size: 1.5rem; margin-bottom: .25rem; line-height: 1; }
+
+.lb-podium-nama {
+  font-size: .85rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  margin-bottom: 2px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-podium-tipe {
+  font-size: .7rem;
+  color: #94a3b8;
+  margin-bottom: .4rem;
+}
+.lb-podium-poin {
+  font-size: .88rem;
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+.lb-podium-poin.rank-1 { color: #d97706; }
+.lb-podium-poin.rank-2 { color: #64748b; }
+.lb-podium-poin.rank-3 { color: #b45309; }
+
+/* Tiang podium */
+.lb-tiang {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: rgba(255,255,255,.7);
+}
+.lb-tiang.rank-1 { height: 110px; background: linear-gradient(180deg,#fbbf24,#d97706); }
+.lb-tiang.rank-2 { height: 80px;  background: linear-gradient(180deg,#cbd5e1,#94a3b8); }
+.lb-tiang.rank-3 { height: 60px;  background: linear-gradient(180deg,#fed7aa,#b45309); }
+
+/* ── Tabel ── */
+.lb-tabel-wrap {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 0 6rem 3rem 6rem;
+}
+.lb-tabel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.125rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.lb-tabel-header h2 {
+  font-size: .95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+.lb-tabel-header span {
+  font-size: .78rem;
+  color: #94a3b8;
+}
+.lb-tabel {
+  width: 100%;
+  border-collapse: collapse;
+}
+.lb-tabel thead th {
+  padding: .7rem 1rem;
+  font-size: .72rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  background: #f8fafc;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+}
+.lb-tabel thead th.center { text-align: center; }
+.lb-tabel tbody tr {
+  border-bottom: 1px solid #f8fafc;
+  transition: background .1s;
+}
+.lb-tabel tbody tr:last-child { border-bottom: none; }
+.lb-tabel tbody tr:hover { background: #f8fafc; }
+.lb-tabel tbody td {
+  padding: .75rem 1rem;
+  font-size: .82rem;
+  color: #1e293b;
+  vertical-align: middle;
+}
+.lb-tabel tbody td.center { text-align: center; }
+
+/* Rank badge */
+.lb-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  font-size: .72rem;
+  font-weight: 800;
+}
+.lb-rank-badge.gold   { background: #1c1917; color: #fbbf24; }
+.lb-rank-badge.silver { background: #334155; color: #cbd5e1; }
+.lb-rank-badge.bronze { background: #431407; color: #fb923c; }
+.lb-rank-num { font-size: .8rem; color: #94a3b8; font-weight: 500; }
+
+/* Member cell */
+.lb-member-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lb-avatar-sm {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #64748b;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #f1f5f9;
+}
+.lb-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+.lb-member-nama { font-size: .83rem; font-weight: 600; color: #1e293b; }
+.lb-member-sub  { font-size: .71rem; color: #94a3b8; margin-top: 1px; }
+.lb-tipe-badge  {
+  display: inline-block;
+  font-size: .65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+/* Poin */
+.lb-poin-val {
+  font-size: .88rem;
+  font-weight: 700;
+  text-align: center;
+}
+.lb-poin-val.pos { color: #16a34a; }
+.lb-poin-val.neg { color: #dc2626; }
+
+/* Kosong */
+.lb-kosong {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+  font-size: .85rem;
+}
+.lb-kosong svg {
+  width: 40px; height: 40px;
+  stroke: #cbd5e1;
+  margin-bottom: .75rem;
+  display: block;
+  margin-left: auto; margin-right: auto;
+}
+
+/* Hitung mundur */
+.lb-countdown {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+}
+.lb-countdown-inner {
+  display: inline-flex;
+  gap: .75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: .75rem 1.5rem;
+}
+.lb-cd-unit { text-align: center; min-width: 48px; }
+.lb-cd-num  { font-size: 1.4rem; font-weight: 800; color: #0f172a; line-height: 1; }
+.lb-cd-label { font-size: .65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+.lb-cd-sep  { font-size: 1.2rem; font-weight: 700; color: #cbd5e1; align-self: flex-start; padding-top: 4px; }
+</style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-
 <?= $this->include('layouts/navbar') ?>
 
-<!-- ══ HEADER HALAMAN ══ -->
-<div class="header-halaman">
-  <h1>Leaderboard</h1>
-  <div class="garis-emas"></div>
-  <p>Peringkat anggota perpustakaan terbaik bulan ini berdasarkan poin gamifikasi</p>
-</div>
-
-<!-- ══ KONTEN LEADERBOARD ══ -->
-<div class="bungkus-leaderboard">
-
-  <!-- ── INFO BULAN + PENJELASAN POIN ── -->
-  <div class="baris-atas-leaderboard">
-
-    <!-- Periode aktif -->
-    <div class="kotak-periode">
-      <div class="ikon-periode">🏆</div>
-      <div>
-        <div class="label-periode">Periode Aktif</div>
-        <div class="nilai-periode"><?= date('F Y') ?></div>
-      </div>
-      <div class="pemisah-vertikal"></div>
-      <div>
-        <div class="label-periode">Sisa Waktu</div>
-        <div class="nilai-periode hitung-mundur" id="hitungMundur">–</div>
-      </div>
-    </div>
-
-    <!-- Panduan poin -->
-    <div class="kotak-panduan-poin">
-      <div class="judul-panduan">Cara Mendapat Poin</div>
-      <div class="daftar-panduan">
-        <div class="item-panduan positif">
-          <span class="ikon-panduan">🚶</span>
-          <span class="nama-panduan">Kunjungan</span>
-          <span class="nilai-panduan">+5 poin</span>
-        </div>
-        <div class="item-panduan positif">
-          <span class="ikon-panduan">📖</span>
-          <span class="nama-panduan">Peminjaman</span>
-          <span class="nilai-panduan">+10 poin</span>
-        </div>
-        <div class="item-panduan positif">
-          <span class="ikon-panduan">✅</span>
-          <span class="nama-panduan">Kembali Tepat Waktu</span>
-          <span class="nilai-panduan">+15 poin</span>
-        </div>
-        <div class="item-panduan negatif">
-          <span class="ikon-panduan">⏰</span>
-          <span class="nama-panduan">Kembali Terlambat</span>
-          <span class="nilai-panduan">-10 poin</span>
-        </div>
-        <div class="item-panduan positif">
-          <span class="ikon-panduan">🎯</span>
-          <span class="nama-panduan">Partisipasi Kuis</span>
-          <span class="nilai-panduan">+20 poin</span>
-        </div>
-      </div>
-    </div>
-
+<?php
+$namaBulan = [
+    1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',
+    5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',
+    9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+];
+$isRealtime  = ($bulan === $bulanIni && $tahun === $tahunIni);
+$bulanLabel  = ($namaBulan[$bulan] ?? $bulan) . ' ' . $tahun;
+$top3        = array_slice($leaderboard, 0, 3);
+$sisanya     = array_slice($leaderboard, 3);
+?>
+  <!-- Header -->
+  <div class="header-halaman">
+    <h1>Leaderboard Perpustakaan</h1>
+    <div class="garis-emas"></div>
+    <p>Peringkat anggota terbaik berdasarkan poin aktivitas perpustakaan</p>
+      <?php if ($isRealtime): ?>
+        <span class="lb-live-dot"></span>
+        <span>Live · <?= $bulanLabel ?></span>
+      <?php else: ?>
+        <span>📅 <?= $bulanLabel ?></span>
+      <?php endif; ?>
   </div>
 
-  <!-- ── PODIUM TOP 3 ── -->
-  <div class="area-podium">
-
-    <!-- Peringkat 2 -->
-    <div class="podium-item podium-dua">
-      <div class="avatar-podium">
-        <div class="foto-avatar" style="background: linear-gradient(135deg,#6c757d,#adb5bd)">BW</div>
-        <div class="lencana-podium">2</div>
+  <!-- Hitung mundur -->
+  <?php if ($isRealtime): ?>
+  <div class="lb-countdown">
+    <div class="lb-countdown-inner">
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdHari">–</div>
+        <div class="lb-cd-label">Hari</div>
       </div>
-      <div class="nama-podium">Budi Wijaya</div>
-      <div class="kelas-podium">XI RPL 1</div>
-      <div class="poin-podium">1.840 poin</div>
-      <div class="tiang-podium tiang-dua"></div>
-    </div>
-
-    <!-- Peringkat 1 -->
-    <div class="podium-item podium-satu">
-      <div class="mahkota-juara">👑</div>
-      <div class="avatar-podium">
-        <div class="foto-avatar foto-juara" style="background: linear-gradient(135deg,#c9a84c,#f0c040)">AS</div>
-        <div class="lencana-podium lencana-juara">1</div>
+      <div class="lb-cd-sep">:</div>
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdJam">–</div>
+        <div class="lb-cd-label">Jam</div>
       </div>
-      <div class="nama-podium">Ahmad Santoso</div>
-      <div class="kelas-podium">XII TKJ 2</div>
-      <div class="poin-podium poin-juara">2.150 poin</div>
-      <div class="tiang-podium tiang-satu"></div>
-    </div>
-
-    <!-- Peringkat 3 -->
-    <div class="podium-item podium-tiga">
-      <div class="avatar-podium">
-        <div class="foto-avatar" style="background: linear-gradient(135deg,#cd7f32,#e8a87c)">SR</div>
-        <div class="lencana-podium lencana-tiga">3</div>
+      <div class="lb-cd-sep">:</div>
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdMenit">–</div>
+        <div class="lb-cd-label">Menit</div>
       </div>
-      <div class="nama-podium">Siti Rahayu</div>
-      <div class="kelas-podium">X AKL 1</div>
-      <div class="poin-podium">1.620 poin</div>
-      <div class="tiang-podium tiang-tiga"></div>
-    </div>
-
-  </div><!-- /area-podium -->
-
-  <!-- ── TABEL PERINGKAT LENGKAP ── -->
-  <div class="kotak-tabel-peringkat">
-
-    <div class="kepala-tabel-peringkat">
-      <h2>Peringkat Lengkap</h2>
-      <div class="filter-bulan">
-        <select class="pilih-bulan" onchange="// nanti connect ke controller">
-          <option value="<?= date('Y-m') ?>" selected><?= date('F Y') ?></option>
-          <option value="<?= date('Y-m', strtotime('-1 month')) ?>"><?= date('F Y', strtotime('-1 month')) ?></option>
-          <option value="<?= date('Y-m', strtotime('-2 month')) ?>"><?= date('F Y', strtotime('-2 month')) ?></option>
-        </select>
+      <div class="lb-cd-sep">:</div>
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdDetik">–</div>
+        <div class="lb-cd-label">Detik</div>
       </div>
     </div>
+  </div>
+  <?php endif; ?>
 
-    <div class="bungkus-tabel">
-      <table class="tabel-peringkat">
-        <thead>
+  <!-- Podium top 3 -->
+  <?php if (count($top3) >= 1): ?>
+  <div class="lb-podium-wrap">
+    <?php
+    // Urutan tampil: 2, 1, 3
+    $urutan = [1 => null, 0 => null, 2 => null];
+    foreach ([1, 0, 2] as $idx):
+      $row = $top3[$idx] ?? null;
+      if (!$row) continue;
+      $rank    = $idx + 1;
+      $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
+      $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
+      $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+      $rankClass = 'rank-' . $rank;
+    ?>
+      <div class="lb-podium-item">
+        <?php if ($rank === 1): ?>
+          <div class="lb-mahkota">👑</div>
+        <?php else: ?>
+          <div style="height:1.75rem"></div>
+        <?php endif; ?>
+
+        <div class="lb-podium-avatar-wrap">
+          <div class="lb-podium-avatar <?= $rankClass ?>">
+            <?php if ($adaFoto): ?>
+              <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>" alt="">
+            <?php else: ?>
+              <?= esc($inisial) ?>
+            <?php endif; ?>
+          </div>
+          <div class="lb-podium-badge <?= $rankClass ?>"><?= $rank ?></div>
+        </div>
+
+        <div class="lb-podium-nama"><?= esc(mb_strimwidth($nama, 0, 18, '...')) ?></div>
+        <div class="lb-podium-tipe"><?= esc($row['tipe_anggota']) ?></div>
+        <div class="lb-podium-poin <?= $rankClass ?>">
+          <?= number_format($row['total_points']) ?> poin
+        </div>
+        <div class="lb-tiang <?= $rankClass ?>">
+          <?= $rank ?>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
+<!-- Filter bulan -->
+  <div class="lb-filter-wrap">
+    <form method="get" action="">
+      <span class="lb-filter-label">Periode:</span>
+      <select name="bulan" class="lb-select" id="selectBulan">
+        <?php foreach ($daftarBulan as $db): ?>
+          <option value="<?= $db['bulan'] ?>"
+                  data-tahun="<?= $db['tahun'] ?>"
+                  <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
+            <?= esc($db['label']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+      <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
+    </form>
+  </div>
+  <!-- Tabel full -->
+  <div class="lb-tabel-wrap">
+    <div class="lb-tabel-header">
+      <h2>Semua Peringkat</h2>
+      <span><?= count($leaderboard) ?> anggota</span>
+    </div>
+    <table class="lb-tabel">
+      <thead>
+        <tr>
+          <th class="center" style="width:60px">#</th>
+          <th>Anggota</th>
+          <th class="center" style="width:120px">Total Poin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (empty($leaderboard)): ?>
           <tr>
-            <th class="kolom-peringkat">#</th>
-            <th class="kolom-anggota">Anggota</th>
-            <th class="kolom-poin-detail">Kunjungan</th>
-            <th class="kolom-poin-detail">Peminjaman</th>
-            <th class="kolom-poin-detail">Tepat Waktu</th>
-            <th class="kolom-poin-detail">Terlambat</th>
-            <th class="kolom-poin-detail">Kuis</th>
-            <th class="kolom-total">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <?php
-          // ── DATA DUMMY ── ganti dengan $leaderboard dari controller nanti
-          $dummy = [
-            ['nama'=>'Ahmad Santoso',   'kelas'=>'XII TKJ 2', 'inisial'=>'AS', 'warna'=>'#c9a84c,#f0c040', 'kunjungan'=>10,'pinjam'=>8,'tepat'=>6,'terlambat'=>1,'kuis'=>5],
-            ['nama'=>'Budi Wijaya',     'kelas'=>'XI RPL 1',  'inisial'=>'BW', 'warna'=>'#6c757d,#adb5bd', 'kunjungan'=>9, 'pinjam'=>7,'tepat'=>5,'terlambat'=>0,'kuis'=>4],
-            ['nama'=>'Siti Rahayu',     'kelas'=>'X AKL 1',   'inisial'=>'SR', 'warna'=>'#cd7f32,#e8a87c', 'kunjungan'=>8, 'pinjam'=>6,'tepat'=>5,'terlambat'=>2,'kuis'=>3],
-            ['nama'=>'Dewi Lestari',    'kelas'=>'XI AKL 2',  'inisial'=>'DL', 'warna'=>'#1e3a8a,#3b82f6', 'kunjungan'=>7, 'pinjam'=>6,'tepat'=>4,'terlambat'=>1,'kuis'=>3],
-            ['nama'=>'Rizky Pratama',   'kelas'=>'XII RPL 1', 'inisial'=>'RP', 'warna'=>'#065f46,#10b981', 'kunjungan'=>6, 'pinjam'=>5,'tepat'=>4,'terlambat'=>0,'kuis'=>2],
-            ['nama'=>'Nur Fadillah',    'kelas'=>'X TKJ 1',   'inisial'=>'NF', 'warna'=>'#6d28d9,#a78bfa', 'kunjungan'=>5, 'pinjam'=>5,'tepat'=>3,'terlambat'=>1,'kuis'=>2],
-            ['nama'=>'Andi Firmansyah', 'kelas'=>'XI TKJ 2',  'inisial'=>'AF', 'warna'=>'#be123c,#fb7185', 'kunjungan'=>5, 'pinjam'=>4,'tepat'=>3,'terlambat'=>2,'kuis'=>1],
-            ['nama'=>'Maya Putri',      'kelas'=>'XII AKL 1', 'inisial'=>'MP', 'warna'=>'#0e7490,#22d3ee', 'kunjungan'=>4, 'pinjam'=>4,'tepat'=>2,'terlambat'=>0,'kuis'=>1],
-            ['nama'=>'Fajar Nugroho',   'kelas'=>'X RPL 2',   'inisial'=>'FN', 'warna'=>'#92400e,#fbbf24', 'kunjungan'=>3, 'pinjam'=>3,'tepat'=>2,'terlambat'=>1,'kuis'=>1],
-            ['nama'=>'Lina Marlina',    'kelas'=>'XI AKL 1',  'inisial'=>'LM', 'warna'=>'#134e4a,#34d399', 'kunjungan'=>3, 'pinjam'=>2,'tepat'=>2,'terlambat'=>0,'kuis'=>0],
-          ];
-
-          foreach ($dummy as $i => $row) :
-            $poinKunjungan = $row['kunjungan'] * 5;
-            $poinPinjam    = $row['pinjam']    * 10;
-            $poinTepat     = $row['tepat']     * 15;
-            $poinTerlambat = $row['terlambat'] * 10;
-            $poinKuis      = $row['kuis']      * 20;
-            $total         = $poinKunjungan + $poinPinjam + $poinTepat - $poinTerlambat + $poinKuis;
-            $peringkat     = $i + 1;
-
-            $kelasBaris = '';
-            if ($peringkat === 1) $kelasBaris = 'baris-juara';
-            elseif ($peringkat === 2) $kelasBaris = 'baris-dua';
-            elseif ($peringkat === 3) $kelasBaris = 'baris-tiga';
-          ?>
-          <tr class="baris-peringkat <?= $kelasBaris ?>">
-            <td class="kolom-peringkat">
-              <?php if ($peringkat === 1) : ?>
-                <span class="ikon-peringkat">🥇</span>
-              <?php elseif ($peringkat === 2) : ?>
-                <span class="ikon-peringkat">🥈</span>
-              <?php elseif ($peringkat === 3) : ?>
-                <span class="ikon-peringkat">🥉</span>
-              <?php else : ?>
-                <span class="nomor-peringkat"><?= $peringkat ?></span>
-              <?php endif; ?>
-            </td>
-            <td class="kolom-anggota">
-              <div class="sel-anggota">
-                <div class="avatar-kecil" style="background: linear-gradient(135deg,<?= $row['warna'] ?>)">
-                  <?= $row['inisial'] ?>
-                </div>
-                <div>
-                  <div class="nama-anggota"><?= $row['nama'] ?></div>
-                  <div class="kelas-anggota"><?= $row['kelas'] ?></div>
-                </div>
+            <td colspan="3">
+              <div class="lb-kosong">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                Belum ada data leaderboard bulan ini
               </div>
             </td>
-            <td class="kolom-poin-detail">
-              <span class="pil-poin positif">+<?= $poinKunjungan ?></span>
-            </td>
-            <td class="kolom-poin-detail">
-              <span class="pil-poin positif">+<?= $poinPinjam ?></span>
-            </td>
-            <td class="kolom-poin-detail">
-              <span class="pil-poin positif">+<?= $poinTepat ?></span>
-            </td>
-            <td class="kolom-poin-detail">
-              <span class="pil-poin <?= $poinTerlambat > 0 ? 'negatif' : 'nol' ?>">
-                <?= $poinTerlambat > 0 ? '-'.$poinTerlambat : '0' ?>
-              </span>
-            </td>
-            <td class="kolom-poin-detail">
-              <span class="pil-poin positif">+<?= $poinKuis ?></span>
-            </td>
-            <td class="kolom-total">
-              <span class="angka-total"><?= number_format($total) ?></span>
-              <span class="satuan-total">poin</span>
-            </td>
           </tr>
+        <?php else: ?>
+          <?php foreach ($leaderboard as $i => $row):
+            $rank    = $i + 1;
+            $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
+            $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
+            $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+          ?>
+            <tr>
+              <td class="center">
+                <?php if ($rank === 1): ?>
+                  <span class="lb-rank-badge gold">1</span>
+                <?php elseif ($rank === 2): ?>
+                  <span class="lb-rank-badge silver">2</span>
+                <?php elseif ($rank === 3): ?>
+                  <span class="lb-rank-badge bronze">3</span>
+                <?php else: ?>
+                  <span class="lb-rank-num"><?= $rank ?></span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <div class="lb-member-cell">
+                  <div class="lb-avatar-sm">
+                    <?php if ($adaFoto): ?>
+                      <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>" alt="">
+                    <?php else: ?>
+                      <?= esc($inisial) ?>
+                    <?php endif; ?>
+                  </div>
+                  <div>
+                    <div class="lb-member-nama"><?= esc($nama) ?></div>
+                    <div class="lb-member-sub">
+                      <?= esc($row['no_identitas']) ?>
+                      <span class="lb-tipe-badge"><?= esc($row['tipe_anggota']) ?></span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="center">
+                <span class="lb-poin-val <?= $row['total_points'] >= 0 ? 'pos' : 'neg' ?>">
+                  <?= ($row['total_points'] >= 0 ? '+' : '') . number_format($row['total_points']) ?>
+                </span>
+              </td>
+            </tr>
           <?php endforeach; ?>
+        <?php endif; ?>
+      </tbody>
+    </table>
+  </div>
 
-        </tbody>
-      </table>
-    </div><!-- /bungkus-tabel -->
-
-  </div><!-- /kotak-tabel-peringkat -->
-
-</div><!-- /bungkus-leaderboard -->
+</div><!-- /bungkus-utama -->
 
 <?= $this->include('layouts/home_footer') ?>
 
-<!-- Script hitung mundur akhir bulan -->
 <script>
-  (function () {
-    const el = document.getElementById('hitungMundur');
-    if (!el) return;
+// Sync tahun ke select bulan
+document.getElementById('selectBulan').addEventListener('change', function() {
+  const opt = this.options[this.selectedIndex];
+  document.getElementById('tahunInput').value = opt.dataset.tahun;
+  this.form.submit();
+});
 
-    function hitungSisa() {
-      const sekarang  = new Date();
-      const akhirBulan = new Date(sekarang.getFullYear(), sekarang.getMonth() + 1, 0, 23, 59, 59);
-      const selisih   = akhirBulan - sekarang;
-
-      if (selisih <= 0) { el.textContent = 'Periode berakhir'; return; }
-
-      const hari  = Math.floor(selisih / 86400000);
-      const jam   = Math.floor((selisih % 86400000) / 3600000);
-      const menit = Math.floor((selisih % 3600000)  / 60000);
-
-      el.textContent = `${hari}h ${jam}j ${menit}m`;
-    }
-
-    hitungSisa();
-    setInterval(hitungSisa, 60000);
-  })();
+// Hitung mundur
+<?php if ($isRealtime): ?>
+(function() {
+  function tick() {
+    const now  = new Date();
+    const akhir = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const sisa  = akhir - now;
+    if (sisa <= 0) return;
+    const d = Math.floor(sisa / 86400000);
+    const h = Math.floor((sisa % 86400000) / 3600000);
+    const m = Math.floor((sisa % 3600000)  / 60000);
+    const s = Math.floor((sisa % 60000)    / 1000);
+    document.getElementById('cdHari').textContent  = String(d).padStart(2,'0');
+    document.getElementById('cdJam').textContent   = String(h).padStart(2,'0');
+    document.getElementById('cdMenit').textContent = String(m).padStart(2,'0');
+    document.getElementById('cdDetik').textContent = String(s).padStart(2,'0');
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+<?php endif; ?>
 </script>
 
 <?= $this->endSection() ?>

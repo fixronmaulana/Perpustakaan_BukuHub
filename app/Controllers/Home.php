@@ -3,14 +3,26 @@
 namespace App\Controllers;
 
 use App\Models\BookModel;
+use App\Models\MemberModel;
+use App\Models\PointTransactionModel;
+use App\Models\PointSettingModel;
+use App\Models\LeaderboardSnapshotModel;
 
 class Home extends BaseController
 {
-    protected BookModel $bookModel;
+    protected BookModel             $bookModel;
+    protected MemberModel           $memberModel;
+    protected PointTransactionModel $pointModel;
+    protected PointSettingModel     $pointSettingModel;
+    protected LeaderboardSnapshotModel $leaderboardModel;
 
     public function __construct()
     {
-        $this->bookModel = new BookModel;
+        $this->bookModel          = new BookModel;
+        $this->memberModel        = new MemberModel;
+        $this->pointModel         = new PointTransactionModel;
+        $this->pointSettingModel  = new PointSettingModel;
+        $this->leaderboardModel   = new LeaderboardSnapshotModel;
     }
 
     public function index(): string
@@ -35,9 +47,7 @@ class Home extends BaseController
                 ->orLike('publisher', $keyword, insensitiveSearch: true)
                 ->paginate($itemPerPage, 'books');
 
-            $books = array_filter($books, function ($book) {
-                return $book['deleted_at'] == null;
-            });
+            $books = array_filter($books, fn($b) => $b['deleted_at'] == null);
         } else {
             $books = $this->bookModel
                 ->select('books.*, book_stock.quantity, categories.name as category, racks.name as rack, racks.floor')
@@ -47,37 +57,91 @@ class Home extends BaseController
                 ->paginate($itemPerPage, 'books');
         }
 
-        $data = [
+        return view('home/book', [
             'books'       => $books,
             'pager'       => $this->bookModel->pager,
             'currentPage' => $this->request->getVar('page_books') ?? 1,
             'itemPerPage' => $itemPerPage,
             'search'      => $this->request->getGet('search'),
             'activeNav'   => 'koleksi',
-        ];
-
-        return view('home/book', $data);
+        ]);
     }
 
     public function layanan(): string
     {
         return view('home/layanan', ['activeNav' => 'layanan']);
     }
+
     public function leaderboard(): string
     {
-        // Nanti $data diisi dari model gamifikasi
-        // contoh: $data['leaderboard'] = $this->gamifikasiModel->getLeaderboardBulanan();
-        return view('home/leaderboard', ['activeNav' => 'leaderboard']);
+        $bulanIni = (int) date('n');
+        $tahunIni = (int) date('Y');
+
+        // Pilih bulan dari query string
+        $bulan = (int) ($this->request->getGet('bulan') ?? $bulanIni);
+        $tahun = (int) ($this->request->getGet('tahun') ?? $tahunIni);
+
+        if ($bulan === $bulanIni && $tahun === $tahunIni) {
+            // Bulan berjalan — real-time
+            $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
+        } else {
+            // Bulan lalu — lazy snapshot
+            if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
+                $this->leaderboardModel->buatSnapshot($bulan, $tahun);
+            }
+            $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun);
+        }
+
+        // Ambil pengaturan poin untuk panduan
+        $pointSettings = $this->pointSettingModel->getAllAsMap();
+
+        // Dropdown 6 bulan
+        $daftarBulan = [];
+        for ($i = 0; $i < 6; $i++) {
+            $ts = mktime(0, 0, 0, $bulanIni - $i, 1, $tahunIni);
+            $daftarBulan[] = [
+                'bulan' => (int) date('n', $ts),
+                'tahun' => (int) date('Y', $ts),
+                'label' => date('F Y', $ts),
+            ];
+        }
+
+        return view('home/leaderboard', [
+            'activeNav'     => 'leaderboard',
+            'leaderboard'   => $leaderboard,
+            'bulan'         => $bulan,
+            'tahun'         => $tahun,
+            'bulanIni'      => $bulanIni,
+            'tahunIni'      => $tahunIni,
+            'daftarBulan'   => $daftarBulan,
+            'pointSettings' => $pointSettings,
+        ]);
     }
+
     public function kontak(): string
     {
         return view('home/kontak', ['activeNav' => 'kontak']);
     }
 
-    // Nanti: handle POST form kontak
-    // public function kontakKirim(): RedirectResponse
-    // {
-    //     // validasi + simpan / kirim email
-    //     return redirect()->to('kontak')->with('sukses', 'Pesan berhasil dikirim!');
-    // }
+    private function _getLeaderboardRealtime(int $bulan, int $tahun): array
+    {
+        $members = $this->memberModel->where('deleted_at', null)->findAll();
+        $data    = [];
+
+        foreach ($members as $m) {
+            $total = $this->pointModel->getTotalPoin($m['id'], $bulan, $tahun);
+            $data[] = [
+                'member_id'    => $m['id'],
+                'first_name'   => $m['first_name'],
+                'last_name'    => $m['last_name'] ?? '',
+                'no_identitas' => $m['no_identitas'],
+                'tipe_anggota' => $m['tipe_anggota'],
+                'foto_profil'  => $m['foto_profil'] ?? null,
+                'total_points' => $total,
+            ];
+        }
+
+        usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
+        return $data;
+    }
 }
