@@ -62,6 +62,11 @@ $sidebarNavs = [
     'link' => '/admin/pengaturan-poin',
     'icon' => 'ti ti-star'
   ],
+  [
+    'name' => 'Leaderboard',
+    'link' => '/admin/leaderboard',
+    'icon' => 'ti ti-trophy'
+  ],
 ];
 
 if (auth()->user()->inGroup('superadmin') ?? false) {

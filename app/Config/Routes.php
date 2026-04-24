@@ -102,6 +102,8 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
     $routes->get('pengaturan-poin',  'Admin\PointSettingsController::index');
     $routes->post('pengaturan-poin', 'Admin\PointSettingsController::update');
 
+    $routes->get('leaderboard', 'Admin\LeaderboardController::index');
+
     $routes->get('returns/new/search', 'Loans\ReturnsController::searchLoan');
     $routes->resource('returns', ['controller' => 'Loans\ReturnsController']);
 
