@@ -6,6 +6,48 @@
 /* ════════════════════════════════════════════
    LEADERBOARD LANDING PAGE
 ════════════════════════════════════════════ */
+
+.lb-page { padding: 2.5rem 0 4rem; }
+
+/* ── Header ── */
+.lb-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.lb-header h1 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -.5px;
+  margin-bottom: .5rem;
+}
+.lb-header p {
+  font-size: .95rem;
+  color: #64748b;
+  max-width: 480px;
+  margin: 0 auto 1.25rem;
+}
+.lb-header-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: .78rem;
+  color: #475569;
+}
+.lb-live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+  animation: pulse-dot 1.5s infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; } 50% { opacity:.25; }
+}
+
 /* ── Filter bulan ── */
 .lb-filter-wrap {
   display: flex;
@@ -16,7 +58,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-right: 6rem;
 }
 .lb-filter-label {
   font-size: .8rem;
@@ -35,6 +76,28 @@
 }
 .lb-select:focus { border-color: #94a3b8; }
 
+/* ── Panduan poin ── */
+.lb-panduan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.lb-panduan-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 500;
+  border: 1px solid;
+}
+.lb-panduan-item.pos { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+.lb-panduan-item.neg { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.lb-panduan-icon { font-size: .85rem; }
+
 /* ── Podium ── */
 .lb-podium-wrap {
   display: flex;
@@ -42,7 +105,7 @@
   align-items: flex-end;
   gap: 1rem;
   margin-bottom: 2.5rem;
-  margin-top: 2rem;
+  padding: 0 3.5rem;
 }
 
 .lb-podium-item {
@@ -133,7 +196,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 14px;
   overflow: hidden;
-  margin: 0 6rem 3rem 6rem;
+  margin: 0 3.5rem;
 }
 .lb-tabel-header {
   display: flex;
@@ -259,7 +322,6 @@
 .lb-countdown {
   text-align: center;
   margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
 }
 .lb-countdown-inner {
   display: inline-flex;
@@ -273,11 +335,91 @@
 .lb-cd-num  { font-size: 1.4rem; font-weight: 800; color: #0f172a; line-height: 1; }
 .lb-cd-label { font-size: .65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
 .lb-cd-sep  { font-size: 1.2rem; font-weight: 700; color: #cbd5e1; align-self: flex-start; padding-top: 4px; }
+
+/* ── Hadiah Leaderboard ── */
+.lb-hadiah-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.lb-hadiah-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 160px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: .875rem .75rem;
+  text-align: center;
+  gap: 6px;
+  position: relative;
+}
+.lb-hadiah-item.rank-1 { border-color: #fbbf24; background: #fffbeb; }
+.lb-hadiah-item.rank-2 { border-color: #cbd5e1; background: #f8fafc; }
+.lb-hadiah-item.rank-3 { border-color: #fed7aa; background: #fff7ed; }
+
+.lb-hadiah-rank-label {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.rank-1 .lb-hadiah-rank-label { background: #fef9c3; color: #b45309; }
+.rank-2 .lb-hadiah-rank-label { background: #f1f5f9; color: #64748b; }
+.rank-3 .lb-hadiah-rank-label { background: #ffedd5; color: #9a3412; }
+
+.lb-hadiah-foto {
+  width: 56px; height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+}
+.lb-hadiah-foto-placeholder {
+  width: 56px; height: 56px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.lb-hadiah-nama {
+  font-size: .78rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+.lb-hadiah-desc {
+  font-size: .68rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+.lb-hadiah-judul {
+  text-align: center;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: .75rem;
+}
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <?= $this->include('layouts/navbar') ?>
+
+<!-- ══ HEADER HALAMAN ══ -->
+<div class="header-halaman">
+  <h1>Leaderboard</h1>
+  <div class="garis-emas"></div>
+  <p>Peringkat anggota perpustakaan terbaik berdasarkan poin gamifikasi</p>
+</div>
 
 <?php
 $namaBulan = [
@@ -289,19 +431,19 @@ $isRealtime  = ($bulan === $bulanIni && $tahun === $tahunIni);
 $bulanLabel  = ($namaBulan[$bulan] ?? $bulan) . ' ' . $tahun;
 $top3        = array_slice($leaderboard, 0, 3);
 $sisanya     = array_slice($leaderboard, 3);
+
+$panduan = [
+    ['ikon' => '🚶', 'label' => 'Kunjungan',         'poin' => $pointSettings['visit']['points']         ?? 5,   'pos' => true],
+    ['ikon' => '📖', 'label' => 'Peminjaman',         'poin' => $pointSettings['loan']['points']          ?? 10,  'pos' => true],
+    ['ikon' => '✅', 'label' => 'Kembali Tepat Waktu','poin' => $pointSettings['return_ontime']['points'] ?? 15,  'pos' => true],
+    ['ikon' => '⏰', 'label' => 'Kembali Terlambat',  'poin' => $pointSettings['return_late']['points']   ?? -10, 'pos' => false],
+    ['ikon' => '🎯', 'label' => 'Kuis (maks.)',        'poin' => 100, 'pos' => true],
+];
 ?>
-  <!-- Header -->
-  <div class="header-halaman">
-    <h1>Leaderboard Perpustakaan</h1>
-    <div class="garis-emas"></div>
-    <p>Peringkat anggota terbaik berdasarkan poin aktivitas perpustakaan</p>
-      <?php if ($isRealtime): ?>
-        <span class="lb-live-dot"></span>
-        <span>Live · <?= $bulanLabel ?></span>
-      <?php else: ?>
-        <span>📅 <?= $bulanLabel ?></span>
-      <?php endif; ?>
-  </div>
+
+<div class="bungkus-utama lb-page">
+
+
 
   <!-- Hitung mundur -->
   <?php if ($isRealtime): ?>
@@ -327,6 +469,40 @@ $sisanya     = array_slice($leaderboard, 3);
         <div class="lb-cd-label">Detik</div>
       </div>
     </div>
+  </div>
+  <?php endif; ?>
+
+
+
+  <!-- Hadiah Leaderboard -->
+  <?php
+  $labelRankHadiah = [1 => '🥇 Juara 1', 2 => '🥈 Juara 2', 3 => '🥉 Juara 3'];
+  $adaHadiah = !empty($hadiah);
+  ?>
+  <?php if ($adaHadiah): ?>
+  <div style="text-align:center;margin-bottom:.5rem">
+    <div class="lb-hadiah-judul">🎁 Hadiah Bulan Ini</div>
+  </div>
+  <div class="lb-hadiah-wrap">
+    <?php foreach ([1, 2, 3] as $r):
+      $h = $hadiah[$r] ?? null;
+      if (!$h) continue;
+      $adaFotoHadiah = !empty($h['foto']) && file_exists(FCPATH . 'uploads/hadiah/' . $h['foto']);
+    ?>
+      <div class="lb-hadiah-item rank-<?= $r ?>">
+        <span class="lb-hadiah-rank-label"><?= $labelRankHadiah[$r] ?></span>
+        <?php if ($adaFotoHadiah): ?>
+          <img src="<?= base_url('uploads/hadiah/' . $h['foto']) ?>"
+               class="lb-hadiah-foto" alt="<?= esc($h['nama_hadiah']) ?>">
+        <?php else: ?>
+          <div class="lb-hadiah-foto-placeholder">🎁</div>
+        <?php endif; ?>
+        <div class="lb-hadiah-nama"><?= esc($h['nama_hadiah']) ?></div>
+        <?php if (!empty($h['deskripsi'])): ?>
+          <div class="lb-hadiah-desc"><?= esc(mb_strimwidth($h['deskripsi'], 0, 60, '...')) ?></div>
+        <?php endif; ?>
+      </div>
+    <?php endforeach; ?>
   </div>
   <?php endif; ?>
 
@@ -375,27 +551,27 @@ $sisanya     = array_slice($leaderboard, 3);
     <?php endforeach; ?>
   </div>
   <?php endif; ?>
-<!-- Filter bulan -->
-  <div class="lb-filter-wrap">
-    <form method="get" action="">
-      <span class="lb-filter-label">Periode:</span>
-      <select name="bulan" class="lb-select" id="selectBulan">
-        <?php foreach ($daftarBulan as $db): ?>
-          <option value="<?= $db['bulan'] ?>"
-                  data-tahun="<?= $db['tahun'] ?>"
-                  <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
-            <?= esc($db['label']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-      <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
-    </form>
-  </div>
+
   <!-- Tabel full -->
   <div class="lb-tabel-wrap">
     <div class="lb-tabel-header">
-      <h2>Semua Peringkat</h2>
-      <span><?= count($leaderboard) ?> anggota</span>
+      <div>
+        <h2>Semua Peringkat</h2>
+        <span style="font-size:.75rem;color:#94a3b8"><?= count($leaderboard) ?> anggota</span>
+      </div>
+      <form method="get" action="" style="display:flex;align-items:center;gap:8px">
+        <span class="lb-filter-label">Periode:</span>
+        <select name="bulan" class="lb-select" id="selectBulan">
+          <?php foreach ($daftarBulan as $db): ?>
+            <option value="<?= $db['bulan'] ?>"
+                    data-tahun="<?= $db['tahun'] ?>"
+                    <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
+              <?= esc($db['label']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+        <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
+      </form>
     </div>
     <table class="lb-tabel">
       <thead>

@@ -101,6 +101,9 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
 
     $routes->get('pengaturan-poin',  'Admin\PointSettingsController::index');
     $routes->post('pengaturan-poin', 'Admin\PointSettingsController::update');
+    $routes->post('hadiah',                    'Admin\PointSettingsController::storeHadiah');
+    $routes->post('hadiah/(:num)/toggle',      'Admin\PointSettingsController::toggleHadiah/$1');
+    $routes->post('hadiah/(:num)/delete',      'Admin\PointSettingsController::deleteHadiah/$1');
 
     $routes->get('leaderboard', 'Admin\LeaderboardController::index');
 

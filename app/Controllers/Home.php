@@ -7,6 +7,7 @@ use App\Models\MemberModel;
 use App\Models\PointTransactionModel;
 use App\Models\PointSettingModel;
 use App\Models\LeaderboardSnapshotModel;
+use App\Models\RewardModel;
 
 class Home extends BaseController
 {
@@ -15,6 +16,7 @@ class Home extends BaseController
     protected PointTransactionModel $pointModel;
     protected PointSettingModel     $pointSettingModel;
     protected LeaderboardSnapshotModel $leaderboardModel;
+    protected RewardModel              $rewardModel;
 
     public function __construct()
     {
@@ -23,6 +25,7 @@ class Home extends BaseController
         $this->pointModel         = new PointTransactionModel;
         $this->pointSettingModel  = new PointSettingModel;
         $this->leaderboardModel   = new LeaderboardSnapshotModel;
+        $this->rewardModel        = new RewardModel;
     }
 
     public function index(): string
@@ -92,7 +95,6 @@ class Home extends BaseController
             $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun);
         }
 
-        // Ambil pengaturan poin untuk panduan
         $pointSettings = $this->pointSettingModel->getAllAsMap();
 
         // Dropdown 6 bulan
@@ -106,6 +108,9 @@ class Home extends BaseController
             ];
         }
 
+        // Ambil hadiah aktif bulan yang dipilih
+        $hadiah = $this->rewardModel->getHadiahBulan($bulan, $tahun);
+
         return view('home/leaderboard', [
             'activeNav'     => 'leaderboard',
             'leaderboard'   => $leaderboard,
@@ -115,6 +120,7 @@ class Home extends BaseController
             'tahunIni'      => $tahunIni,
             'daftarBulan'   => $daftarBulan,
             'pointSettings' => $pointSettings,
+            'hadiah'        => $hadiah,
         ]);
     }
 
