@@ -74,7 +74,7 @@
 }
 @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.25} }
 
-/* ── Podium section ── */
+/* ── Podium ── */
 .lb-podium-section {
   background: #fff;
   border-bottom: 1px solid #e2e8f0;
@@ -95,26 +95,18 @@
   flex: 1;
   max-width: 160px;
 }
-
-/* Avatar */
 .lb-podium-avatar-wrap { position: relative; margin-bottom: .6rem; }
 .lb-podium-avatar {
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  color: #fff;
-  overflow: hidden;
-  border: 3px solid;
-  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: #fff;
+  overflow: hidden; border: 3px solid;
 }
 .lb-podium-avatar img { width:100%; height:100%; object-fit:cover; }
 .lb-podium-avatar.rank-1 {
-  width: 76px; height: 76px;
+  width: 76px; height: 76px; font-size: 1rem;
   border-color: #fbbf24;
   background: linear-gradient(135deg,#92400e,#d97706);
-  box-shadow: 0 0 0 4px rgba(251,191,36,.2), 0 0 20px rgba(251,191,36,.3);
   animation: glow-gold 2.5s ease-in-out infinite;
 }
 @keyframes glow-gold {
@@ -122,63 +114,44 @@
   50%      { box-shadow: 0 0 0 6px rgba(251,191,36,.35), 0 0 32px rgba(251,191,36,.5); }
 }
 .lb-podium-avatar.rank-2 {
-  width: 62px; height: 62px;
+  width: 62px; height: 62px; font-size: .9rem;
   border-color: #94a3b8;
   background: linear-gradient(135deg,#475569,#94a3b8);
-  font-size: .9rem;
 }
 .lb-podium-avatar.rank-3 {
-  width: 58px; height: 58px;
+  width: 58px; height: 58px; font-size: .85rem;
   border-color: #b45309;
   background: linear-gradient(135deg,#78350f,#c2410c);
-  font-size: .85rem;
 }
-.lb-podium-avatar.rank-1 { font-size: 1rem; }
-
 .lb-podium-badge {
-  position: absolute;
-  bottom: -3px; right: -3px;
-  width: 20px; height: 20px;
-  border-radius: 50%;
+  position: absolute; bottom: -3px; right: -3px;
+  width: 20px; height: 20px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: .6rem; font-weight: 800;
-  border: 2px solid #fff;
+  font-size: .6rem; font-weight: 800; border: 2px solid #fff;
 }
 .lb-podium-badge.rank-1 { background: #d97706; color: #fff; }
 .lb-podium-badge.rank-2 { background: #64748b; color: #fff; }
 .lb-podium-badge.rank-3 { background: #b45309; color: #fff; }
-
 .lb-mahkota { font-size: 1.4rem; margin-bottom: .2rem; line-height: 1; }
-.lb-spacer   { height: 1.6rem; }
-
+.lb-spacer  { height: 1.6rem; }
 .lb-podium-nama {
   font-size: .8rem; font-weight: 700; color: #1e293b;
   text-align: center; margin-bottom: 1px;
-  max-width: 130px; overflow: hidden;
-  text-overflow: ellipsis; white-space: nowrap;
+  max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .lb-podium-nama.rank-1 { font-size: .88rem; }
-.lb-podium-tipe  { font-size: .67rem; color: #94a3b8; margin-bottom: .3rem; }
-.lb-podium-poin  { font-size: .82rem; font-weight: 700; margin-bottom: .6rem; }
+.lb-podium-tipe { font-size: .67rem; color: #94a3b8; margin-bottom: .3rem; }
+.lb-podium-poin { font-size: .82rem; font-weight: 700; margin-bottom: .6rem; }
 .lb-podium-poin.rank-1 { font-size: .9rem; color: #d97706; }
 .lb-podium-poin.rank-2 { color: #64748b; }
 .lb-podium-poin.rank-3 { color: #b45309; }
-
-/* Tombol hadiah — di bawah poin, di atas tiang */
 .lb-btn-hadiah {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: .6rem;
-  padding: 4px 11px;
-  border-radius: 20px;
-  border: 1.5px solid;
-  font-size: .67rem;
-  font-weight: 600;
-  cursor: pointer;
-  background: transparent;
-  transition: all .15s;
-  letter-spacing: .2px;
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-bottom: .6rem; padding: 4px 11px;
+  border-radius: 20px; border: 1.5px solid;
+  font-size: .67rem; font-weight: 600;
+  cursor: pointer; background: transparent;
+  transition: all .15s; letter-spacing: .2px;
 }
 .lb-btn-hadiah.rank-1 { border-color: #fbbf24; color: #d97706; }
 .lb-btn-hadiah.rank-2 { border-color: #94a3b8; color: #64748b; }
@@ -187,16 +160,10 @@
 .lb-btn-hadiah.rank-1:hover { background: #fef9c3; }
 .lb-btn-hadiah.rank-2:hover { background: #f1f5f9; }
 .lb-btn-hadiah.rank-3:hover { background: #ffedd5; }
-
-/* Tiang podium */
 .lb-tiang {
-  width: 100%;
-  border-radius: 8px 8px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  font-weight: 900;
+  width: 100%; border-radius: 8px 8px 0 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; font-weight: 900;
   color: rgba(255,255,255,.8);
   box-shadow: 0 -4px 12px rgba(0,0,0,.1);
 }
@@ -205,164 +172,132 @@
 .lb-tiang.rank-3 { height: 60px;  background: linear-gradient(180deg,#fed7aa,#fb923c,#c2410c); }
 
 /* ── Filter + tabel ── */
-.lb-tabel-section {
-  padding: 2rem 6rem 3rem;
-  background: #f8fafc;
-}
+.lb-tabel-section { padding: 2rem 6rem 3rem; background: #f8fafc; }
 .lb-tabel-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  gap: 1rem;
-  flex-wrap: wrap;
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 1rem;
+  gap: 1rem; flex-wrap: wrap;
 }
-.lb-search-wrap {
-  position: relative;
-  flex: 1;
-  max-width: 280px;
-}
+.lb-search-wrap { position: relative; flex: 1; max-width: 280px; }
 .lb-search-wrap svg {
-  position: absolute;
-  left: 10px; top: 50%;
-  transform: translateY(-50%);
-  width: 15px; height: 15px;
-  stroke: #94a3b8;
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%); width: 15px; height: 15px; stroke: #94a3b8;
 }
 .lb-search-input {
-  width: 100%;
-  padding: 7px 12px 7px 32px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: .82rem;
-  background: #fff;
-  color: #334155;
-  outline: none;
+  width: 100%; padding: 7px 12px 7px 32px;
+  border: 1px solid #e2e8f0; border-radius: 8px;
+  font-size: .82rem; background: #fff; color: #334155; outline: none;
 }
 .lb-search-input:focus { border-color: #94a3b8; }
-
 .lb-filter-right { display: flex; align-items: center; gap: 8px; }
 .lb-filter-label { font-size: .8rem; color: #64748b; font-weight: 500; }
 .lb-select {
-  font-size: .82rem;
-  padding: 7px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #fff;
-  color: #334155;
-  cursor: pointer;
-  outline: none;
+  font-size: .82rem; padding: 7px 12px;
+  border: 1px solid #e2e8f0; border-radius: 8px;
+  background: #fff; color: #334155; cursor: pointer; outline: none;
 }
 .lb-select:focus { border-color: #94a3b8; }
 
 /* Tabel */
 .lb-tabel-wrap {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  overflow: hidden;
-  margin-bottom: 1rem;
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 14px; overflow: hidden; margin-bottom: 1rem;
 }
 .lb-tabel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #f1f5f9;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9;
 }
 .lb-tabel-header h2 { font-size: .92rem; font-weight: 700; color: #0f172a; margin: 0; }
 .lb-tabel-header span { font-size: .75rem; color: #94a3b8; }
 .lb-tabel { width: 100%; border-collapse: collapse; }
 .lb-tabel thead th {
-  padding: .65rem 1rem;
-  font-size: .7rem;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  background: #f8fafc;
-  border-bottom: 1px solid #f1f5f9;
-  text-align: left;
+  padding: .65rem .875rem;
+  font-size: .68rem; font-weight: 600; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: .4px;
+  background: #f8fafc; border-bottom: 1px solid #f1f5f9;
+  text-align: left; white-space: nowrap;
 }
 .lb-tabel thead th.center { text-align: center; }
 .lb-tabel tbody tr { border-bottom: 1px solid #f8fafc; transition: background .1s; }
 .lb-tabel tbody tr:last-child { border-bottom: none; }
-.lb-tabel tbody tr:hover { background: #f8fafc; }
+.lb-tabel tbody tr:hover { background: #f8fafc !important; }
 .lb-tabel tbody tr.row-top-1 { background: #fffbeb; }
 .lb-tabel tbody tr.row-top-2 { background: #f8fafc; }
 .lb-tabel tbody tr.row-top-3 { background: #fff7ed; }
-.lb-tabel tbody tr.row-top-1:hover { background: #fef9c3; }
-.lb-tabel tbody tr.row-top-2:hover { background: #f1f5f9; }
-.lb-tabel tbody tr.row-top-3:hover { background: #ffedd5; }
-.lb-tabel tbody td { padding: .7rem 1rem; font-size: .82rem; color: #1e293b; vertical-align: middle; }
+.lb-tabel tbody td {
+  padding: .65rem .875rem; font-size: .81rem;
+  color: #1e293b; vertical-align: middle;
+}
 .lb-tabel tbody td.center { text-align: center; }
 
+/* Rank badge */
 .lb-rank-badge {
-  display: inline-flex;
-  align-items: center; justify-content: center;
-  width: 28px; height: 28px;
-  border-radius: 7px;
-  font-size: .72rem; font-weight: 800;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 6px;
+  font-size: .7rem; font-weight: 800;
 }
 .lb-rank-badge.gold   { background: #1c1917; color: #fbbf24; }
 .lb-rank-badge.silver { background: #334155; color: #cbd5e1; }
 .lb-rank-badge.bronze { background: #431407; color: #fb923c; }
-.lb-rank-num { font-size: .8rem; color: #94a3b8; font-weight: 500; }
+.lb-rank-num { font-size: .78rem; color: #94a3b8; font-weight: 500; }
 
+/* Member cell */
 .lb-member-cell { display: flex; align-items: center; gap: 10px; }
 .lb-avatar-sm {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: .72rem; font-weight: 700; color: #64748b;
-  overflow: hidden; flex-shrink: 0;
-  border: 2px solid #f1f5f9;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #e2e8f0; display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 700; color: #64748b;
+  overflow: hidden; flex-shrink: 0; border: 2px solid #f1f5f9;
 }
 .lb-avatar-sm img { width:100%; height:100%; object-fit:cover; }
-.lb-member-nama { font-size: .83rem; font-weight: 600; color: #1e293b; }
-.lb-member-sub  { font-size: .71rem; color: #94a3b8; margin-top: 1px; }
+.lb-member-nama { font-size: .82rem; font-weight: 600; color: #1e293b; }
+.lb-member-sub  { font-size: .7rem; color: #94a3b8; margin-top: 1px; }
 .lb-tipe-badge  {
-  display: inline-block; font-size: .65rem;
-  padding: 1px 6px; border-radius: 4px;
+  display: inline-block; font-size: .63rem;
+  padding: 1px 5px; border-radius: 4px;
   background: #f1f5f9; color: #475569;
   font-weight: 500; margin-left: 4px;
 }
+
+/* Poin total */
 .lb-poin-val { font-size: .88rem; font-weight: 700; }
 .lb-poin-val.pos { color: #16a34a; }
 .lb-poin-val.neg { color: #dc2626; }
 
-/* Kosong / no-result */
+/* Chip poin per aktivitas */
+.lb-chip {
+  display: inline-block;
+  font-size: .71rem; font-weight: 600;
+  padding: 2px 7px; border-radius: 5px;
+}
+.lb-chip.pos { background: #f0fdf4; color: #16a34a; }
+.lb-chip.neg { background: #fef2f2; color: #dc2626; }
+.lb-dash { font-size: .8rem; color: #e2e8f0; }
+
+/* Divider kolom breakdown */
+.lb-tabel thead th.divider-l,
+.lb-tabel tbody td.divider-l {
+  border-left: 1px solid #f1f5f9;
+}
+
+/* Kosong */
 .lb-kosong { text-align: center; padding: 3rem 1rem; color: #94a3b8; font-size: .85rem; }
 .lb-kosong svg { width:40px; height:40px; stroke:#cbd5e1; margin: 0 auto .75rem; display:block; }
 
-/* CTA login */
+/* CTA */
 .lb-cta {
-  text-align: center;
-  padding: 1.5rem 1rem;
+  text-align: center; padding: 1.25rem 1rem;
   background: linear-gradient(135deg, #eff4ff, #e0e7ff);
-  border-top: 1px solid #c7d7fe;
-  font-size: .85rem;
-  color: #3730a3;
+  border: 1px solid #c7d7fe; border-radius: 10px;
+  font-size: .85rem; color: #3730a3; margin-top: .75rem;
 }
-.lb-cta a {
-  font-weight: 700;
-  color: #1e3a8a;
-  text-decoration: underline;
-  margin-left: 4px;
-}
+.lb-cta a { font-weight: 700; color: #1e3a8a; text-decoration: underline; margin-left: 4px; }
 
 /* ── Modal hadiah ── */
 .lb-modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.55);
-  backdrop-filter: blur(4px);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+  z-index: 9999; align-items: center; justify-content: center; padding: 1rem;
 }
 .lb-modal-overlay.tampil { display: flex; }
 @keyframes lb-modal-in {
@@ -370,18 +305,14 @@
   to   { transform: scale(1) translateY(0);     opacity: 1; }
 }
 .lb-modal {
-  background: #fff;
-  border-radius: 20px;
-  max-width: 360px;
-  width: 100%;
-  overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0,0,0,.25);
+  background: #fff; border-radius: 20px;
+  max-width: 360px; width: 100%;
+  overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,.25);
   animation: lb-modal-in .3s cubic-bezier(.34,1.56,.64,1);
 }
 .lb-modal-header {
   padding: 1.75rem 1.5rem 1.5rem;
-  text-align: center;
-  position: relative;
+  text-align: center; position: relative;
 }
 .lb-modal-header.rank-1 { background: linear-gradient(135deg,#78350f,#d97706,#fbbf24); }
 .lb-modal-header.rank-2 { background: linear-gradient(135deg,#1e293b,#475569,#94a3b8); }
@@ -395,26 +326,21 @@
   transition: background .15s;
 }
 .lb-modal-close:hover { background: rgba(255,255,255,.35); }
-.lb-modal-emoji       { font-size: 2rem; margin-bottom: .25rem; line-height: 1; }
-.lb-modal-rank-label  { font-size: .68rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: rgba(255,255,255,.7); margin-bottom: .35rem; }
-.lb-modal-rank-title  { font-size: 1.1rem; font-weight: 800; color: #fff; }
-
+.lb-modal-emoji      { font-size: 2rem; margin-bottom: .25rem; line-height: 1; }
+.lb-modal-rank-label { font-size: .68rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: rgba(255,255,255,.7); margin-bottom: .35rem; }
+.lb-modal-rank-title { font-size: 1.1rem; font-weight: 800; color: #fff; }
 .lb-modal-body { padding: 1.5rem; }
 .lb-modal-foto-wrap { text-align: center; margin-bottom: 1.25rem; }
 .lb-modal-foto {
-  width: 100px; height: 100px;
-  border-radius: 16px;
-  object-fit: cover;
-  border: 3px solid #e2e8f0;
+  width: 100px; height: 100px; border-radius: 16px;
+  object-fit: cover; border: 3px solid #e2e8f0;
   box-shadow: 0 8px 24px rgba(0,0,0,.1);
 }
 .lb-modal-foto-placeholder {
-  width: 100px; height: 100px;
-  border-radius: 16px;
-  background: #f1f5f9;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 2.75rem;
-  border: 3px solid #e2e8f0;
+  width: 100px; height: 100px; border-radius: 16px;
+  background: #f1f5f9; display: inline-flex;
+  align-items: center; justify-content: center;
+  font-size: 2.75rem; border: 3px solid #e2e8f0;
 }
 .lb-modal-nama { font-size: 1.05rem; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: .5rem; }
 .lb-modal-desc { font-size: .82rem; color: #64748b; text-align: center; line-height: 1.65; margin-bottom: 1.25rem; }
@@ -434,7 +360,7 @@
 .lb-modal-btn-tutup:hover { background: #e2e8f0; }
 
 /* ── Responsif mobile ── */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .lb-tabel-section { padding: 1.5rem 1rem 2rem; }
   .lb-tabel-wrap { border-radius: 10px; }
   .lb-podium-wrap { gap: .5rem; }
@@ -473,36 +399,35 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
 <div class="header-halaman">
   <h1>Leaderboard Perpustakaan</h1>
   <div class="garis-emas"></div>
-<!-- Hitung mundur -->
-<?php if ($isRealtime): ?>
-<div class="lb-countdown-section">
-  <div class="lb-countdown-label">Periode berakhir dalam</div>
-  <div class="lb-countdown-inner">
-    <div class="lb-cd-unit">
-      <div class="lb-cd-num" id="cdHari">–</div>
-      <div class="lb-cd-label">Hari</div>
+  <!-- Hitung mundur -->
+  <?php if ($isRealtime): ?>
+  <div class="lb-countdown-section">
+    <div class="lb-countdown-label">Periode berakhir dalam</div>
+    <div class="lb-countdown-inner">
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdHari">–</div>
+        <div class="lb-cd-label">Hari</div>
+      </div>
+      <div class="lb-cd-sep">:</div>
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdJam">–</div>
+        <div class="lb-cd-label">Jam</div>
+      </div>
+      <div class="lb-cd-sep">:</div>
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdMenit">–</div>
+        <div class="lb-cd-label">Menit</div>
+      </div>
+      <div class="lb-cd-sep">:</div>
+      <div class="lb-cd-unit">
+        <div class="lb-cd-num" id="cdDetik">–</div>
+        <div class="lb-cd-label">Detik</div>
+      </div>
     </div>
-    <div class="lb-cd-sep">:</div>
-    <div class="lb-cd-unit">
-      <div class="lb-cd-num" id="cdJam">–</div>
-      <div class="lb-cd-label">Jam</div>
-    </div>
-    <div class="lb-cd-sep">:</div>
-    <div class="lb-cd-unit">
-      <div class="lb-cd-num" id="cdMenit">–</div>
-      <div class="lb-cd-label">Menit</div>
-    </div>
-    <div class="lb-cd-sep">:</div>
-    <div class="lb-cd-unit">
-      <div class="lb-cd-num" id="cdDetik">–</div>
-      <div class="lb-cd-label">Detik</div>
-    </div>
+    <div><span class="lb-live-pill"><span class="lb-live-dot"></span> Live</span></div>
   </div>
-  <div><span class="lb-live-pill"><span class="lb-live-dot"></span> Live</span></div>
+  <?php endif; ?>
 </div>
-<?php endif; ?>
-</div>
-
 
 <!-- Podium -->
 <?php if (count($top3) >= 1): ?>
@@ -511,12 +436,12 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
     <?php foreach ([1, 0, 2] as $idx):
       $row = $top3[$idx] ?? null;
       if (!$row) continue;
-      $rank     = $idx + 1;
-      $nama     = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
-      $inisial  = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
-      $adaFoto  = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
-      $rc       = 'rank-' . $rank;
-      $h        = $hadiah[$rank] ?? null;
+      $rank    = $idx + 1;
+      $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
+      $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
+      $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+      $rc      = 'rank-' . $rank;
+      $h       = $hadiah[$rank] ?? null;
     ?>
       <div class="lb-podium-item">
         <?php if ($rank === 1): ?>
@@ -524,7 +449,6 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
         <?php else: ?>
           <div class="lb-spacer"></div>
         <?php endif; ?>
-
         <div class="lb-podium-avatar-wrap">
           <div class="lb-podium-avatar <?= $rc ?>">
             <?php if ($adaFoto): ?>
@@ -535,18 +459,14 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
           </div>
           <div class="lb-podium-badge <?= $rc ?>"><?= $rank ?></div>
         </div>
-
         <div class="lb-podium-nama <?= $rc ?>"><?= esc(mb_strimwidth($nama, 0, 16, '...')) ?></div>
         <div class="lb-podium-tipe"><?= esc($row['tipe_anggota']) ?></div>
         <div class="lb-podium-poin <?= $rc ?>"><?= number_format($row['total_points']) ?> poin</div>
-
-        <!-- Tombol hadiah di bawah poin, di atas tiang -->
         <?php if ($h): ?>
           <button class="lb-btn-hadiah <?= $rc ?>" onclick="bukaModalHadiah(<?= $rank ?>)">
             🎁 Hadiah
           </button>
         <?php endif; ?>
-
         <div class="lb-tiang <?= $rc ?>"><?= $rank ?></div>
       </div>
     <?php endforeach; ?>
@@ -556,8 +476,6 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
 
 <!-- Filter + Tabel -->
 <div class="lb-tabel-section">
-
-  <!-- Toolbar: search + filter bulan -->
   <div class="lb-tabel-toolbar">
     <div class="lb-search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -583,92 +501,126 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
     </div>
   </div>
 
-  <!-- Tabel -->
-  <div class="lb-tabel-wrap">
-    <div class="lb-tabel-header">
-      <h2>Semua Peringkat</h2>
-      <span id="jumlahAnggota"><?= count($leaderboard) ?> anggota</span>
-    </div>
-    <table class="lb-tabel">
-      <thead>
-        <tr>
-          <th class="center" style="width:60px">#</th>
-          <th>Anggota</th>
-          <th class="center" style="width:130px">Total Poin</th>
-        </tr>
-      </thead>
-      <tbody id="tabelBody">
-        <?php if (empty($leaderboard)): ?>
+  <div style="overflow-x:auto">
+    <div class="lb-tabel-wrap" style="min-width:700px">
+      <div class="lb-tabel-header">
+        <h2>Semua Peringkat</h2>
+        <span id="jumlahAnggota"><?= count($leaderboard) ?> anggota</span>
+      </div>
+      <table class="lb-tabel">
+        <thead>
           <tr>
-            <td colspan="3">
-              <div class="lb-kosong">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="20" x2="18" y2="10"/>
-                  <line x1="12" y1="20" x2="12" y2="4"/>
-                  <line x1="6"  y1="20" x2="6"  y2="14"/>
-                </svg>
-                Belum ada data leaderboard bulan ini
-              </div>
-            </td>
+            <th class="center" style="width:52px">#</th>
+            <th>Anggota</th>
+            <th class="center divider-l" title="Poin dari kunjungan perpustakaan">Kunjungan</th>
+            <th class="center" title="Poin dari peminjaman buku">Peminjaman</th>
+            <th class="center" title="Poin dari pengembalian tepat waktu">Tepat Waktu</th>
+            <th class="center" title="Pengurangan poin karena terlambat">Terlambat</th>
+            <th class="center" title="Poin dari kuis buku">Kuis</th>
+            <th class="center divider-l" style="width:110px">Total Poin</th>
           </tr>
-        <?php else: ?>
-          <?php foreach ($leaderboard as $i => $row):
-            $rank    = $i + 1;
-            $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
-            $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
-            $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
-            $rowClass = $rank === 1 ? 'row-top-1' : ($rank === 2 ? 'row-top-2' : ($rank === 3 ? 'row-top-3' : ''));
-          ?>
-            <tr class="<?= $rowClass ?>" data-nama="<?= strtolower($nama) ?>">
-              <td class="center">
-                <?php if ($rank === 1): ?>
-                  <span class="lb-rank-badge gold">1</span>
-                <?php elseif ($rank === 2): ?>
-                  <span class="lb-rank-badge silver">2</span>
-                <?php elseif ($rank === 3): ?>
-                  <span class="lb-rank-badge bronze">3</span>
-                <?php else: ?>
-                  <span class="lb-rank-num"><?= $rank ?></span>
-                <?php endif; ?>
-              </td>
-              <td>
-                <div class="lb-member-cell">
-                  <div class="lb-avatar-sm">
-                    <?php if ($adaFoto): ?>
-                      <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>" alt="">
-                    <?php else: ?>
-                      <?= esc($inisial) ?>
-                    <?php endif; ?>
-                  </div>
-                  <div>
-                    <div class="lb-member-nama"><?= esc($nama) ?></div>
-                    <div class="lb-member-sub">
-                      <?= esc($row['no_identitas']) ?>
-                      <span class="lb-tipe-badge"><?= esc($row['tipe_anggota']) ?></span>
-                    </div>
-                  </div>
+        </thead>
+        <tbody id="tabelBody">
+          <?php if (empty($leaderboard)): ?>
+            <tr>
+              <td colspan="8">
+                <div class="lb-kosong">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6"  y1="20" x2="6"  y2="14"/>
+                  </svg>
+                  Belum ada data leaderboard bulan ini
                 </div>
               </td>
-              <td class="center">
-                <span class="lb-poin-val <?= $row['total_points'] >= 0 ? 'pos' : 'neg' ?>">
-                  <?= ($row['total_points'] >= 0 ? '+' : '') . number_format($row['total_points']) ?>
-                </span>
-              </td>
             </tr>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </tbody>
-    </table>
+          <?php else: ?>
+            <?php foreach ($leaderboard as $i => $row):
+              $rank     = $i + 1;
+              $nama     = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
+              $inisial  = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
+              $adaFoto  = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+              $rowClass = $rank === 1 ? 'row-top-1' : ($rank === 2 ? 'row-top-2' : ($rank === 3 ? 'row-top-3' : ''));
+              $poinKunjungan  = (int) ($row['poin_kunjungan']  ?? 0);
+              $poinPeminjaman = (int) ($row['poin_peminjaman'] ?? 0);
+              $poinTepat      = (int) ($row['poin_tepat']      ?? 0);
+              $poinTerlambat  = (int) ($row['poin_terlambat']  ?? 0);
+              $poinKuis       = (int) ($row['poin_kuis']       ?? 0);
+            ?>
+              <tr class="<?= $rowClass ?>" data-nama="<?= strtolower($nama) ?>">
+                <td class="center">
+                  <?php if ($rank === 1): ?>
+                    <span class="lb-rank-badge gold">1</span>
+                  <?php elseif ($rank === 2): ?>
+                    <span class="lb-rank-badge silver">2</span>
+                  <?php elseif ($rank === 3): ?>
+                    <span class="lb-rank-badge bronze">3</span>
+                  <?php else: ?>
+                    <span class="lb-rank-num"><?= $rank ?></span>
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <div class="lb-member-cell">
+                    <div class="lb-avatar-sm">
+                      <?php if ($adaFoto): ?>
+                        <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>" alt="">
+                      <?php else: ?>
+                        <?= esc($inisial) ?>
+                      <?php endif; ?>
+                    </div>
+                    <div>
+                      <div class="lb-member-nama"><?= esc($nama) ?></div>
+                      <div class="lb-member-sub">
+                        <?= esc($row['no_identitas']) ?>
+                        <span class="lb-tipe-badge"><?= esc($row['tipe_anggota']) ?></span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="center divider-l">
+                  <?= $poinKunjungan > 0
+                    ? '<span class="lb-chip pos">+' . $poinKunjungan . '</span>'
+                    : '<span class="lb-dash">—</span>' ?>
+                </td>
+                <td class="center">
+                  <?= $poinPeminjaman > 0
+                    ? '<span class="lb-chip pos">+' . $poinPeminjaman . '</span>'
+                    : '<span class="lb-dash">—</span>' ?>
+                </td>
+                <td class="center">
+                  <?= $poinTepat > 0
+                    ? '<span class="lb-chip pos">+' . $poinTepat . '</span>'
+                    : '<span class="lb-dash">—</span>' ?>
+                </td>
+                <td class="center">
+                  <?= $poinTerlambat < 0
+                    ? '<span class="lb-chip neg">' . $poinTerlambat . '</span>'
+                    : '<span class="lb-dash">—</span>' ?>
+                </td>
+                <td class="center">
+                  <?= $poinKuis > 0
+                    ? '<span class="lb-chip pos">+' . $poinKuis . '</span>'
+                    : '<span class="lb-dash">—</span>' ?>
+                </td>
+                <td class="center divider-l">
+                  <span class="lb-poin-val <?= $row['total_points'] >= 0 ? 'pos' : 'neg' ?>">
+                    <?= ($row['total_points'] >= 0 ? '+' : '') . number_format($row['total_points']) ?>
+                  </span>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- CTA login -->
   <?php if (!auth()->loggedIn()): ?>
   <div class="lb-cta">
     Ingin tahu peringkat kamu?
     <a href="<?= base_url('login') ?>">Login sekarang</a> untuk melihat posisi kamu di leaderboard.
   </div>
   <?php endif; ?>
-
 </div>
 
 <!-- Modal Hadiah -->
@@ -698,12 +650,8 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
       <?php if (!empty($h['deskripsi'])): ?>
         <div class="lb-modal-desc"><?= esc($h['deskripsi']) ?></div>
       <?php endif; ?>
-      <div class="lb-modal-info">
-        📅 Diberikan kepada pemenang di akhir periode bulan ini
-      </div>
-      <button class="lb-modal-btn-tutup" onclick="tutupModalHadiah(<?= $r ?>)">
-        Tutup
-      </button>
+      <div class="lb-modal-info">📅 Diberikan kepada pemenang di akhir periode bulan ini</div>
+      <button class="lb-modal-btn-tutup" onclick="tutupModalHadiah(<?= $r ?>)">Tutup</button>
     </div>
   </div>
 </div>
@@ -712,48 +660,39 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
 <?= $this->include('layouts/home_footer') ?>
 
 <script>
-// Filter member by nama
 function filterMember() {
-  const q     = document.getElementById('cariMember').value.toLowerCase();
-  const rows  = document.querySelectorAll('#tabelBody tr[data-nama]');
-  let visible = 0;
+  const q    = document.getElementById('cariMember').value.toLowerCase();
+  const rows = document.querySelectorAll('#tabelBody tr[data-nama]');
+  let vis    = 0;
   rows.forEach(tr => {
     const match = tr.dataset.nama.includes(q);
     tr.style.display = match ? '' : 'none';
-    if (match) visible++;
+    if (match) vis++;
   });
-  document.getElementById('jumlahAnggota').textContent = visible + ' anggota';
+  document.getElementById('jumlahAnggota').textContent = vis + ' anggota';
 }
 
-// Sync tahun ke select bulan
 document.getElementById('selectBulan').addEventListener('change', function() {
-  const opt = this.options[this.selectedIndex];
-  document.getElementById('tahunInput').value = opt.dataset.tahun;
+  document.getElementById('tahunInput').value = this.options[this.selectedIndex].dataset.tahun;
   this.form.submit();
 });
 
-// Modal hadiah
 function bukaModalHadiah(rank) {
-  const modal = document.getElementById('modalHadiah' + rank);
-  if (modal) modal.classList.add('tampil');
+  const m = document.getElementById('modalHadiah' + rank);
+  if (m) m.classList.add('tampil');
 }
 function tutupModalHadiah(rank) {
-  const modal = document.getElementById('modalHadiah' + rank);
-  if (modal) modal.classList.remove('tampil');
+  const m = document.getElementById('modalHadiah' + rank);
+  if (m) m.classList.remove('tampil');
 }
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('lb-modal-overlay')) {
-    e.target.classList.remove('tampil');
-  }
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('lb-modal-overlay')) e.target.classList.remove('tampil');
 });
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.lb-modal-overlay.tampil')
-      .forEach(m => m.classList.remove('tampil'));
-  }
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape')
+    document.querySelectorAll('.lb-modal-overlay.tampil').forEach(m => m.classList.remove('tampil'));
 });
 
-// Hitung mundur
 <?php if ($isRealtime): ?>
 (function() {
   function tick() {
@@ -761,17 +700,12 @@ document.addEventListener('keydown', function(e) {
     const akhir = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const sisa  = akhir - now;
     if (sisa <= 0) return;
-    const d = Math.floor(sisa / 86400000);
-    const h = Math.floor((sisa % 86400000) / 3600000);
-    const m = Math.floor((sisa % 3600000)  / 60000);
-    const s = Math.floor((sisa % 60000)    / 1000);
-    document.getElementById('cdHari').textContent  = String(d).padStart(2,'0');
-    document.getElementById('cdJam').textContent   = String(h).padStart(2,'0');
-    document.getElementById('cdMenit').textContent = String(m).padStart(2,'0');
-    document.getElementById('cdDetik').textContent = String(s).padStart(2,'0');
+    document.getElementById('cdHari').textContent  = String(Math.floor(sisa/86400000)).padStart(2,'0');
+    document.getElementById('cdJam').textContent   = String(Math.floor((sisa%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cdMenit').textContent = String(Math.floor((sisa%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cdDetik').textContent = String(Math.floor((sisa%60000)/1000)).padStart(2,'0');
   }
-  tick();
-  setInterval(tick, 1000);
+  tick(); setInterval(tick, 1000);
 })();
 <?php endif; ?>
 </script>

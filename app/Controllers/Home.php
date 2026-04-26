@@ -111,6 +111,31 @@ class Home extends BaseController
         // Ambil hadiah aktif bulan yang dipilih
         $hadiah = $this->rewardModel->getHadiahBulan($bulan, $tahun);
 
+        // Untuk snapshot (bulan lalu), tambah breakdown dari point_transactions
+        if ($bulan !== $bulanIni || $tahun !== $tahunIni) {
+            $db = \Config\Database::connect();
+            foreach ($leaderboard as &$row) {
+                $bd = $db->table('point_transactions')
+                    ->select("
+                        SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
+                        SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
+                        SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
+                        SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
+                        SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis
+                    ")
+                    ->where('member_id', $row['member_id'])
+                    ->where('MONTH(created_at)', $bulan)
+                    ->where('YEAR(created_at)',  $tahun)
+                    ->get()->getRowArray();
+                $row['poin_kunjungan']  = (int) ($bd['poin_kunjungan']  ?? 0);
+                $row['poin_peminjaman'] = (int) ($bd['poin_peminjaman'] ?? 0);
+                $row['poin_tepat']      = (int) ($bd['poin_tepat']      ?? 0);
+                $row['poin_terlambat']  = (int) ($bd['poin_terlambat']  ?? 0);
+                $row['poin_kuis']       = (int) ($bd['poin_kuis']       ?? 0);
+            }
+            unset($row);
+        }
+
         return view('home/leaderboard', [
             'activeNav'     => 'leaderboard',
             'leaderboard'   => $leaderboard,
@@ -133,17 +158,37 @@ class Home extends BaseController
     {
         $members = $this->memberModel->where('deleted_at', null)->findAll();
         $data    = [];
+        $db      = \Config\Database::connect();
 
         foreach ($members as $m) {
-            $total = $this->pointModel->getTotalPoin($m['id'], $bulan, $tahun);
+            // Hitung poin per aktivitas dalam bulan ini
+            $breakdown = $db->table('point_transactions')
+                ->select("
+                    SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
+                    SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
+                    SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
+                    SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
+                    SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis,
+                    SUM(points) as total_points
+                ")
+                ->where('member_id', $m['id'])
+                ->where('MONTH(created_at)', $bulan)
+                ->where('YEAR(created_at)',  $tahun)
+                ->get()->getRowArray();
+
             $data[] = [
-                'member_id'    => $m['id'],
-                'first_name'   => $m['first_name'],
-                'last_name'    => $m['last_name'] ?? '',
-                'no_identitas' => $m['no_identitas'],
-                'tipe_anggota' => $m['tipe_anggota'],
-                'foto_profil'  => $m['foto_profil'] ?? null,
-                'total_points' => $total,
+                'member_id'       => $m['id'],
+                'first_name'      => $m['first_name'],
+                'last_name'       => $m['last_name'] ?? '',
+                'no_identitas'    => $m['no_identitas'],
+                'tipe_anggota'    => $m['tipe_anggota'],
+                'foto_profil'     => $m['foto_profil'] ?? null,
+                'poin_kunjungan'  => (int) ($breakdown['poin_kunjungan']  ?? 0),
+                'poin_peminjaman' => (int) ($breakdown['poin_peminjaman'] ?? 0),
+                'poin_tepat'      => (int) ($breakdown['poin_tepat']      ?? 0),
+                'poin_terlambat'  => (int) ($breakdown['poin_terlambat']  ?? 0),
+                'poin_kuis'       => (int) ($breakdown['poin_kuis']       ?? 0),
+                'total_points'    => (int) ($breakdown['total_points']    ?? 0),
             ];
         }
 
