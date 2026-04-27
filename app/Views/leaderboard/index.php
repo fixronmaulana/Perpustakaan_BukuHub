@@ -51,48 +51,76 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     </div>
 
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table table-hover align-middle mb-0" style="min-width:800px">
         <thead class="table-light">
           <tr>
-            <th style="width:60px" class="text-center">#</th>
+            <th style="width:56px" class="text-center">#</th>
             <th>Anggota</th>
-            <th>Tipe</th>
-            <th class="text-center">Poin</th>
+            <th class="text-center border-start" title="Poin dari kunjungan">
+              <span class="d-block" style="font-size:.65rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Kunjungan</span>
+            </th>
+            <th class="text-center" title="Poin dari peminjaman buku">
+              <span class="d-block" style="font-size:.65rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Peminjaman</span>
+            </th>
+            <th class="text-center" title="Poin pengembalian tepat waktu">
+              <span class="d-block" style="font-size:.65rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Tepat Waktu</span>
+            </th>
+            <th class="text-center" title="Pengurangan poin terlambat">
+              <span class="d-block" style="font-size:.65rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Terlambat</span>
+            </th>
+            <th class="text-center" title="Poin dari kuis buku">
+              <span class="d-block" style="font-size:.65rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Kuis</span>
+            </th>
+            <th class="text-center border-start" style="width:110px">
+              <span class="d-block" style="font-size:.65rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Total Poin</span>
+            </th>
           </tr>
         </thead>
         <tbody>
           <?php if (empty($leaderboard)): ?>
             <tr>
-              <td colspan="4" class="text-center py-5 text-muted">
+              <td colspan="8" class="text-center py-5 text-muted">
                 <i class="ti ti-chart-bar" style="font-size:2.5rem;display:block;margin-bottom:.5rem;opacity:.3"></i>
                 Belum ada data leaderboard bulan ini
               </td>
             </tr>
           <?php else: ?>
             <?php foreach ($leaderboard as $i => $row):
-              $rank    = $i + 1;
-              $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
-              $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
-              $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+              $rank           = $i + 1;
+              $nama           = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
+              $inisial        = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
+              $adaFoto        = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+              $poinKunjungan  = (int) ($row['poin_kunjungan']  ?? 0);
+              $poinPeminjaman = (int) ($row['poin_peminjaman'] ?? 0);
+              $poinTepat      = (int) ($row['poin_tepat']      ?? 0);
+              $poinTerlambat  = (int) ($row['poin_terlambat']  ?? 0);
+              $poinKuis       = (int) ($row['poin_kuis']       ?? 0);
+              // Warna baris top 3
+              $bgBaris = '';
+              if ($rank === 1) $bgBaris = 'background:#fffbeb';
+              elseif ($rank === 2) $bgBaris = 'background:#f8fafc';
+              elseif ($rank === 3) $bgBaris = 'background:#fff7ed';
             ?>
-              <tr>
-                <td class="text-center fw-semibold">
+              <tr style="<?= $bgBaris ?>">
+                <!-- Rank -->
+                <td class="text-center">
                   <?php if ($rank === 1): ?>
-                    <span style="font-size:1.2rem">🥇</span>
+                    <span style="font-size:1.15rem">🥇</span>
                   <?php elseif ($rank === 2): ?>
-                    <span style="font-size:1.2rem">🥈</span>
+                    <span style="font-size:1.15rem">🥈</span>
                   <?php elseif ($rank === 3): ?>
-                    <span style="font-size:1.2rem">🥉</span>
+                    <span style="font-size:1.15rem">🥉</span>
                   <?php else: ?>
-                    <span class="text-muted"><?= $rank ?></span>
+                    <span class="text-muted small"><?= $rank ?></span>
                   <?php endif; ?>
                 </td>
+
+                <!-- Anggota -->
                 <td>
                   <div class="d-flex align-items-center gap-2">
-                    <!-- Avatar -->
-                    <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;overflow:hidden;
+                    <div style="width:34px;height:34px;border-radius:50%;flex-shrink:0;overflow:hidden;
                                 background:#e2e8f0;display:flex;align-items:center;justify-content:center;
-                                font-size:.72rem;font-weight:700;color:#64748b;border:2px solid #f1f5f9">
+                                font-size:.7rem;font-weight:700;color:#64748b;border:2px solid #f1f5f9">
                       <?php if ($adaFoto): ?>
                         <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>"
                              style="width:100%;height:100%;object-fit:cover" alt="">
@@ -102,18 +130,75 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                     </div>
                     <div>
                       <div class="fw-semibold small"><?= esc($nama) ?></div>
-                      <div class="text-muted" style="font-size:.75rem"><?= esc($row['no_identitas']) ?></div>
+                      <div class="text-muted" style="font-size:.72rem">
+                        <?= esc($row['no_identitas']) ?>
+                        <span class="badge bg-light text-secondary border ms-1" style="font-size:.6rem">
+                          <?= esc($row['tipe_anggota']) ?>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </td>
-                <td>
-                  <span class="badge bg-light text-secondary border">
-                    <?= esc($row['tipe_anggota']) ?>
-                  </span>
+
+                <!-- Kunjungan -->
+                <td class="text-center border-start">
+                  <?php if ($poinKunjungan > 0): ?>
+                    <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
+                      +<?= $poinKunjungan ?>
+                    </span>
+                  <?php else: ?>
+                    <span class="text-muted" style="font-size:.8rem">—</span>
+                  <?php endif; ?>
                 </td>
+
+                <!-- Peminjaman -->
                 <td class="text-center">
-                  <span class="fw-bold" style="color:<?= $row['total_points'] >= 0 ? '#16a34a' : '#dc2626' ?>">
-                    <?= ($row['total_points'] >= 0 ? '+' : '') . $row['total_points'] ?>
+                  <?php if ($poinPeminjaman > 0): ?>
+                    <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
+                      +<?= $poinPeminjaman ?>
+                    </span>
+                  <?php else: ?>
+                    <span class="text-muted" style="font-size:.8rem">—</span>
+                  <?php endif; ?>
+                </td>
+
+                <!-- Tepat Waktu -->
+                <td class="text-center">
+                  <?php if ($poinTepat > 0): ?>
+                    <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
+                      +<?= $poinTepat ?>
+                    </span>
+                  <?php else: ?>
+                    <span class="text-muted" style="font-size:.8rem">—</span>
+                  <?php endif; ?>
+                </td>
+
+                <!-- Terlambat -->
+                <td class="text-center">
+                  <?php if ($poinTerlambat < 0): ?>
+                    <span class="badge" style="background:#fef2f2;color:#dc2626;font-size:.72rem;font-weight:600">
+                      <?= $poinTerlambat ?>
+                    </span>
+                  <?php else: ?>
+                    <span class="text-muted" style="font-size:.8rem">—</span>
+                  <?php endif; ?>
+                </td>
+
+                <!-- Kuis -->
+                <td class="text-center">
+                  <?php if ($poinKuis > 0): ?>
+                    <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
+                      +<?= $poinKuis ?>
+                    </span>
+                  <?php else: ?>
+                    <span class="text-muted" style="font-size:.8rem">—</span>
+                  <?php endif; ?>
+                </td>
+
+                <!-- Total -->
+                <td class="text-center border-start">
+                  <span class="fw-bold" style="color:<?= $row['total_points'] >= 0 ? '#16a34a' : '#dc2626' ?>;font-size:.9rem">
+                    <?= ($row['total_points'] >= 0 ? '+' : '') . number_format($row['total_points']) ?>
                   </span>
                 </td>
               </tr>
@@ -127,8 +212,7 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 
 <script>
 document.getElementById('selectBulan').addEventListener('change', function() {
-  const opt = this.options[this.selectedIndex];
-  document.getElementById('tahunInput').value = opt.dataset.tahun;
+  document.getElementById('tahunInput').value = this.options[this.selectedIndex].dataset.tahun;
   this.form.submit();
 });
 </script>
