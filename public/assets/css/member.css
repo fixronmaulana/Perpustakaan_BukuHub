@@ -2434,7 +2434,7 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
   border-radius: 50%;
   flex-shrink: 0;
 }
-.tl-dot.pos { background: #639922; }
+.tl-dot.pos { background: var(--biru); }
 .tl-dot.neg { background: #E24B4A; }
 
 .tl-line {
@@ -2474,7 +2474,7 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
   padding-right: 1.5rem;
   padding-top: 1rem;
 }
-.tl-poin.pos { color: #3B6D11; }
+.tl-poin.pos { color: var(--biru); }
 .tl-poin.neg { color: #A32D2D; }
 
 .tl-meta {
@@ -2492,7 +2492,7 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
   line-height: 1.5;
   flex-shrink: 0;
 }
-.tl-chip.pos { background: #EAF3DE; color: #3B6D11; }
+.tl-chip.pos { background: rgb(239, 246, 255); color: var(--biru); }
 .tl-chip.neg { background: #FCEBEB; color: #A32D2D; }
 
 .tl-tgl {
