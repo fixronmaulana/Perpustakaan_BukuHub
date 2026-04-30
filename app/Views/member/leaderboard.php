@@ -58,14 +58,18 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
         <tr>
           <th style="width:60px" class="teks-center">#</th>
           <th>Anggota</th>
-          <th>Tipe</th>
-          <th class="teks-center">Poin</th>
-        </tr>
+          <th class="teks-center">Kunjungan</th>
+          <th class="teks-center">Pinjam</th>
+          <th class="teks-center">Tepat</th>
+          <th class="teks-center">Telat</th>
+          <th class="teks-center">Kuis</th>
+          <th class="teks-center">Total</th>
+                  </tr>
       </thead>
       <tbody>
         <?php if (empty($leaderboard)): ?>
           <tr>
-            <td colspan="4">
+            <td colspan="8">
               <div class="kondisi-kosong">
                 <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 <p>Belum ada data leaderboard bulan ini</p>
@@ -79,6 +83,11 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
             $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
             $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
             $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+            $poinKunjungan  = (int) ($row['poin_kunjungan']  ?? 0);
+            $poinPeminjaman = (int) ($row['poin_peminjaman'] ?? 0);
+            $poinTepat      = (int) ($row['poin_tepat']      ?? 0);
+            $poinTerlambat  = (int) ($row['poin_terlambat']  ?? 0);
+            $poinKuis       = (int) ($row['poin_kuis']       ?? 0);
           ?>
             <tr style="<?= $isMe ? 'background:#eff4ff;font-weight:600' : '' ?>">
               <td class="teks-center">
@@ -114,15 +123,64 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                         <span class="badge-admin biru" style="font-size:.68rem;margin-left:4px">Kamu</span>
                       <?php endif; ?>
                     </div>
-                    <div class="penulis-tabel"><?= esc($row['no_identitas']) ?></div>
-                  </div>
+                      <div class="penulis-tabel" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                        <span><?= esc($row['no_identitas']) ?></span>
+                        <span style="
+                          display: inline-block;
+                          font-size: .63rem;
+                          padding: 1px 5px;
+                          border-radius: 4px;
+                          background: #f1f5f9;
+                          color: #475569;
+                          font-weight: 500;
+                          margin-left: 4px;
+                        ">
+                          <?= esc($row['tipe_anggota']) ?>
+                        </span>
+                      </div>                  
+                    </div>
                 </div>
               </td>
               <td>
-                <span class="badge-admin" style="background:#f1f5f9;color:#475569;font-size:.75rem">
-                  <?= esc($row['tipe_anggota']) ?>
-                </span>
+                <?php if ($poinKunjungan != 0): ?>
+                  <span class="badge-point badge-green">+<?= $poinKunjungan ?></span>
+                <?php else: ?>
+                  — 
+                <?php endif; ?>
               </td>
+
+              <td>
+                <?php if ($poinPeminjaman != 0): ?>
+                  <span class="badge-point badge-green">+<?= $poinPeminjaman ?></span>
+                <?php else: ?>
+                  — 
+                <?php endif; ?>
+              </td>
+
+              <td>
+                <?php if ($poinTepat != 0): ?>
+                  <span class="badge-point badge-green">+<?= $poinTepat ?></span>
+                <?php else: ?>
+                  — 
+                <?php endif; ?>
+              </td>
+
+              <td>
+                <?php if ($poinTerlambat != 0): ?>
+                  <span class="badge-point badge-red"><?= $poinTerlambat ?></span>
+                <?php else: ?>
+                  — 
+                <?php endif; ?>
+              </td>
+
+              <td>
+                <?php if ($poinKuis != 0): ?>
+                  <span class="badge-point badge-green">+<?= $poinKuis ?></span>
+                <?php else: ?>
+                  — 
+                <?php endif; ?>
+              </td>
+
               <td class="teks-center">
                 <span style="font-weight:700;color:<?= $row['total_points'] >= 0 ? '#16a34a' : '#dc2626' ?>">
                   <?= ($row['total_points'] >= 0 ? '+' : '') . $row['total_points'] ?>

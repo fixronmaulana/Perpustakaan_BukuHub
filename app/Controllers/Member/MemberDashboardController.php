@@ -469,26 +469,47 @@ class MemberDashboardController extends Controller
 
     // ── Helper: hitung leaderboard real-time bulan ini ───────
     private function _getLeaderboardRealtime(int $bulan, int $tahun): array
-    {
-        $members = $this->memberModel->where('deleted_at', null)->findAll();
-        $data    = [];
+{
+    $members = $this->memberModel->where('deleted_at', null)->findAll();
+    $db      = \Config\Database::connect();
+    $data    = [];
 
-        foreach ($members as $m) {
-            $total    = $this->pointModel->getTotalPoin($m['id'], $bulan, $tahun);
-            $data[]   = [
-                'member_id'    => $m['id'],
-                'first_name'   => $m['first_name'],
-                'last_name'    => $m['last_name'],
-                'no_identitas' => $m['no_identitas'],
-                'tipe_anggota' => $m['tipe_anggota'],
-                'foto_profil'  => $m['foto_profil'],
-                'total_points' => $total,
-            ];
-        }
+    foreach ($members as $m) {
+        $bd = $db->table('point_transactions')
+            ->select("
+                SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
+                SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
+                SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
+                SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
+                SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis,
+                SUM(points) as total_points
+            ")
+            ->where('member_id', $m['id'])
+            ->where('MONTH(created_at)', $bulan)
+            ->where('YEAR(created_at)',  $tahun)
+            ->get()->getRowArray();
 
-        usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
-        return $data;
+        $data[] = [
+            'member_id'       => $m['id'],
+            'first_name'      => $m['first_name'],
+            'last_name'       => $m['last_name'],
+            'no_identitas'    => $m['no_identitas'],
+            'tipe_anggota'    => $m['tipe_anggota'],
+            'foto_profil'     => $m['foto_profil'],
+
+            // 🔥 TAMBAHAN
+            'poin_kunjungan'  => (int) ($bd['poin_kunjungan']  ?? 0),
+            'poin_peminjaman' => (int) ($bd['poin_peminjaman'] ?? 0),
+            'poin_tepat'      => (int) ($bd['poin_tepat']      ?? 0),
+            'poin_terlambat'  => (int) ($bd['poin_terlambat']  ?? 0),
+            'poin_kuis'       => (int) ($bd['poin_kuis']       ?? 0),
+            'total_points'    => (int) ($bd['total_points']    ?? 0),
+        ];
     }
+
+    usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
+    return $data;
+}
 
     // ── Helper: hitung rank member real-time ─────────────────
     private function _hitungRankRealtime(int $memberId, int $bulan, int $tahun): int

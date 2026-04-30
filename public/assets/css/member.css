@@ -2157,8 +2157,8 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
 }
 
 .badge-admin.biru   { background: #cfe2ff; color: #084298; }
-.badge-admin.hijau  { background: #d1e7dd; color: #0a3622; }
-.badge-admin.merah  { background: #f8d7da; color: #842029; }
+.badge-admin.hijau  { background: rgb(239, 246, 255); color: var(--biru); }
+.badge-admin.merah  { background: #FCEBEB; color: #A32D2D; }
 .badge-admin.kuning { background: #fff3cd; color: #664d03; }
 
 /* ═══════════════════════════════════════════
@@ -2508,4 +2508,20 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.badge-point {
+  display: inline-block;
+  font-size: .71rem; font-weight: 600;
+  padding: 2px 7px; border-radius: 5px;
+}
+
+.badge-green {
+  background:#f0fdf4;
+  color:#16a34a;
+}
+
+.badge-red {
+  background:#fee2e2;
+  color:#991b1b;
 }
