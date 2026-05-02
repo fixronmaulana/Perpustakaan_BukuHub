@@ -114,8 +114,13 @@ class VisitsController extends BaseController
         );
         // ────────────────────────────────────────────────────
 
-        session()->setFlashdata(['msg' => 'Kunjungan berhasil dicatat.']);
-        return redirect()->to('admin/kunjungan');
+        // Ganti bagian flashdata lama dengan ini
+session()->setFlashdata('success_visit', [
+    'nama' => trim($member['first_name'] . ' ' . $member['last_name']),
+    'poin' => $poinKunjungan
+]);
+
+return redirect()->to('admin/kunjungan');
     }
 
     public function scanQr()
@@ -177,15 +182,17 @@ class VisitsController extends BaseController
         );
         // ────────────────────────────────────────────────────
 
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Kunjungan ' . $member['first_name'] . ' berhasil dicatat. +' . $poinKunjungan . ' poin.',
-            'member'  => [
-                'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
-                'no_identitas' => $member['no_identitas'],
-                'tipe'         => $member['tipe_anggota'],
-            ],
-        ]);
+        // Tambahkan 'poin' di dalam return success
+return $this->response->setJSON([
+    'success' => true,
+    'message' => 'Kunjungan berhasil dicatat.',
+    'poin'    => $poinKunjungan, // Tambahkan ini
+    'member'  => [
+        'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
+        'no_identitas' => $member['no_identitas'],
+        'tipe'         => $member['tipe_anggota'],
+    ],
+]);
     }
 
     public function delete($id = null)

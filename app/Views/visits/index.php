@@ -105,3 +105,31 @@
 </div>
 
 <?= $this->endSection() ?>
+<?= $this->section('scripts') ?>
+<!-- Memanggil Library SweetAlert2 via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Mengecek apakah ada flashdata dengan key 'success_visit'
+    <?php if (session()->getFlashdata('success_visit')) : 
+        $data = session()->getFlashdata('success_visit'); ?>
+        
+        Swal.fire({
+            title: 'Kunjungan Berhasil!',
+            html: `
+                <div class="p-3 mb-2" style="background-color: #f0f4ff; border-radius: 15px;">
+                    <h5 class="text-primary mb-1" style="font-size: 1.1rem;">⭐ Reward Poin ⭐</h5>
+                    <h2 class="fw-bold text-primary" style="font-size: 2.5rem;">+<?= $data['poin'] ?></h2>
+                    <p class="mb-0 text-muted">Poin diberikan ke <b><?= esc($data['nama']) ?></b></p>
+                </div>
+            `,
+            icon: 'success',
+            confirmButtonText: 'Selesai',
+            confirmButtonColor: '#0d6efd',
+            customClass: {
+                popup: 'rounded-4'
+            }
+        });
+    <?php endif; ?>
+</script>
+<?= $this->endSection() ?>

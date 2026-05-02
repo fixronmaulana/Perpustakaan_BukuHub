@@ -113,6 +113,7 @@
 
 <?= $this->section('scripts') ?>
 <script src="<?= base_url('assets/libs/html5-qrcode/html5-qrcode.min.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 // ── Scanner QR ──────────────────────────────────────────────
 const html5QrcodeScanner = new Html5QrcodeScanner(
@@ -165,11 +166,49 @@ function kirimScan(uid) {
     pesanSpan.textContent  = data.message;
 
     if (data.success) {
+      // --- MODAL REWARD POIN (SESUAI GAMBAR) ---
+      Swal.fire({
+        title: 'Kunjungan Berhasil!',
+        html: `
+            <div class="p-3 mb-2" style="background-color: #f0f4ff; border-radius: 15px;">
+                <h5 class="text-primary mb-1" style="font-size: 1.1rem;">⭐ Reward Poin ⭐</h5>
+                <h2 class="fw-bold text-primary" style="font-size: 2.5rem;">+${data.poin}</h2>
+                <p class="mb-0 text-muted">Poin diberikan ke <b>${data.member.nama}</b></p>
+            </div>
+            <div class="mt-3 text-start small border-top pt-2">
+                <b>Anggota:</b> ${data.member.nama} <br>
+                <b>ID:</b> ${data.member.no_identitas}
+            </div>
+        `,
+        icon: 'success',
+        confirmButtonText: 'Selesai',
+        confirmButtonColor: '#0d6efd',
+        customClass: { popup: 'rounded-4' }
+      }).then(() => {
+        // Otomatis tutup info dan lanjut scan setelah klik Selesai
+        html5QrcodeScanner.resume();
+        document.getElementById('resumeBtn').style.display = 'none';
+        hasilDiv.style.display = 'none';
+      });
+
+      // Update tampilan alert lama (opsional tetap dipertahankan)
       alertDiv.className = 'alert alert-success alert-dismissible fade show';
       infoDiv.style.display = 'block';
       document.getElementById('namaMemberScan').textContent      = data.member.nama;
       document.getElementById('identitasMemberScan').textContent = data.member.no_identitas + ' — ' + data.member.tipe;
+
     } else {
+      // --- MODAL PERINGATAN (MISAL SUDAH ABSEN) ---
+      Swal.fire({
+        title: 'Perhatian',
+        text: data.message,
+        icon: 'warning',
+        confirmButtonColor: '#0d6efd'
+      }).then(() => {
+        html5QrcodeScanner.resume();
+        document.getElementById('resumeBtn').style.display = 'none';
+      });
+
       alertDiv.className = 'alert alert-warning alert-dismissible fade show';
       infoDiv.style.display = data.member ? 'block' : 'none';
       if (data.member) {
@@ -179,12 +218,9 @@ function kirimScan(uid) {
     }
   })
   .catch(() => {
-    document.getElementById('hasilScan').style.display = 'block';
-    document.getElementById('alertScan').className = 'alert alert-danger alert-dismissible fade show';
-    document.getElementById('pesanScan').textContent = 'Terjadi kesalahan. Coba lagi.';
+    Swal.fire('Error', 'Terjadi kesalahan sistem.', 'error');
   });
 }
-
 // ── Cari anggota untuk form manual ─────────────────────────
 let cariTimeout;
 document.getElementById('cariAnggota').addEventListener('input', function() {
