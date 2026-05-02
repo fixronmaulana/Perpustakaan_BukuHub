@@ -115,9 +115,10 @@ class VisitsController extends BaseController
         // ────────────────────────────────────────────────────
 
         // Ganti bagian flashdata lama dengan ini
-session()->setFlashdata('success_visit', [
-    'nama' => trim($member['first_name'] . ' ' . $member['last_name']),
-    'poin' => $poinKunjungan
+        session()->setFlashdata('success_visit', [
+        'nama' => trim($member['first_name'] . ' ' . $member['last_name']),
+        'no_identitas'  => $member['no_identitas'],
+        'poin' => $poinKunjungan
 ]);
 
 return redirect()->to('admin/kunjungan');

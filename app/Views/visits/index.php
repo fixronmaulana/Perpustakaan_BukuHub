@@ -114,22 +114,48 @@
     <?php if (session()->getFlashdata('success_visit')) : 
         $data = session()->getFlashdata('success_visit'); ?>
         
-        Swal.fire({
-            title: 'Kunjungan Berhasil!',
-            html: `
-                <div class="p-3 mb-2" style="background-color: #f0f4ff; border-radius: 15px;">
-                    <h5 class="text-primary mb-1" style="font-size: 1.1rem;">⭐ Reward Poin ⭐</h5>
-                    <h2 class="fw-bold text-primary" style="font-size: 2.5rem;">+<?= $data['poin'] ?></h2>
-                    <p class="mb-0 text-muted">Poin diberikan ke <b><?= esc($data['nama']) ?></b></p>
+    Swal.fire({
+        title: '<span style="font-size: 1.25rem; font-weight: bold; color: #333;">Kunjungan Berhasil!</span>',
+        html: `
+            <p style="color: #666; font-size: 0.9rem; margin-top: -10px;">Kunjungan tercatat dalam sistem</p>
+            <div class="p-3 mb-3" style="background-color: #eef2ff; border-radius: 15px;">
+                <div class="d-flex justify-content-center align-items-center mb-1">
+                    <span class="mx-2" style="color: #1e3a8a; font-weight: bold; font-size: 1rem;">Mendapat Reward Poin</span>
                 </div>
-            `,
-            icon: 'success',
-            confirmButtonText: 'Selesai',
-            confirmButtonColor: '#0d6efd',
-            customClass: {
-                popup: 'rounded-4'
-            }
-        });
-    <?php endif; ?>
+                <h2 class="fw-bold" style="font-size: 2.5rem; color: #1e3a8a; margin: 5px 0;">+<?= $data['poin'] ?></h2>
+                <p class="mb-0 text-muted" style="font-size: 0.85rem;">Poin diberikan ke <?= esc($data['nama']) ?></p>
+            </div>
+            
+            <div class="text-start mb-3" style="font-size: 0.85rem; color: #666;">
+                <div class="d-flex justify-content-between border-bottom py-1">
+                    <span>Anggota</span>
+                    <span class="text-dark fw-bold"><?= esc($data['nama']) ?></span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span>ID</span>
+                    <span class="text-dark fw-bold"><?= esc($data['no_identitas']) ?></span>
+                </div>
+            </div>
+        `,
+        icon: 'success',
+        iconColor: '#1e3a8a',
+        showConfirmButton: true,
+        confirmButtonText: 'Selesai',
+        buttonsStyling: false,
+        customClass: {
+            popup: 'rounded-4',
+            confirmButton: 'btn btn-primary w-100 py-2'
+        },
+        didOpen: () => {
+            // Menyesuaikan style tombol agar persis seperti gambar
+            const btn = Swal.getConfirmButton();
+            btn.style.backgroundColor = '#1e3a8a';
+            btn.style.borderRadius = '10px'; 
+            btn.style.fontSize = '1rem';
+            btn.style.fontWeight = 'bold';
+            btn.style.border = 'none';
+        }
+    });
+<?php endif; ?>
 </script>
 <?= $this->endSection() ?>

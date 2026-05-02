@@ -168,27 +168,52 @@ function kirimScan(uid) {
     if (data.success) {
       // --- MODAL REWARD POIN (SESUAI GAMBAR) ---
       Swal.fire({
-        title: 'Kunjungan Berhasil!',
-        html: `
-            <div class="p-3 mb-2" style="background-color: #f0f4ff; border-radius: 15px;">
-                <h5 class="text-primary mb-1" style="font-size: 1.1rem;">⭐ Reward Poin ⭐</h5>
-                <h2 class="fw-bold text-primary" style="font-size: 2.5rem;">+${data.poin}</h2>
-                <p class="mb-0 text-muted">Poin diberikan ke <b>${data.member.nama}</b></p>
-            </div>
-            <div class="mt-3 text-start small border-top pt-2">
-                <b>Anggota:</b> ${data.member.nama} <br>
-                <b>ID:</b> ${data.member.no_identitas}
-            </div>
-        `,
-        icon: 'success',
-        confirmButtonText: 'Selesai',
-        confirmButtonColor: '#0d6efd',
-        customClass: { popup: 'rounded-4' }
+          title: '<span style="font-size: 1.25rem; font-weight: bold; color: #333;">Kunjungan Berhasil!</span>',
+          html: `
+              <p style="color: #666; font-size: 0.9rem; margin-top: -10px;">Kunjungan tercatat dalam sistem</p>
+              <div class="p-3 mb-3" style="background-color: #eef2ff; border-radius: 15px;">
+                  <div class="d-flex justify-content-center align-items-center mb-1">
+                      <i class="ti ti-star-poly style="color: #1e3a8a; font-size: 1.2rem;"></i>
+                      <span class="mx-2" style="color: #1e3a8a; font-weight: bold; font-size: 1rem;">Mendapat Reward Poin</span>
+                      <i class="ti ti-star-poly style="color: #1e3a8a; font-size: 1.2rem;"></i>
+                  </div>
+                  <h2 class="fw-bold" style="font-size: 2.5rem; color: #1e3a8a; margin: 5px 0;">+${data.poin}</h2>
+                  <p class="mb-0 text-muted" style="font-size: 0.85rem;">Poin diberikan ke ${data.member.nama}</p>
+              </div>
+              
+              <div class="text-start mb-3" style="font-size: 0.85rem; color: #666;">
+                  <div class="d-flex justify-content-between border-bottom py-1">
+                      <span>Anggota</span>
+                      <span class="text-dark fw-bold">${data.member.nama}</span>
+                  </div>
+                  <div class="d-flex justify-content-between py-1">
+                      <span>ID</span>
+                      <span class="text-dark fw-bold">${data.member.no_identitas}</span>
+                  </div>
+              </div>
+          `,
+          icon: 'success',
+          iconColor: '#1e3a8a',
+          showConfirmButton: true,
+          confirmButtonText: 'Selesai',
+          buttonsStyling: false,
+          customClass: {
+              popup: 'rounded-4',
+              confirmButton: 'btn btn-primary w-100 py-2' // Membuat tombol lebar penuh
+          },
+          didOpen: () => {
+              // Style khusus untuk menyamai gambar: Rounded sedang & warna #1e3a8a
+              const btn = Swal.getConfirmButton();
+              btn.style.backgroundColor = '#1e3a8a';
+              btn.style.borderRadius = '10px'; // Sesuai dengan gambar, bukan pill
+              btn.style.fontSize = '1rem';
+              btn.style.fontWeight = 'bold';
+              btn.style.border = 'none';
+          }
       }).then(() => {
-        // Otomatis tutup info dan lanjut scan setelah klik Selesai
-        html5QrcodeScanner.resume();
-        document.getElementById('resumeBtn').style.display = 'none';
-        hasilDiv.style.display = 'none';
+          html5QrcodeScanner.resume();
+          document.getElementById('resumeBtn').style.display = 'none';
+          hasilDiv.style.display = 'none';
       });
 
       // Update tampilan alert lama (opsional tetap dipertahankan)
