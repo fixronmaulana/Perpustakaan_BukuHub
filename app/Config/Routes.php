@@ -115,6 +115,21 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
     $routes->resource('fines/settings', ['controller' => 'Loans\FineSettingsController', 'filter' => 'group:superadmin']);
     $routes->resource('fines', ['controller' => 'Loans\FinesController']);
 
+    // WA Reminder
+    $routes->get('wa-reminder',                  'Admin\WaReminderController::index');
+    $routes->get('wa-reminder/logs',             'Admin\WaReminderController::logs');
+    $routes->get('wa-reminder/preview-loans/(:segment)', 'Admin\WaReminderController::previewLoans/$1'); 
+    $routes->get('wa-reminder/create',           'Admin\WaReminderController::create');
+    $routes->post('wa-reminder',                 'Admin\WaReminderController::store');
+    $routes->get('wa-reminder/(:num)/edit',      'Admin\WaReminderController::edit/$1');
+    $routes->post('wa-reminder/(:num)',          'Admin\WaReminderController::update/$1');
+    $routes->put('wa-reminder/(:num)',           'Admin\WaReminderController::update/$1');
+    $routes->delete('wa-reminder/(:num)',        'Admin\WaReminderController::delete/$1');
+    $routes->post('wa-reminder/(:num)/toggle',   'Admin\WaReminderController::toggle/$1');
+    $routes->post('wa-reminder/send-all',        'Admin\WaReminderController::sendAll');
+    $routes->post('wa-reminder/send/(:segment)', 'Admin\WaReminderController::sendByType/$1');
+    $routes->post('wa-reminder/preview',         'Admin\WaReminderController::preview');
+
     $routes->group('users', ['filter' => 'group:superadmin'], static function (RouteCollection $routes) {
         $routes->get('new', 'Users\RegisterController::index');
         $routes->post('', 'Users\RegisterController::registerAction');

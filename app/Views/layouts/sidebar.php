@@ -67,6 +67,12 @@ $sidebarNavs = [
     'link' => '/admin/leaderboard',
     'icon' => 'ti ti-trophy'
   ],
+  'Notifikasi',
+  [
+    'name' => 'WA Reminder',
+    'link' => '/admin/wa-reminder',
+    'icon' => 'ti ti-brand-whatsapp'
+  ],
 ];
 
 if (auth()->user()->inGroup('superadmin') ?? false) {
