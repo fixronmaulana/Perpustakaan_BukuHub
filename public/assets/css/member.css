@@ -106,7 +106,7 @@ body {
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 1px;
-  padding: 1rem 1.75rem 0.6rem;
+  padding: 1rem 2.1rem 0.6rem;
   margin: 0;
 }
 
@@ -212,7 +212,8 @@ body {
   color: var(--navy-dark);
   font-weight: 600;
   border-left: none !important;
-  padding-left: 14px !important;
+  padding: 10px 14px !important;
+  margin: 0 1.2rem !important;
   transform: none !important;
   box-shadow: inset 3px 0 0 var(--navy-main);
 }
