@@ -182,6 +182,244 @@ body {
   border: 1.5px solid rgba(255, 255, 255, 0.35);
   color: #ffffff;
 }
+
+/* ── Burger Button ── */
+.tombol-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  margin-left: 12px;
+}
+
+.tombol-burger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--putih);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animasi burger → X saat aktif */
+.tombol-burger.aktif span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.tombol-burger.aktif span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.tombol-burger.aktif span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ════════════════════════════════════════
+   RESPONSIVE NAVBAR
+   ════════════════════════════════════════ */
+
+.kanan-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Burger Button ── */
+.tombol-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 38px;
+  height: 38px;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.tombol-burger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tombol-burger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--putih);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* Animasi burger → X */
+.tombol-burger.aktif span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.tombol-burger.aktif span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.tombol-burger.aktif span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Login mobile - hidden di desktop */
+.menu-login-mobile {
+  display: none !important;
+}
+
+/* ── Tablet (max 992px) ── */
+@media (max-width: 992px) {
+  .bilah-navigasi {
+    padding: 0 1.5rem;
+  }
+
+  .daftar-menu {
+    gap: 1.2rem;
+  }
+
+  .daftar-menu a {
+    font-size: 0.85rem;
+  }
+}
+
+/* ── Mobile (max 768px) ── */
+@media (max-width: 768px) {
+  .bilah-navigasi {
+    padding: 0 1.25rem;
+    height: 64px;
+  }
+
+  .bilah-navigasi.menggulir {
+    height: 60px;
+  }
+
+  /* Sembunyikan tombol login desktop */
+  .tombol-masuk {
+    display: none !important;
+  }
+
+  /* Tampilkan burger */
+  .tombol-burger {
+    display: flex;
+  }
+
+  /* Menu dropdown */
+  .daftar-menu {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background: rgba(10, 20, 50, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+    padding: 0.5rem 0 1rem;
+    z-index: 999;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .bilah-navigasi.menggulir ~ * .daftar-menu,
+  .daftar-menu {
+    top: 64px;
+  }
+
+  .bilah-navigasi.menggulir .daftar-menu {
+    top: 60px;
+  }
+
+  .daftar-menu.terbuka {
+    display: flex;
+  }
+
+  .daftar-menu li {
+    width: 100%;
+  }
+
+  .daftar-menu a {
+    display: block;
+    padding: 0.85rem 1.75rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .daftar-menu a::after {
+    display: none !important;
+  }
+
+  .daftar-menu a:hover,
+  .daftar-menu a.aktif {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--putih) !important;
+    padding-left: 2rem;
+  }
+
+  /* Tampilkan login di dalam menu */
+  .menu-login-mobile {
+    display: block !important;
+    border-top: 1px solid rgba(201, 168, 76, 0.25) !important;
+    margin-top: 0.5rem;
+    padding-top: 0.25rem;
+  }
+
+  .menu-login-mobile a {
+    color: var(--emas) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px;
+  }
+
+  .menu-login-mobile a:hover {
+    background: rgba(201, 168, 76, 0.1) !important;
+    color: var(--emas) !important;
+  }
+
+  /* Brand teks lebih kecil */
+  .teks-atas {
+    font-size: 0.8rem;
+  }
+
+  .teks-bawah {
+    font-size: 0.82rem;
+  }
+
+  .logo-smk-nav {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+  .bilah-navigasi {
+    padding: 0 1rem;
+  }
+
+  .teks-merek {
+    display: none;
+  }
+
+  .logo-smk-nav {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 /* ════════════════════════════════════════
    HERO (Halaman Beranda)
    ════════════════════════════════════════ */
@@ -393,6 +631,177 @@ body {
 .tombol-lihat-semua:hover { background: var(--biru-aksen); color: var(--putih); transform: translateY(-2px); }
 
 /* ════════════════════════════════════════
+   RESPONSIVE HERO & BERANDA
+   ════════════════════════════════════════ */
+
+/* ── Tablet (max 992px) ── */
+@media (max-width: 992px) {
+  .konten-hero {
+    max-width: 600px;
+    padding: 0 1.5rem;
+  }
+
+  .kotak-cari-hero {
+    max-width: 100%;
+  }
+
+  .grid-populer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dalam-populer {
+    padding: 0 1.5rem;
+  }
+
+  .seksi-populer {
+    padding: 4rem 0;
+  }
+}
+
+/* ── Mobile (max 768px) ── */
+@media (max-width: 768px) {
+  /* Hero */
+  .seksi-hero {
+    min-height: 100svh;
+    align-items: center;
+  }
+
+  .konten-hero {
+    padding: 5rem 1.25rem 2rem;
+  }
+
+  .konten-hero p {
+    font-size: 0.95rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .kotak-cari-hero {
+    flex-direction: row;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .kotak-cari-hero input {
+    padding: 13px 14px;
+    font-size: 0.9875rem;
+    border-bottom: none;
+  }
+
+  .kotak-cari-hero button {
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .statistik-hero {
+    gap: 1.2rem;
+  }
+
+  .item-statistik .angka-statistik {
+    font-size: 1.1rem;
+  }
+
+  .item-statistik .label-statistik {
+    font-size: 0.72rem;
+  }
+
+  /* Koleksi Populer */
+  .seksi-populer {
+    padding: 3rem 0;
+  }
+
+  .dalam-populer {
+    padding: 0 1rem;
+  }
+
+  .grid-populer {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .sampul-populer {
+    height: 200px;
+  }
+
+  .isi-kartu-populer {
+    padding: 0.75rem 0.85rem 1rem;
+  }
+
+  .judul-kartu {
+    font-size: 0.9rem;
+  }
+
+  .penulis-kartu {
+    font-size: 0.78rem;
+  }
+
+  .pil-kategori {
+    gap: 0.4rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .pil {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+  }
+
+  .tombol-lihat-semua {
+    padding: 11px 28px;
+    font-size: 0.875rem;
+  }
+}
+
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+  .konten-hero {
+    padding: 4.5rem 1rem 2rem;
+  }
+
+  .konten-hero h1 {
+    font-size: 1.9rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .konten-hero p {
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  .statistik-hero {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
+  }
+
+  .grid-populer {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .sampul-populer {
+    height: 160px;
+  }
+
+  .judul-kartu {
+    font-size: 0.82rem;
+  }
+
+  .label-kategori {
+    font-size: 0.68rem;
+  }
+
+  .rating-kartu {
+    font-size: 0.78rem;
+  }
+
+  .ajakan-populer {
+    margin-top: 2rem;
+  }
+}
+
+/* ════════════════════════════════════════
    SEKSI LAYANAN
    ════════════════════════════════════════ */
 .seksi-layanan { background: var(--latar-hangat); padding: 5rem 0; }
@@ -489,6 +898,120 @@ body {
 }
 .bawah-kaki p { font-size: 0.8rem; color: rgba(255,255,255,0.35); margin: 0; }
 .teks-emas { color: var(--emas); }
+
+/* ════════════════════════════════════════
+   RESPONSIVE FOOTER
+   ════════════════════════════════════════ */
+
+/* ── Tablet (max 992px) ── */
+@media (max-width: 992px) {
+  .dalam-kaki {
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 2rem;
+  }
+
+  /* Kolom jam operasional pindah ke bawah */
+  .dalam-kaki > div:last-child {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .dalam-kaki > div:last-child h4 {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* ── Mobile (max 768px) ── */
+@media (max-width: 768px) {
+  .kaki-halaman {
+    padding: 3rem 0 0;
+  }
+
+  .dalam-kaki {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 0 1.25rem;
+  }
+
+  /* Kolom brand full width */
+  .dalam-kaki > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .nama-merek-kaki span {
+    font-size: 0.9rem;
+  }
+
+  .deskripsi-kaki {
+    font-size: 0.825rem;
+  }
+
+  /* Kolom jam operasional full width */
+  .dalam-kaki > div:last-child {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 1.5rem;
+  }
+
+  .bawah-kaki {
+    padding: 1.25rem;
+    margin-top: 2.5rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.4rem;
+  }
+}
+
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+  .kaki-halaman {
+    padding: 2.5rem 0 0;
+  }
+
+  .dalam-kaki {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    padding: 0 1rem;
+  }
+
+  /* Semua kolom full width */
+  .dalam-kaki > div:first-child,
+  .dalam-kaki > div:last-child {
+    grid-column: 1;
+  }
+
+  .dalam-kaki > div:last-child {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nama-merek-kaki {
+    gap: 8px;
+  }
+
+  .nama-merek-kaki span {
+    font-size: 0.875rem;
+  }
+
+  .kolom-kaki h4 {
+    margin-bottom: 0.75rem;
+  }
+
+  .bawah-kaki {
+    padding: 1rem;
+    margin-top: 2rem;
+  }
+
+  .bawah-kaki p {
+    font-size: 0.75rem;
+  }
+}
 
 /* ════════════════════════════════════════
    HALAMAN KOLEKSI (book.php)

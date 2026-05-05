@@ -27,6 +27,7 @@
 
   <!-- Slot untuk script tambahan per-halaman -->
   <?= $this->renderSection('scripts') ?>
+
 <script>
   /* ── Navbar scroll effect ── */
   (function () {
@@ -41,11 +42,40 @@
       }
     }
 
-    // Cek langsung saat halaman load (kalau refresh di tengah halaman)
     cekGulir();
     window.addEventListener('scroll', cekGulir, { passive: true });
   })();
+
+  /* ── Burger Menu ── */
+  function toggleMenu() {
+    const menu   = document.getElementById('daftarMenu');
+    const burger = document.getElementById('tombolBurger');
+    menu.classList.toggle('terbuka');
+    burger.classList.toggle('aktif');
+  }
+
+  // Tutup menu saat klik di luar navbar
+  document.addEventListener('click', function(e) {
+    const menu   = document.getElementById('daftarMenu');
+    const burger = document.getElementById('tombolBurger');
+    const nav    = document.querySelector('.bilah-navigasi');
+    if (menu && burger && nav && !nav.contains(e.target)) {
+      menu.classList.remove('terbuka');
+      burger.classList.remove('aktif');
+    }
+  });
+
+  // Tutup menu saat klik salah satu link
+  document.querySelectorAll('.daftar-menu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      const menu   = document.getElementById('daftarMenu');
+      const burger = document.getElementById('tombolBurger');
+      if (menu)   menu.classList.remove('terbuka');
+      if (burger) burger.classList.remove('aktif');
+    });
+  });
 </script>
+
 </body>
 
 </html>

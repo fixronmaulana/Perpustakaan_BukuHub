@@ -2,14 +2,14 @@
 <nav class="bilah-navigasi">
 
   <a href="<?= base_url('/') ?>" class="merek-perpus">
-  <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="logo-smk-nav">
-  <div class="teks-merek">
-    <span class="teks-atas">Perpustakaan</span>
-    <span class="teks-bawah">SMK Al-Munawwir IIBS</span>
-  </div>
-</a>
+    <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="logo-smk-nav">
+    <div class="teks-merek">
+      <span class="teks-atas">Perpustakaan</span>
+      <span class="teks-bawah">SMK Al-Munawwir IIBS</span>
+    </div>
+  </a>
 
-  <ul class="daftar-menu">
+  <ul class="daftar-menu" id="daftarMenu">
     <li>
       <a href="<?= base_url('/') ?>"
         <?= (isset($activeNav) && $activeNav === 'beranda') ? 'class="aktif"' : '' ?>>
@@ -40,8 +40,20 @@
         Kontak
       </a>
     </li>
+    <!-- Login masuk ke menu saat mobile -->
+    <li class="menu-login-mobile">
+      <a href="<?= base_url('login') ?>">Login</a>
+    </li>
   </ul>
 
-  <a href="<?= base_url('login') ?>" class="tombol-masuk">Login</a>
+  <div class="kanan-nav">
+    <!-- Login tetap tampil di desktop -->
+    <a href="<?= base_url('login') ?>" class="tombol-masuk">Login</a>
+    <button class="tombol-burger" id="tombolBurger" onclick="toggleMenu()" aria-label="Toggle Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
 
 </nav>
