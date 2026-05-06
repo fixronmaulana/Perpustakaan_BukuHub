@@ -630,6 +630,54 @@ body {
 }
 .tombol-lihat-semua:hover { background: var(--biru-aksen); color: var(--putih); transform: translateY(-2px); }
 
+/* ── Fix Card Koleksi agar seragam ── */
+.grid-populer .kartu-populer {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-populer .isi-kartu-populer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.grid-populer .judul-kartu {
+  flex: 1;
+  min-height: 2.7rem;
+}
+
+.grid-populer .tombol-detail-koleksi {
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+
+/* ── Fix Card Koleksi ── */
+.grid-populer .label-kategori {
+  display: inline-block !important;
+  width: auto !important;
+  align-self: flex-start;
+}
+
+.grid-populer .judul-kartu {
+  flex: 1;
+  min-height: auto;
+  margin-bottom: 0 !important;
+}
+
+.grid-populer .penulis-kartu {
+  margin-bottom: 0 !important;
+}
+
+.grid-populer .isi-kartu-populer {
+  gap: 0.3rem;
+}
+
+.grid-populer .tombol-detail-koleksi {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--batas);
+}
 /* ════════════════════════════════════════
    RESPONSIVE HERO & BERANDA
    ════════════════════════════════════════ */
@@ -1148,29 +1196,225 @@ body {
 .bungkus-pager nav ul li.active a    { background: var(--navy); color: var(--putih); border-color: var(--navy); }
 
 /* ════════════════════════════════════════
-   RESPONSIF
+   RESPONSIVE KOLEKSI BUKU
    ════════════════════════════════════════ */
-@media (max-width: 900px) {
-  .grid-layanan { grid-template-columns: repeat(2, 1fr); }
-  .dalam-kaki   { grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+/* ── Tablet (max 992px) ── */
+@media (max-width: 992px) {
+  .bungkus-halaman-buku {
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  .grid-buku {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .sampul-buku {
+    height: 220px;
+  }
+
+  .form-cari input {
+    width: 200px;
+  }
+
+  /* Layanan */
+  .grid-layanan {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Footer */
+  .dalam-kaki {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
 }
 
-@media (max-width: 640px) {
-  .daftar-menu          { display: none; }
-  .grid-populer         { grid-template-columns: repeat(2, 1fr); }
-  .sampul-populer       { height: 180px; }
-  .grid-layanan         { grid-template-columns: 1fr; }
-  .dalam-kaki           { grid-template-columns: 1fr; gap: 1.75rem; }
-  .grid-buku            { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
-  .sampul-buku          { height: 200px; }
-  .bilah-alat-buku      { flex-direction: column; align-items: stretch; }
-  .form-cari input      { width: 100%; }
+/* ── Mobile (max 768px) ── */
+@media (max-width: 768px) {
+  /* Header halaman */
+  .header-halaman {
+    padding: 4.5rem 1.25rem 2.5rem;
+  }
+
+  /* Bilah alat */
+  .bilah-alat-buku {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .jumlah-buku {
+    text-align: center;
+  }
+
+  /* Form cari */
+  .form-cari {
+    width: 100%;
+  }
+
+  .form-cari input {
+    width: 100%;
+    flex: 1;
+    padding: 12px 14px;
+  }
+
+  .form-cari button {
+    padding: 0 16px;
+    font-size: 0.85rem;
+  }
+
+  /* Grid buku */
+  .bungkus-halaman-buku {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .grid-buku {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .sampul-buku {
+    height: 200px;
+  }
+
+  .info-buku {
+    padding: 0.75rem 0.85rem 1rem;
+  }
+
+  .judul-buku {
+    font-size: 0.85rem;
+  }
+
+  .tahun-buku {
+    font-size: 0.75rem;
+  }
+
+  .tombol-detail {
+    font-size: 0.78rem;
+    padding: 6px 0;
+  }
+
+  /* Pagination */
+  .bungkus-pager {
+    margin-top: 2rem;
+  }
+
+  .bungkus-pager nav ul li a,
+  .bungkus-pager nav ul li span {
+    width: 34px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+
+  /* Layanan */
+  .grid-layanan {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  /* Footer */
+  .dalam-kaki {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+    padding: 0 1.25rem;
+  }
+
+  .dalam-kaki > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .dalam-kaki > div:last-child {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 1.5rem;
+  }
+
+  .bawah-kaki {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.25rem;
+    margin-top: 2rem;
+    gap: 0.4rem;
+  }
 }
 
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+  .header-halaman {
+    padding: 4rem 1rem 2rem;
+  }
+
+  .header-halaman h1 {
+    font-size: 1.7rem;
+  }
+
+  .header-halaman p {
+    font-size: 0.775rem;
+  }
+
+  .bungkus-halaman-buku {
+    padding: 1.25rem 0.75rem 2.5rem;
+  }
+
+  .grid-buku {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .sampul-buku {
+    height: 170px;
+  }
+
+  .info-buku {
+    padding: 0.65rem 0.75rem 0.85rem;
+    gap: 0.35rem;
+  }
+
+  .judul-buku {
+    font-size: 0.8rem;
+  }
+
+  .kondisi-kosong {
+    padding: 3rem 1rem;
+  }
+
+  .kondisi-kosong .ikon-kosong {
+    font-size: 2.5rem;
+  }
+
+  /* Layanan */
+  .grid-layanan {
+    grid-template-columns: 1fr;
+  }
+
+  /* Footer */
+  .dalam-kaki {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .dalam-kaki > div:last-child {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bawah-kaki {
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .bawah-kaki p {
+    font-size: 0.72rem;
+  }
+}
 /* ════════════════════════════════════════
    HALAMAN LOGIN
-   Tambahkan blok ini di bagian paling
-   bawah file public/assets/css/home.css
    ════════════════════════════════════════ */
 
 /* Pembungkus halaman — tengah layar */
@@ -1325,9 +1569,232 @@ body {
 .tautan-kembali:hover { color: #2f4ec0; }
 
 /* ════════════════════════════════════════
+   DETAIL BUKU
+   ════════════════════════════════════════ */
+.bungkus-detail-buku {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 5rem;
+}
+
+.tombol-kembali {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--biru-aksen);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  transition: color 0.2s;
+}
+.tombol-kembali:hover { color: var(--navy); }
+
+.layout-detail-buku {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+/* Kolom Cover */
+.kolom-cover-buku {
+  position: sticky;
+  top: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cover-detail {
+  width: 100%;
+  aspect-ratio: 3/4;
+  background-size: cover;
+  background-position: center;
+  background-color: #dde4f4;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(13,27,62,0.18);
+}
+
+.badge-stok-detail {
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.badge-stok-detail.tersedia {
+  background: rgba(16,185,129,0.1);
+  color: #059669;
+  border: 1.5px solid rgba(16,185,129,0.25);
+}
+.badge-stok-detail.habis {
+  background: rgba(239,68,68,0.1);
+  color: #dc2626;
+  border: 1.5px solid rgba(239,68,68,0.25);
+}
+
+.tombol-pinjam {
+  display: block;
+  text-align: center;
+  padding: 13px;
+  background: var(--navy);
+  color: var(--putih);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+}
+.tombol-pinjam:hover {
+  background: var(--biru-aksen);
+  transform: translateY(-2px);
+  color: var(--putih);
+}
+
+.kotak-ebook {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--latar);
+  border: 1.5px solid var(--batas);
+  border-radius: 10px;
+}
+.ikon-ebook { font-size: 1.5rem; flex-shrink: 0; }
+.label-ebook { font-size: 0.85rem; font-weight: 700; color: var(--teks); }
+.sub-ebook { font-size: 0.75rem; color: var(--teks-redup); margin-top: 2px; }
+.tombol-ebook {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: var(--biru-aksen);
+  color: var(--putih);
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.tombol-ebook:hover { background: var(--navy); color: var(--putih); }
+
+/* Kolom Info */
+.kolom-info-buku { display: flex; flex-direction: column; gap: 1rem; }
+
+.judul-detail {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: var(--teks);
+  line-height: 1.25;
+  margin: 0.5rem 0 0;
+}
+
+.penulis-detail {
+  font-size: 1rem;
+  color: var(--teks-redup);
+  margin: 0;
+}
+
+.garis-detail {
+  height: 1px;
+  background: var(--batas);
+  margin: 0.5rem 0;
+}
+
+.deskripsi-detail h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--teks);
+  margin: 0 0 0.75rem;
+}
+.deskripsi-detail p {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--teks-redup);
+  margin: 0 0 0.75rem;
+}
+
+/* Tabel Info */
+.tabel-info-buku {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1.5px solid var(--batas);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.baris-info {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--batas);
+  gap: 1rem;
+}
+.baris-info:last-child { border-bottom: none; }
+.label-info {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--teks-redup);
+  width: 130px;
+  flex-shrink: 0;
+}
+.nilai-info {
+  font-size: 0.875rem;
+  color: var(--teks);
+  font-weight: 500;
+}
+.teks-hijau { color: #059669 !important; font-weight: 600 !important; }
+.teks-merah { color: #dc2626 !important; font-weight: 600 !important; }
+
+/* ── Responsive Detail Buku ── */
+@media (max-width: 768px) {
+  .bungkus-detail-buku {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .layout-detail-buku {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .kolom-cover-buku {
+    position: static;
+    max-width: 260px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .judul-detail {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .kolom-cover-buku {
+    max-width: 220px;
+  }
+
+  .baris-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 14px;
+  }
+
+  .label-info {
+    width: auto;
+    font-size: 0.75rem;
+  }
+}
+.kolom-info-buku .label-kategori {
+  display: inline-block !important;
+  width: auto !important;
+  align-self: flex-start;
+}
+
+/* ════════════════════════════════════════
    HALAMAN LAYANAN
-   Tambahkan blok ini di bagian paling
-   bawah file public/assets/css/home.css
    ════════════════════════════════════════ */
 
 /* Pembungkus konten layanan */
@@ -2308,6 +2775,7 @@ body {
 }
 
 .register-back:hover { color: #2f4ec0; }
+
 /* ════════════════════════════════════════════
    LEADERBOARD LANDING PAGE
 ════════════════════════════════════════════ */
@@ -2679,4 +3147,20 @@ body {
   .lb-cd-unit { min-width: 52px; padding: .6rem .75rem; }
   .lb-cd-num { font-size: 1.4rem; }
   .lb-search-wrap { max-width: 100%; }
+}
+
+.lb-tabel-scroll .lb-tabel-wrap {
+  min-width: 850px;
+  width: max-content;
+  max-width: none;
+}
+.lb-tabel-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  cursor: grab;
+}
+
+.lb-tabel-scroll:active {
+  cursor: grabbing;
 }

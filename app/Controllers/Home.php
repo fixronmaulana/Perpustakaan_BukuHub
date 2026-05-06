@@ -70,6 +70,26 @@ class Home extends BaseController
         ]);
     }
 
+    public function bookShow(string $slug): string
+{
+    $book = $this->bookModel
+        ->select('books.*, book_stock.quantity, categories.name as category, racks.name as rack, racks.floor')
+        ->join('book_stock', 'books.id = book_stock.book_id', 'LEFT')
+        ->join('categories', 'books.category_id = categories.id', 'LEFT')
+        ->join('racks', 'books.rack_id = racks.id', 'LEFT')
+        ->where('books.slug', $slug)
+        ->first();
+
+    if (empty($book)) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException('Buku tidak ditemukan');
+    }
+
+    return view('home/book_show', [
+        'book'      => $book,
+        'activeNav' => 'koleksi',
+    ]);
+}
+
     public function layanan(): string
     {
         return view('home/layanan', ['activeNav' => 'layanan']);

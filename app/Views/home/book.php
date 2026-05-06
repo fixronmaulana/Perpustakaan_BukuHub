@@ -4,10 +4,6 @@
 <title>Koleksi Buku — Perpustakaan SMK</title>
 <?= $this->endSection() ?>
 
-<?= $this->section('back') ?>
-<?php /* kosong — navigasi sudah ada di navbar */ ?>
-<?= $this->endSection() ?>
-
 <?= $this->section('content') ?>
 
 <?= $this->include('layouts/navbar') ?>
@@ -44,7 +40,7 @@
   </div>
 
   <!-- Grid kartu buku -->
-  <div class="grid-buku">
+  <div class="grid-populer">
 
     <?php if (empty($books)) : ?>
       <div class="kondisi-kosong">
@@ -56,41 +52,46 @@
 
     <?php foreach ($books as $i => $book) : ?>
       <?php
-        $coverImageFilePath = BOOK_COVER_URI . $book['book_cover'];
-        $coverUrl = base_url(
-          (!empty($book['book_cover']) && file_exists($coverImageFilePath))
-            ? $coverImageFilePath
+        $coverPath = BOOK_COVER_PATH . ($book['book_cover'] ?? '');
+        $adaCover  = !empty($book['book_cover']) && file_exists($coverPath);
+        $coverUrl  = base_url(
+          $adaCover
+            ? BOOK_COVER_URI . $book['book_cover']
             : BOOK_COVER_URI . DEFAULT_BOOK_COVER
         );
         $tunda = ($i % 8) * 60;
       ?>
 
-      <div class="kartu-buku" style="animation-delay: <?= $tunda ?>ms">
+      <a href="<?= base_url("book/{$book['slug']}") ?>"
+         class="kartu-populer"
+         style="animation-delay: <?= $tunda ?>ms">
 
-        <a href="<?= base_url("admin/books/{$book['slug']}") ?>" class="tautan-sampul">
-          <div
-            class="sampul-buku"
-            style="background-image: url('<?= $coverUrl ?>');"
-            role="img"
-            aria-label="Sampul buku <?= esc($book['title']) ?>"
-          ></div>
-        </a>
-
-        <div class="info-buku">
-          <p class="judul-buku">
-            <?= esc(substr($book['title'], 0, 80) . (strlen($book['title']) > 80 ? '…' : '')) ?>
-          </p>
-          <p class="tahun-buku"><?= esc($book['year']) ?></p>
-          <a href="<?= base_url("admin/books/{$book['slug']}") ?>" class="tombol-detail">
-            Lihat Detail
-          </a>
+        <!-- Sampul -->
+        <div class="bungkus-sampul-populer">
+          <div class="sampul-populer"
+               style="background-image: url('<?= $coverUrl ?>');">
+          </div>
         </div>
 
-      </div>
+        <!-- Info -->
+        <div class="isi-kartu-populer">
+          <?php if (!empty($book['category'])) : ?>
+            <span class="label-kategori"><?= esc($book['category']) ?></span>
+          <?php endif; ?>
+          <p class="judul-kartu">
+            <?= esc(substr($book['title'], 0, 60) . (strlen($book['title']) > 60 ? '…' : '')) ?>
+          </p>
+          <p class="penulis-kartu"><?= esc($book['author']) ?></p>
+          <div class="tombol-detail-koleksi">
+            Lihat Detail →
+          </div>
+        </div>
+
+      </a>
 
     <?php endforeach; ?>
 
-  </div><!-- /grid-buku -->
+  </div><!-- /grid-populer -->
 
   <!-- Pagination -->
   <div class="bungkus-pager">

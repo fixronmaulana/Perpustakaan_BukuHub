@@ -116,32 +116,6 @@ $labelRank = [1 => '🥇 Peringkat 1', 2 => '🥈 Peringkat 2', 3 => '🥉 Perin
 
       </div>
     </div>
-
-    <!-- Preview poin -->
-    <div class="card mt-3">
-      <div class="card-body">
-        <h6 class="fw-semibold mb-3">
-          <i class="ti ti-eye me-1 text-primary"></i>
-          Preview Poin Saat Ini
-        </h6>
-        <div class="row g-2">
-          <?php foreach ($urutan as $type):
-            $row = $settings[$type] ?? null;
-            if (!$row) continue;
-            $isNegatif = $row['points'] < 0;
-          ?>
-            <div class="col-6 col-md-3">
-              <div class="text-center p-3 rounded border <?= $isNegatif ? 'border-danger bg-danger bg-opacity-10' : 'border-success bg-success bg-opacity-10' ?>">
-                <div class="fw-bold fs-4 <?= $isNegatif ? 'text-danger' : 'text-success' ?>">
-                  <?= ($isNegatif ? '' : '+') . $row['points'] ?>
-                </div>
-                <div class="small text-muted"><?= esc($row['label']) ?></div>
-              </div>
-            </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ════ Kolom Kanan: Hadiah Leaderboard ════ -->

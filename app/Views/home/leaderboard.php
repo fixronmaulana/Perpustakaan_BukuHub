@@ -126,7 +126,7 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
   </div>
 
   <div style="overflow-x:auto">
-    <div class="lb-tabel-wrap" style="min-width:700px">
+    <div class="lb-tabel-wrap" style="min-width:850px">
       <div class="lb-tabel-header">
         <h2>Semua Peringkat</h2>
         <span id="jumlahAnggota"><?= count($leaderboard) ?> anggota</span>

@@ -92,7 +92,7 @@
 
     </form>
 
-    <a href="<?= base_url('admin/users') ?>" class="register-back">← Kembali ke Daftar User</a>
+    <a href="<?= base_url('admin/users') ?>" class="register-back">← Kembali ke Daftar Admin</a>
 
   </div>
 </div>
