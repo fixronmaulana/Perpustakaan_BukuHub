@@ -371,9 +371,9 @@ class MemberDashboardController extends Controller
             }
         }
 
-        // Poin berbasis persentase 100 — bukan per soal
+        // Poin berbasis persentase 100 
         $skor = $total > 0 ? round($benar / $total * 100) : 0;
-        $poin = $skor; // maks 100
+        $poin = $skor; 
 
         $this->attemptModel->insert([
             'quiz_id'     => $quizId,
@@ -522,41 +522,74 @@ class MemberDashboardController extends Controller
     }
 
     public function poin()
-    {
-        $member      = $this->getMember();
-        $bulan       = (int) ($this->request->getGet('bulan') ?? date('n'));
-        $tahun       = (int) ($this->request->getGet('tahun') ?? date('Y'));
+{
+    $member   = $this->getMember();
+    $bulanIni = (int) date('n');
+    $tahunIni = (int) date('Y');
 
-        // Riwayat poin dengan pagination
-        $riwayat = $this->pointModel
+    // Riwayat poin dengan pagination
+    $riwayat = $this->pointModel
+        ->where('member_id', $member['id'])
+        ->orderBy('created_at', 'DESC')
+        ->paginate(15, 'poin');
+
+    $pager = $this->pointModel->pager;
+
+    // Total poin bulan ini
+    $totalBulanIni = $this->pointModel->getTotalPoinBulanIni($member['id']);
+
+    // Total poin all time
+    $totalAllTime = $this->pointModel->getTotalPoinAllTime($member['id']);
+
+    // Rank bulan ini
+    $rankBulanIni = $this->_hitungRankRealtime($member['id'], $bulanIni, $tahunIni);
+
+    // Chart: poin per bulan (6 bulan terakhir)
+    $db = \Config\Database::connect();
+    $chartPoin = [];
+    $namaBulan = ['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    for ($i = 5; $i >= 0; $i--) {
+        $ts    = mktime(0, 0, 0, $bulanIni - $i, 1, $tahunIni);
+        $bln   = (int) date('n', $ts);
+        $thn   = (int) date('Y', $ts);
+        $total = $db->table('point_transactions')
+            ->selectSum('points')
             ->where('member_id', $member['id'])
-            ->orderBy('created_at', 'DESC')
-            ->paginate(15, 'poin');
-
-        $pager = $this->pointModel->pager;
-
-        // Total poin bulan ini
-        $totalBulanIni = $this->pointModel->getTotalPoinBulanIni($member['id']);
-
-        // Total poin all time
-        $totalAllTime = $this->pointModel->getTotalPoinAllTime($member['id']);
-
-        // Rank bulan ini — hitung real-time dari semua member
-        $bulanIni = (int) date('n');
-        $tahunIni = (int) date('Y');
-        $rankBulanIni = $this->_hitungRankRealtime($member['id'], $bulanIni, $tahunIni);
-
-        return view('member/poin', [
-            'member'        => $member,
-            'activeNav'     => 'poin',
-            'riwayat'       => $riwayat,
-            'pager'         => $pager,
-            'totalBulanIni' => $totalBulanIni,
-            'totalAllTime'  => $totalAllTime,
-            'rankBulanIni'  => $rankBulanIni,
-        ]);
+            ->where('MONTH(created_at)', $bln)
+            ->where('YEAR(created_at)',  $thn)
+            ->get()->getRow()->points ?? 0;
+        $chartPoin[] = [
+            'bulan' => $namaBulan[$bln] . ' ' . $thn,
+            'total' => (int) $total,
+        ];
     }
 
+    // Breakdown poin per aktivitas (bulan ini)
+    $poinPerAktivitas = [];
+    $tipes = ['visit', 'loan', 'return_ontime', 'return_late', 'quiz'];
+    foreach ($tipes as $tipe) {
+        $hasil = $db->table('point_transactions')
+            ->selectSum('points')
+            ->where('member_id', $member['id'])
+            ->where('activity_type', $tipe)
+            ->where('MONTH(created_at)', $bulanIni)
+            ->where('YEAR(created_at)',  $tahunIni)
+            ->get()->getRow()->points ?? 0;
+        $poinPerAktivitas[$tipe] = (int) $hasil;
+    }
+
+    return view('member/poin', [
+        'member'           => $member,
+        'activeNav'        => 'poin',
+        'riwayat'          => $riwayat,
+        'pager'            => $pager,
+        'totalBulanIni'    => $totalBulanIni,
+        'totalAllTime'     => $totalAllTime,
+        'rankBulanIni'     => $rankBulanIni,
+        'chartPoin'        => $chartPoin,
+        'poinPerAktivitas' => $poinPerAktivitas,
+    ]);
+}
     public function kunjungan()
     {
         $member   = $this->getMember();

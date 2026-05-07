@@ -112,9 +112,7 @@ class VisitsController extends BaseController
             $visitId,
             'visit'
         );
-        // ────────────────────────────────────────────────────
 
-        // Ganti bagian flashdata lama dengan ini
         session()->setFlashdata('success_visit', [
         'nama' => trim($member['first_name'] . ' ' . $member['last_name']),
         'no_identitas'  => $member['no_identitas'],

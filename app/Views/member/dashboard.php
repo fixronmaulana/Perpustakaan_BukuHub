@@ -55,8 +55,9 @@
   <div class="kartu-stat-admin">
     <div class="ksa-body">
       <div class="ksa-icon">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-          <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-0.9L12 2z"/>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+          <polyline points="17 6 23 6 23 12"/>
         </svg>
       </div>
       <div class="ksa-angka"><?= $totalPoinBulanIni ?? 0 ?></div>
@@ -67,11 +68,13 @@
   <div class="kartu-stat-admin">
     <div class="ksa-body">
       <div class="ksa-icon">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-          <path d="M18 2h-2V1H8v1H6a1 1 0 00-1 1v3a5 5 0 004 4.9V13H7v2h10v-2h-2v-2.1A5 5 0 0019 6V3a1 1 0 00-1-1zm-1 4a3 3 0 01-2 2.83V4h2v2zm-10 0V4h2v4.83A3 3 0 017 6z"/>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6"  y1="20" x2="6"  y2="14"/>
         </svg>
       </div>
-      <div class="ksa-angka"><?= isset($rankBulanIni) && $rankBulanIni > 0 ? '#' . $rankBulanIni : '—' ?></div>
+      <div class="ksa-angka"><?= isset($rankBulanIni) && $rankBulanIni > 0 ? $rankBulanIni : '—' ?></div>
       <div class="ksa-label">Peringkat Bulan Ini</div>
     </div>
   </div>
@@ -111,8 +114,8 @@
         <h3>Peminjaman Aktif</h3>
         <a href="<?= base_url('member/peminjaman') ?>" class="tautan-lihat-semua">Lihat Semua →</a>
       </div>
-      <div class="bungkus-tabel">
-        <table class="tabel-admin-member">
+      <div class="table-responsive">
+        <table class="table table-hover table-sm mb-0">
           <thead>
             <tr>
               <th>Judul Buku</th>
@@ -164,8 +167,8 @@
         <h3>Pengembalian Terakhir</h3>
         <a href="<?= base_url('member/pengembalian') ?>" class="tautan-lihat-semua">Lihat Semua →</a>
       </div>
-      <div class="bungkus-tabel">
-        <table class="tabel-admin-member">
+      <div class="table-responsive">
+        <table class="table table-hover table-sm mb-0">
           <thead>
             <tr>
               <th>Judul Buku</th>
@@ -227,7 +230,7 @@
                                    background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;
                                    cursor:default;white-space:nowrap">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Selesai
+                        Sudah Selesai
                       </span>
                     <?php elseif ($expired): ?>
                       <span style="display:inline-flex;align-items:center;gap:5px;

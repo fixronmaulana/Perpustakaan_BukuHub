@@ -354,6 +354,19 @@ body {
     font-size: 0.85rem;
   }
 }
+@media (max-width: 992px) {
+  .tombol-toggle-sidebar {
+    display: flex !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    padding: 6px !important;
+    margin-right: 8px !important;
+  }
+
+  .tombol-toggle-sidebar svg {
+    stroke: #ffffff !important;
+  }
+}
 
 /* ── Sync dengan Topbar Navy ── */
 /* Pastikan member-konten punya padding-left agar tidak tertutup sidebar */
@@ -361,6 +374,7 @@ body {
   margin-left: var(--sidebar-w, 260px);
   transition: margin-left 0.28s ease;
   min-height: 100vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: #f8fafc; /* Light background untuk kontras dengan sidebar putih */
@@ -382,11 +396,6 @@ body {
 /* ════════════════════════════════════════
    KONTEN UTAMA / TOPBAR
    ════════════════════════════════════════ */
-.member-konten {
-  margin-left: var(--sidebar-w);
-  flex: 1; display: flex; flex-direction: column;
-  min-height: 100vh;
-}
 
 .topbar {
   background: linear-gradient(135deg, #1e3a8a, #1e40af); /* Navy gradient */
@@ -594,6 +603,46 @@ body {
 .area-halaman {
   flex: 1; padding: 1.5rem 2.5rem 2.5rem;
 }
+/* ── Fix Tabel Bootstrap di Member ── */
+.kotak-konten .table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b7a9d;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 0.65rem 1rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.kotak-konten .table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  color: #1a2340;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.kotak-konten .table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.kotak-konten .table tbody tr:hover {
+  background: #fafbfe;
+}
+
+.kotak-konten .table thead tr {
+  background: #f8fafc;
+}
+.kotak-konten .table {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+.kotak-konten .table-responsive {
+  border-radius: 0;
+}
 
 /* ════════════════════════════════════════
    KARTU STATISTIK
@@ -786,6 +835,158 @@ body {
 
 .badge-poin.positif { background: var(--hijau-muda); color: var(--hijau); }
 .badge-poin.negatif { background: var(--merah-muda); color: var(--merah); }
+
+/* ════════════════════════════════════════
+   RESPONSIVE DASHBOARD MEMBER
+   ════════════════════════════════════════ */
+
+/* ── Tablet (max 992px) ── */
+@media (max-width: 992px) {
+  .grid-stat {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .grid-konten-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .area-halaman {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* ── Mobile (max 768px) ── */
+@media (max-width: 768px) {
+  .area-halaman {
+    padding: 1rem 0.75rem;
+  }
+
+  /* Grid stat 2 kolom */
+  .grid-stat {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  /* Kartu stat */
+  .kartu-stat-admin .ksa-body {
+    padding: 0.85rem 1rem;
+  }
+
+  .kartu-stat-admin .ksa-angka {
+    font-size: 1.4rem;
+  }
+
+  .kartu-stat-admin .ksa-label {
+    font-size: 0.72rem;
+  }
+
+  /* Alert */
+  .profil-alert {
+    font-size: 0.82rem;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* Kotak konten */
+  .kotak-konten {
+    border-radius: 10px;
+  }
+
+  .kepala-kotak {
+    padding: 0.75rem 1rem;
+  }
+
+  .kepala-kotak h3 {
+    font-size: 0.825rem;
+  }
+
+  /* Tabel */
+  .tabel-admin-member th,
+  .tabel-member th {
+    font-size: 0.65rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .tabel-admin-member td,
+  .tabel-member td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .judul-tabel {
+    font-size: 0.78rem;
+  }
+
+  .penulis-tabel {
+    font-size: 0.68rem;
+  }
+
+  /* Timeline poin */
+  .timeline-wrap {
+    padding: 0 0.75rem;
+  }
+
+  .tl-label {
+    font-size: 0.8rem;
+  }
+
+  .tl-tgl {
+    font-size: 0.68rem;
+  }
+}
+
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+  .area-halaman {
+    padding: 0.75rem 0.5rem;
+  }
+
+  /* Grid stat 2 kolom tetap */
+  .grid-stat {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .kartu-stat-admin .ksa-angka {
+    font-size: 1.25rem;
+  }
+
+  .kartu-stat-admin .ksa-label {
+    font-size: 0.68rem;
+  }
+
+  .kartu-stat-admin .ksa-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Tabel scroll */
+  .bungkus-tabel {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Sembunyikan kolom kuis di mobile kecil */
+  .tabel-admin-member th:last-child,
+  .tabel-admin-member td:last-child {
+    display: none;
+  }
+
+  /* Timeline */
+  .tl-row {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+
+  .tl-poin {
+    font-size: 0.82rem;
+  }
+
+  .tl-desc {
+    font-size: 0.72rem;
+  }
+}
 
 /* ════════════════════════════════════════
    HALAMAN KARTU PERPUSTAKAAN

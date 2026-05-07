@@ -9,9 +9,8 @@
 <?= $this->section('content') ?>
 <?php use CodeIgniter\I18n\Time; ?>
 
-<!-- Statistik — 2 card -->
+<!-- Statistik -->
 <div class="grid-stat" style="grid-template-columns: repeat(2,1fr); margin-bottom:1.25rem">
-
   <div class="kartu-stat-admin">
     <div class="ksa-body">
       <div class="ksa-icon">
@@ -21,7 +20,6 @@
       <div class="ksa-label">Kunjungan Bulan Ini</div>
     </div>
   </div>
-
   <div class="kartu-stat-admin">
     <div class="ksa-body">
       <div class="ksa-icon">
@@ -31,24 +29,23 @@
       <div class="ksa-label">Total Kunjungan</div>
     </div>
   </div>
-
 </div>
 
-<!-- Tabel riwayat kunjungan -->
+<!-- Tabel -->
 <div class="kotak-konten">
   <div class="kepala-kotak">
     <h3>Riwayat Kunjungan</h3>
   </div>
 
-  <div class="bungkus-tabel">
-    <table class="tabel-admin-member" id="tabel-kunjungan">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm mb-0" id="tabel-kunjungan">
       <thead>
         <tr>
           <th style="width:40px">#</th>
           <th>Tanggal Kunjungan</th>
           <th>Hari</th>
           <th>Waktu</th>
-          <th class="teks-center">Metode</th>
+          <th class="text-center">Metode</th>
           <th>Catatan</th>
         </tr>
       </thead>
@@ -73,10 +70,10 @@
           ?>
             <tr>
               <td class="teks-redup-sm"><?= $i++ ?></td>
-              <td class="tgl-normal"><b><?= $vDate->format('d/m/Y') ?></b></td>
-              <td class="tgl-normal"><?= $hari ?></td>
-              <td class="tgl-normal"><?= $vDate->format('H:i:s') ?></td>
-              <td class="teks-center">
+              <td><b><?= $vDate->format('d/m/Y') ?></b></td>
+              <td class="teks-redup-sm"><?= $hari ?></td>
+              <td class="teks-redup-sm"><?= $vDate->format('H:i:s') ?></td>
+              <td class="text-center">
                 <?php if ($visit['method'] === 'scan'): ?>
                   <span class="badge-admin biru">Scan QR</span>
                 <?php else: ?>

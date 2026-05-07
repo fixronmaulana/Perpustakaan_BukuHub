@@ -9,7 +9,7 @@
 <?= $this->section('content') ?>
 <?php use CodeIgniter\I18n\Time; $now = Time::now(); ?>
 
-<!-- Statistik — mirip admin -->
+<!-- Statistik -->
 <div class="grid-stat" style="margin-bottom:1.25rem">
   <div class="kartu-stat-admin">
     <div class="ksa-body">
@@ -40,7 +40,7 @@
   </div>
 </div>
 
-<!-- Tabel — mirip admin -->
+<!-- Tabel -->
 <div class="kotak-konten">
   <div class="kepala-kotak">
     <h3>Peminjaman Aktif</h3>
@@ -52,16 +52,16 @@
     </div>
   </div>
 
-  <div class="bungkus-tabel">
-    <table class="tabel-admin-member" id="tabel-peminjaman">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm mb-0" id="tabel-peminjaman">
       <thead>
         <tr>
           <th style="width:40px">#</th>
           <th>Judul Buku</th>
-          <th style="width:80px" class="teks-center">Jumlah</th>
+          <th style="width:80px" class="text-center">Jumlah</th>
           <th>Tgl Pinjam</th>
           <th>Tenggat</th>
-          <th class="teks-center">Status</th>
+          <th class="text-center">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -89,7 +89,7 @@
                 <div class="judul-tabel"><?= esc($loan['title']) ?> (<?= esc($loan['year']) ?>)</div>
                 <div class="penulis-tabel">Author: <?= esc($loan['author']) ?></div>
               </td>
-              <td class="teks-center"><?= $loan['quantity'] ?></td>
+              <td class="text-center"><?= $loan['quantity'] ?></td>
               <td>
                 <b><?= Time::parse($loan['loan_date'])->format('d/m/Y') ?></b><br>
                 <span class="teks-redup-sm"><?= Time::parse($loan['loan_date'])->format('H:i:s') ?></span>
@@ -97,7 +97,7 @@
               <td class="<?= $isLate ? 'tgl-terlambat' : '' ?>">
                 <b><?= $dueDate->format('d/m/Y') ?></b>
               </td>
-              <td class="teks-center">
+              <td class="text-center">
                 <span class="<?= $badgeClass ?>"><?= $badgeLabel ?></span>
               </td>
             </tr>
