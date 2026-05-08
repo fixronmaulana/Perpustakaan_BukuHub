@@ -18,7 +18,6 @@ $bulanLabel = ($namaBulan[$bulan] ?? $bulan) . ' ' . $tahun;
 $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 ?>
 
-<!-- Header + Filter -->
 <div class="kotak-konten" style="margin-bottom:1.25rem">
   <div class="kepala-kotak">
     <h3>
@@ -31,8 +30,7 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
       <?php endif; ?>
     </h3>
     <form method="get" action="" style="display:flex;gap:8px;align-items:center">
-      <select name="bulan" class="form-select form-select-sm" style="width:auto"
-              onchange="this.form.submit()">
+      <select name="bulan" class="form-select form-select-sm" style="width:auto">
         <?php foreach ($daftarBulan as $db): ?>
           <option value="<?= $db['bulan'] ?>"
                   data-tahun="<?= $db['tahun'] ?>"
@@ -46,7 +44,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
   </div>
 </div>
 
-<!-- Rank Saya -->
 <?php if ($rankSaya > 0): ?>
 <div class="kotak-konten" style="margin-bottom:1.25rem">
   <div style="padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
@@ -59,11 +56,11 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
         <line x1="6"  y1="20" x2="6"  y2="14"/>
       </svg>
     </div>
-    <div>
+    <div style="flex:1; min-width:200px">
       <div style="font-size:.82rem;font-weight:700;color:#1a2340">Peringkat Kamu Bulan Ini</div>
       <div style="font-size:.75rem;color:#6b7a9d">Berdasarkan total poin yang dikumpulkan</div>
     </div>
-    <div style="margin-left:auto;text-align:right">
+    <div style="text-align:right">
       <div style="font-size:1.5rem;font-weight:800;color:#4f46e5">#<?= $rankSaya ?></div>
       <div style="font-size:.72rem;color:#6b7a9d">dari <?= count($leaderboard) ?> anggota</div>
     </div>
@@ -71,18 +68,17 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 </div>
 <?php endif; ?>
 
-<!-- Tabel Leaderboard -->
 <div class="kotak-konten">
   <div class="kepala-kotak">
     <h3>Semua Peringkat</h3>
     <span class="teks-redup-sm"><?= count($leaderboard) ?> anggota</span>
   </div>
 
-  <div class="table-responsive">
-    <table class="table table-hover table-sm mb-0">
+  <div class="table-responsive-custom">
+    <table class="table table-hover mb-0" id="tabel-leaderboard">
       <thead>
         <tr>
-          <th style="width:52px" class="text-center">#</th>
+          <th style="width:60px" class="text-center">#</th>
           <th>Anggota</th>
           <th class="text-center">Kunjungan</th>
           <th class="text-center">Pinjam</th>
@@ -109,29 +105,24 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
             $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
             $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
             $adaFoto = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
-            $poinKunjungan  = (int) ($row['poin_kunjungan']  ?? 0);
-            $poinPeminjaman = (int) ($row['poin_peminjaman'] ?? 0);
-            $poinTepat      = (int) ($row['poin_tepat']      ?? 0);
-            $poinTerlambat  = (int) ($row['poin_terlambat']  ?? 0);
-            $poinKuis       = (int) ($row['poin_kuis']       ?? 0);
           ?>
-            <tr style="<?= $isMe ? 'background:#eff4ff !important' : '' ?>">
+            <tr style="<?= $isMe ? 'background:#f8faff !important' : '' ?>">
               <td class="text-center">
                 <?php if ($rank === 1): ?>
-                  <span style="font-size:1.1rem">🥇</span>
+                  <span style="font-size:1.2rem">🥇</span>
                 <?php elseif ($rank === 2): ?>
-                  <span style="font-size:1.1rem">🥈</span>
+                  <span style="font-size:1.2rem">🥈</span>
                 <?php elseif ($rank === 3): ?>
-                  <span style="font-size:1.1rem">🥉</span>
+                  <span style="font-size:1.2rem">🥉</span>
                 <?php else: ?>
-                  <span class="teks-redup-sm"><?= $rank ?></span>
+                  <span class="teks-redup-sm" style="font-weight:600"><?= $rank ?></span>
                 <?php endif; ?>
               </td>
               <td>
                 <div style="display:flex;align-items:center;gap:10px">
-                  <div style="width:34px;height:34px;border-radius:50%;flex-shrink:0;overflow:hidden;
+                  <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;overflow:hidden;
                               background:#e2e8f0;display:flex;align-items:center;justify-content:center;
-                              font-size:.72rem;font-weight:700;color:#64748b;
+                              font-size:.75rem;font-weight:700;color:#64748b;
                               border:2px solid <?= $isMe ? '#818cf8' : '#f1f5f9' ?>">
                     <?php if ($adaFoto): ?>
                       <img src="<?= base_url('uploads/foto_profil/' . $row['foto_profil']) ?>"
@@ -148,54 +139,28 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                       <?php endif; ?>
                     </div>
                     <div class="penulis-tabel">
-                      <?= esc($row['no_identitas']) ?>
-                      <span style="display:inline-block;font-size:.63rem;padding:1px 5px;
-                                   border-radius:4px;background:#f1f5f9;color:#475569;
-                                   font-weight:500;margin-left:4px">
-                        <?= esc($row['tipe_anggota']) ?>
-                      </span>
+                      <?= esc($row['no_identitas']) ?> • <?= esc($row['tipe_anggota']) ?>
                     </div>
                   </div>
                 </div>
               </td>
               <td class="text-center">
-                <?php if ($poinKunjungan > 0): ?>
-                  <span class="lb-chip pos">+<?= $poinKunjungan ?></span>
-                <?php else: ?>
-                  <span class="lb-dash">—</span>
-                <?php endif; ?>
+                <span class="lb-chip <?= ($row['poin_kunjungan'] > 0) ? 'pos' : '' ?>"><?= ($row['poin_kunjungan'] > 0) ? '+'.$row['poin_kunjungan'] : '—' ?></span>
               </td>
               <td class="text-center">
-                <?php if ($poinPeminjaman > 0): ?>
-                  <span class="lb-chip pos">+<?= $poinPeminjaman ?></span>
-                <?php else: ?>
-                  <span class="lb-dash">—</span>
-                <?php endif; ?>
+                <span class="lb-chip <?= ($row['poin_peminjaman'] > 0) ? 'pos' : '' ?>"><?= ($row['poin_peminjaman'] > 0) ? '+'.$row['poin_peminjaman'] : '—' ?></span>
               </td>
               <td class="text-center">
-                <?php if ($poinTepat > 0): ?>
-                  <span class="lb-chip pos">+<?= $poinTepat ?></span>
-                <?php else: ?>
-                  <span class="lb-dash">—</span>
-                <?php endif; ?>
+                <span class="lb-chip <?= ($row['poin_tepat'] > 0) ? 'pos' : '' ?>"><?= ($row['poin_tepat'] > 0) ? '+'.$row['poin_tepat'] : '—' ?></span>
               </td>
               <td class="text-center">
-                <?php if ($poinTerlambat < 0): ?>
-                  <span class="lb-chip neg"><?= $poinTerlambat ?></span>
-                <?php else: ?>
-                  <span class="lb-dash">—</span>
-                <?php endif; ?>
+                <span class="lb-chip <?= ($row['poin_terlambat'] < 0) ? 'neg' : '' ?>"><?= ($row['poin_terlambat'] < 0) ? $row['poin_terlambat'] : '—' ?></span>
               </td>
               <td class="text-center">
-                <?php if ($poinKuis > 0): ?>
-                  <span class="lb-chip pos">+<?= $poinKuis ?></span>
-                <?php else: ?>
-                  <span class="lb-dash">—</span>
-                <?php endif; ?>
+                <span class="lb-chip <?= ($row['poin_kuis'] > 0) ? 'pos' : '' ?>"><?= ($row['poin_kuis'] > 0) ? '+'.$row['poin_kuis'] : '—' ?></span>
               </td>
               <td class="text-center">
-                <span style="font-weight:700;font-size:.88rem;
-                             color:<?= $row['total_points'] >= 0 ? '#16a34a' : '#dc2626' ?>">
+                <span style="font-weight:700;font-size:.9rem;color:<?= $row['total_points'] >= 0 ? '#16a34a' : '#dc2626' ?>">
                   <?= ($row['total_points'] >= 0 ? '+' : '') . $row['total_points'] ?>
                 </span>
               </td>
@@ -209,9 +174,9 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 
 <script>
 document.querySelector('select[name="bulan"]').addEventListener('change', function() {
-  const opt = this.options[this.selectedIndex];
-  document.getElementById('tahunInput').value = opt.dataset.tahun;
-  this.form.submit();
+    const opt = this.options[this.selectedIndex];
+    document.getElementById('tahunInput').value = opt.dataset.tahun;
+    this.form.submit();
 });
 </script>
 

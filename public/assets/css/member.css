@@ -690,7 +690,7 @@ body {
 .grid-konten-dashboard {
   display: grid;
   grid-template-columns: 1.75fr 1fr;
-  gap: 1.25rem;
+  gap: 0rem;
   margin-bottom: 1.25rem;
 }
 @media (max-width: 768px) {
@@ -2676,7 +2676,10 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
   padding-right: 1.5rem;
   padding-top: 1rem;
 }
-.tl-poin.pos { color: var(--biru); }
+.tl-poin.pos { 
+  color: var(--biru); 
+  margin-right: 0.75rem;
+}
 .tl-poin.neg { color: #A32D2D; }
 
 .tl-meta {
@@ -2726,4 +2729,213 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
 .badge-red {
   background:#fee2e2;
   color:#991b1b;
+}
+
+/* ── Fix Timeline Riwayat Poin Dashboard ── */
+.timeline-wrap {
+  padding: 0.25rem 1rem 0.5rem;
+}
+
+.tl-poin {
+  padding-top: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* --- Fix Layout Global --- */
+html, body {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto;   /* Izinkan scroll ke bawah */
+    height: auto;       
+    margin: 0;
+    padding: 0;
+}
+
+.member-konten {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-width: 100% !important;
+    overflow-x: visible !important; /* Agar dropdown profil tidak terpotong */
+    min-height: 100vh;
+}
+
+.area-halaman {
+    flex: 1;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    padding: 20px; 
+    overflow-x: hidden !important; /* Mengunci konten di dalam halaman */
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Pastikan di atas konten */
+    max-width: 100% !important;
+    box-sizing: border-box;
+    overflow: visible; /* Penting untuk Dropdown */
+}
+
+/* Media Query Mobile */
+@media (max-width: 768px) {
+    .area-halaman {
+        padding: 10px;
+    }
+    .profil-info {
+        display: none;
+    }
+}
+
+/* TABEL RESPONSIVE CUSTOM */
+/* --- UI Dasar & Kontainer --- */
+.kotak-konten {
+    background: #fff;
+    border-radius: 5px;
+    padding: 0rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    width: 100%;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+.kepala-kotak {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+/* Bagian Judul & Badge */
+.kepala-kotak h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap; /* Agar badge tidak memotong layar di HP kecil */
+}
+/* Bagian Kanan (Form/Filter/Button) */
+.kepala-kotak .box-kontrol {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* --- Grid Statistik (2 Kolom di Mobile/Tablet) --- */
+.grid-stat {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Default Desktop 3 kolom */
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+@media (max-width: 992px) {
+    .grid-stat {
+        grid-template-columns: repeat(2, 1fr); /* Tablet & Mobile jadi 2 kolom */
+    }
+    .grid-stat > div:last-child:nth-child(odd) {
+        grid-column: span 2;
+    }
+}
+
+/* --- Tabel Responsif & Custom Scroll --- */
+.table-responsive-custom {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid #f1f5f9;
+    border-radius: 8px;
+}
+
+.table-custom {
+    width: 100%;
+    min-width: 800px; /* Lebar minimal agar data tidak berdempetan saat di-scroll */
+    border-collapse: collapse;
+}
+
+.table-custom th {
+    background: #f8fafc;
+    padding: 12px 10px;
+    color: #64748b;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.table-custom td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* --- Filter Pills --- */
+.filter-status {
+    display: flex;
+    gap: 8px;
+}
+
+.pil-filter {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.pil-filter.aktif {
+    background: #1e3a8a;
+    color: #fff;
+    border-color: #1e3a8a;
+}
+
+/* --- Chart Layout --- */
+.chart-container {
+    position: relative;
+    height: 320px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .chart-container { height: 250px; }
+    .kepala-kotak { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .kepala-kotak h3 {font-size: 1rem; line-height: 1.4;}
+    .filter-status { width: 100%; overflow-x: auto; padding-bottom: 5px; }
+    .kepala-kotak .box-kontrol,
+    .kepala-kotak form {
+        width: 100%;
+        display: flex;
+    }
+    .kepala-kotak select, 
+    .kepala-kotak .form-select {
+        flex: 1; /* Select box memanjang memenuhi layar HP */
+        width: 100% !important;
+    }
+  }
+/* --- Khusus untuk menu dengan hanya 2 Card agar Proporsional di Desktop --- */
+.grid-stat.dua-kolom {
+    grid-template-columns: 1fr 1fr; /* Membagi 2 sama rata di desktop */
+}
+
+/* --- Pengaturan Responsive untuk Tablet & Mobile --- */
+@media (max-width: 992px) {
+    .grid-stat.dua-kolom, 
+    .grid-stat {
+        grid-template-columns: repeat(2, 1fr); /* Tetap 2 kolom di layar lebih kecil */
+    }
+}
+
+@media (max-width: 576px) {
+    /* Opsional: Jika di HP layar sangat kecil dirasa terlalu sempit untuk 2 kolom */
+    /* .grid-stat.dua-kolom,
+    .grid-stat {
+        grid-template-columns: 1fr; 
+    } */
 }

@@ -32,11 +32,7 @@ $labelRank = [1 => '🥇 Peringkat 1', 2 => '🥈 Peringkat 2', 3 => '🥉 Perin
     <div class="card">
       <div class="card-body">
         <h5 class="card-title fw-semibold mb-1">Pengaturan Poin Gamifikasi</h5>
-        <p class="text-muted small mb-4">
-          Atur jumlah poin yang diperoleh member untuk setiap aktivitas.
-          Nilai negatif akan mengurangi poin member.
-        </p>
-
+        <p class="text-muted small mb-4"></p>
         <form action="<?= base_url('admin/pengaturan-poin') ?>" method="post">
           <?= csrf_field() ?>
           <div class="table-responsive">
@@ -105,7 +101,6 @@ $labelRank = [1 => '🥇 Peringkat 1', 2 => '🥈 Peringkat 2', 3 => '🥉 Perin
             <div class="small">
               <b>Poin Kuis</b> tidak dapat diatur di sini karena dihitung otomatis berdasarkan
               persentase jawaban benar (maks. 100 poin).
-              Contoh: benar 8 dari 10 soal = <b>80 poin</b>.
             </div>
           </div>
 
@@ -125,11 +120,7 @@ $labelRank = [1 => '🥇 Peringkat 1', 2 => '🥈 Peringkat 2', 3 => '🥉 Perin
     <div class="card">
       <div class="card-body">
         <h5 class="card-title fw-semibold mb-1">Hadiah Leaderboard</h5>
-        <p class="text-muted small mb-4">
-          Set hadiah untuk peringkat 1, 2, dan 3 pada bulan
-          <strong><?= $namaBulan[$bulanIni] . ' ' . $tahunIni ?></strong>.
-          Hadiah akan ditampilkan di halaman leaderboard publik.
-        </p>
+        <p class="text-muted small mb-4"></p>
 
         <!-- Tab rank 1/2/3 -->
         <ul class="nav nav-tabs mb-3" id="tabHadiah">
