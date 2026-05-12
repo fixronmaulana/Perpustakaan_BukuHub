@@ -369,7 +369,6 @@ body {
 }
 
 /* ── Sync dengan Topbar Navy ── */
-/* Pastikan member-konten punya padding-left agar tidak tertutup sidebar */
 .member-konten {
   margin-left: var(--sidebar-w, 260px);
   transition: margin-left 0.28s ease;
@@ -2743,39 +2742,44 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
 
 /* --- Fix Layout Global --- */
 html, body {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    overflow-y: auto;   /* Izinkan scroll ke bawah */
-    height: auto;       
     margin: 0;
     padding: 0;
+    width: 100%;
+    /* Hapus overflow-x: hidden di sini jika sticky tidak jalan */
+    height: 100%; 
 }
 
 .member-konten {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    max-width: 100% !important;
-    overflow-x: visible !important; /* Agar dropdown profil tidak terpotong */
-    min-height: 100vh;
+    width: 100%;
+    /* PENTING: Untuk membuat header diam, area ini harus setinggi layar */
+    height: 100vh; 
+    overflow: hidden; /* Kontainer utama tidak boleh scroll */
 }
 
+/* --- Area Halaman (Inilah yang melakukan Scroll) --- */
 .area-halaman {
     flex: 1;
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
     box-sizing: border-box;
-    padding: 20px; 
-    overflow-x: hidden !important; /* Mengunci konten di dalam halaman */
+    padding: 20px;
+    /* KUNCINYA DI SINI: Scroll hanya terjadi di dalam area konten */
+    overflow-y: auto; 
+    overflow-x: hidden;
 }
 
+/* --- Topbar (Akan otomatis diam karena parent-nya flex & area-halaman yang scroll) --- */
 .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000; /* Pastikan di atas konten */
-    max-width: 100% !important;
+    /* Jika menggunakan struktur flex di atas, position: relative saja sudah cukup diam */
+    position: relative; 
+    flex-shrink: 0; /* Mencegah topbar tertekuk */
+    z-index: 1000;
+    width: 100%;
     box-sizing: border-box;
-    overflow: visible; /* Penting untuk Dropdown */
+    overflow: visible; /* Tetap agar dropdown profil aman */
+    background-color: #1e3a8a; /* Pastikan warna background ada agar konten tabel tidak tembus */
 }
 
 /* Media Query Mobile */

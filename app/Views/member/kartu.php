@@ -110,10 +110,6 @@
           <span class="kartu-no-label">No. Anggota</span>
           <span class="kartu-no-value"><?= $noAnggota ?></span>
         </div>
-        <div class="kartu-berlaku">
-          Berlaku s/d
-          <span><?= $berlakuHingga ?></span>
-        </div>
       </div>
 
     </div><!-- /kartu-id -->

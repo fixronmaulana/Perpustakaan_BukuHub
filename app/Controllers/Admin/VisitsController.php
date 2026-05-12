@@ -59,12 +59,25 @@ class VisitsController extends BaseController
     {
         if (!$this->validate([
             'member_uid' => 'required',
-            'visit_date' => 'required|valid_date',
-            'notes'      => 'permit_empty|max_length[500]',
+            'visit_date' => [
+                'rules'  => 'required|valid_date',
+                'errors' => ['required' => 'Tanggal kunjungan wajib diisi.', 'valid_date' => 'Format tanggal tidak valid.'],
+            ],
+            'notes' => 'permit_empty|max_length[500]',
         ])) {
             return view('visits/create', [
                 'validation' => \Config\Services::validation(),
                 'oldInput'   => $this->request->getPost(),
+            ]);
+        }
+
+        // Validasi tanggal tidak boleh masa depan
+        $visitDateInput = strtotime($this->request->getPost('visit_date'));
+        if ($visitDateInput > time()) {
+            return view('visits/create', [
+                'validation'     => \Config\Services::validation(),
+                'oldInput'       => $this->request->getPost(),
+                'errorVisitDate' => 'Tanggal kunjungan tidak boleh melebihi waktu sekarang.',
             ]);
         }
 
@@ -96,9 +109,9 @@ class VisitsController extends BaseController
 
         $this->visitModel->insert([
             'member_id'  => $member['id'],
-            'visit_date' => $this->request->getPost('visit_date'),
+            'visit_date' => date('Y-m-d H:i:s', strtotime($this->request->getPost('visit_date'))),
             'method'     => 'manual',
-            'notes'      => $this->request->getPost('notes') ?? null,
+            'notes'      => $this->request->getPost('notes') ?: '—',
         ]);
         $visitId = $this->visitModel->getInsertID();
 
@@ -182,16 +195,16 @@ return redirect()->to('admin/kunjungan');
         // ────────────────────────────────────────────────────
 
         // Tambahkan 'poin' di dalam return success
-return $this->response->setJSON([
-    'success' => true,
-    'message' => 'Kunjungan berhasil dicatat.',
-    'poin'    => $poinKunjungan, // Tambahkan ini
-    'member'  => [
-        'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
-        'no_identitas' => $member['no_identitas'],
-        'tipe'         => $member['tipe_anggota'],
-    ],
-]);
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Kunjungan berhasil dicatat.',
+            'poin'    => $poinKunjungan, // Tambahkan ini
+            'member'  => [
+                'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
+                'no_identitas' => $member['no_identitas'],
+                'tipe'         => $member['tipe_anggota'],
+            ],
+        ]);
     }
 
     public function delete($id = null)
