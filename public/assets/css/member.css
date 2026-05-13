@@ -2679,7 +2679,7 @@ tr.baris-saya:hover > td   { background: #fef3c7; }
   color: var(--biru); 
   margin-right: 0.75rem;
 }
-.tl-poin.neg { color: #A32D2D; }
+.tl-poin.neg { color: #A32D2D; margin-right: 0.75rem;}
 
 .tl-meta {
   display: flex;

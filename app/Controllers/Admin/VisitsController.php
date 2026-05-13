@@ -48,6 +48,95 @@ class VisitsController extends BaseController
         ]);
     }
 
+    public function report()
+    {
+        $bulan = $this->request->getGet('bulan'); // format: 2026-05
+        
+        $query = $this->visitModel
+            ->select('visits.*, members.first_name, members.last_name, members.no_identitas, members.tipe_anggota')
+            ->join('members', 'visits.member_id = members.id', 'LEFT')
+            ->orderBy('visits.visit_date', 'ASC');
+
+        if ($bulan) {
+            $query->where('DATE_FORMAT(visits.visit_date, "%Y-%m")', $bulan);
+        }
+
+        $visits = $query->findAll();
+
+        // Hitung summary
+        $summary = [
+            'total'  => count($visits),
+            'murid'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
+            'guru'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
+            'staf'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
+            'manual' => count(array_filter($visits, fn($v) => $v['method'] === 'manual')),
+            'scan'   => count(array_filter($visits, fn($v) => $v['method'] === 'scan')),
+        ];
+
+        return view('visits/report', [
+            'visits'  => $visits,
+            'summary' => $summary,
+            'bulan'   => $bulan,
+        ]);
+    }
+
+    public function exportPdf()
+    {
+        $bulan = $this->request->getGet('bulan');
+
+        $query = $this->visitModel
+            ->select('visits.*, members.first_name, members.last_name, members.no_identitas, members.tipe_anggota')
+            ->join('members', 'visits.member_id = members.id', 'LEFT')
+            ->orderBy('visits.visit_date', 'ASC');
+
+        if ($bulan) {
+            $query->where('DATE_FORMAT(visits.visit_date, "%Y-%m")', $bulan);
+        }
+
+        $visits = $query->findAll();
+
+        $summary = [
+            'total'  => count($visits),
+            'murid'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
+            'guru'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
+            'staf'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
+            'manual' => count(array_filter($visits, fn($v) => $v['method'] === 'manual')),
+            'scan'   => count(array_filter($visits, fn($v) => $v['method'] === 'scan')),
+        ];
+
+        // Label periode
+        if ($bulan) {
+            $periodeLabel = \CodeIgniter\I18n\Time::createFromFormat('Y-m', $bulan)->toLocalizedString('MMMM yyyy');
+        } else {
+            $periodeLabel = 'Semua Data';
+        }
+
+        // Generate HTML untuk PDF
+        $html = view('visits/pdf_template', [
+            'visits'       => $visits,
+            'summary'      => $summary,
+            'periodeLabel' => $periodeLabel,
+            'bulan'        => $bulan,
+        ]);
+
+        // DOMPDF
+        $options = new \Dompdf\Options();
+        $options->set('defaultFont', 'Arial');
+        $options->set('isHtml5ParserEnabled', true);
+
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        // Nama file
+        $namaFile = $bulan
+            ? 'laporan-kunjungan-' . $bulan . '.pdf'
+            : 'laporan-kunjungan-semua.pdf';
+
+        $dompdf->stream($namaFile, ['Attachment' => true]);
+    }
+
     public function create()
     {
         return view('visits/create', [

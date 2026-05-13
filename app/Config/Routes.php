@@ -84,6 +84,8 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
     $routes->post('kunjungan/scan',     'Admin\VisitsController::scanQr');
     $routes->get('kunjungan/search',    'Admin\VisitsController::searchMember');
     $routes->delete('kunjungan/(:num)', 'Admin\VisitsController::delete/$1');
+    $routes->get('kunjungan/laporan',        'Admin\VisitsController::report');
+    $routes->get('kunjungan/laporan/export', 'Admin\VisitsController::exportPdf');
 
     $routes->get('loans/new/members/search', 'Loans\LoansController::searchMember');
     $routes->get('loans/new/books/search', 'Loans\LoansController::searchBook');

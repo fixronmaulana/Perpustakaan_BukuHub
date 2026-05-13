@@ -33,6 +33,9 @@
               <button class="btn btn-outline-secondary" type="submit">Cari</button>
             </div>
           </form>
+          <a href="<?= base_url('admin/kunjungan/laporan') ?>" class="btn btn-outline-success text-nowrap">
+            <i class="ti ti-file-text me-1"></i> Laporan
+          </a>
           <a href="<?= base_url('admin/kunjungan/new') ?>" class="btn btn-primary text-nowrap">
             <i class="ti ti-plus"></i> Catat Kunjungan
           </a>
