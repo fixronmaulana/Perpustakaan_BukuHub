@@ -126,7 +126,7 @@ class VisitsController extends BaseController
 
         $dompdf = new \Dompdf\Dompdf($options);
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
         // Nama file
@@ -134,7 +134,8 @@ class VisitsController extends BaseController
             ? 'laporan-kunjungan-' . $bulan . '.pdf'
             : 'laporan-kunjungan-semua.pdf';
 
-        $dompdf->stream($namaFile, ['Attachment' => true]);
+        $isPreview = $this->request->getGet('preview') === '1';
+        $dompdf->stream($namaFile, ['Attachment' => !$isPreview]);
     }
 
     public function create()

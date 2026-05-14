@@ -11,101 +11,106 @@
   <i class="ti ti-arrow-left"></i> Kembali
 </a>
 
+<!-- ── Filter Card ── -->
 <div class="card mb-3">
   <div class="card-body">
-    <h5 class="card-title fw-semibold mb-3">
-      <i class="ti ti-file-text me-1"></i> Laporan Kunjungan
-    </h5>
-
-    <!-- Filter -->
-    <form action="" method="get" class="row g-2 align-items-end">
-      <div class="col-12 col-md-4">
-        <label class="form-label">Filter Bulan</label>
-        <input type="month" class="form-control" name="bulan"
-               value="<?= esc($bulan ?? '') ?>"
-               max="<?= date('Y-m') ?>">
+    <div class="row align-items-end">
+      <div class="col-12 col-lg-6 mb-2 mb-lg-0">
+        <h5 class="card-title fw-semibold mb-0">
+          <i class="ti ti-file-analytics me-1"></i> Laporan Kunjungan
+        </h5>
+        <small class="text-muted">Filter data kunjungan berdasarkan periode bulan</small>
       </div>
-      <div class="col-auto">
-        <button type="submit" class="btn btn-primary">
-          <i class="ti ti-search me-1"></i> Tampilkan
-        </button>
+      <div class="col-12 col-lg-6">
+        <form action="" method="get" class="d-flex gap-2 justify-content-lg-end align-items-end flex-wrap">
+          <div>
+            <label class="form-label mb-1 small fw-semibold">Filter Bulan</label>
+            <input type="month" class="form-control" name="bulan"
+                   value="<?= esc($bulan ?? '') ?>"
+                   max="<?= date('Y-m') ?>">
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-search me-1"></i> Tampilkan
+            </button>
+            <?php if ($bulan): ?>
+              <a href="<?= base_url('admin/kunjungan/laporan') ?>" class="btn btn-outline-secondary">
+                <i class="ti ti-x"></i> Reset
+              </a>
+            <?php endif; ?>
+          </div>
+        </form>
       </div>
-      <?php if ($bulan): ?>
-        <div class="col-auto">
-          <a href="<?= base_url('admin/kunjungan/laporan') ?>" class="btn btn-outline-secondary">
-            <i class="ti ti-x me-1"></i> Reset
-          </a>
-        </div>
-      <?php endif; ?>
-      <?php if (!empty($visits)): ?>
-        <div class="col-auto ms-auto">
-          <a href="<?= base_url('admin/kunjungan/laporan/export') . ($bulan ? '?bulan=' . $bulan : '') ?>"
-             class="btn btn-danger">
-            <i class="ti ti-file-type-pdf me-1"></i> Export PDF
-          </a>
-        </div>
-      <?php endif; ?>
-    </form>
+    </div>
   </div>
 </div>
 
 <?php if (!empty($visits)): ?>
 
-  <!-- Summary -->
-  <div class="row mb-3 g-2">
-    <div class="col-6 col-md-2">
-      <div class="card text-center border-primary">
-        <div class="card-body py-2">
-          <div class="fs-4 fw-bold text-primary"><?= $summary['total'] ?></div>
-          <small class="text-muted">Total</small>
+  <!-- ── Summary Cards ── -->
+  <div class="row g-2 mb-3">
+    <div class="col-6 col-md-3">
+      <div class="card border-primary h-100">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center py-3 gap-1">
+          <div class="fs-2 fw-bold text-primary lh-1"><?= $summary['total'] ?></div>
+          <div class="text-muted fw-semibold" style="font-size:0.75rem;letter-spacing:0.05em;">TOTAL</div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-md-2">
-      <div class="card text-center">
-        <div class="card-body py-2">
-          <div class="fs-4 fw-bold"><?= $summary['murid'] ?></div>
-          <small class="text-muted">Murid</small>
+    <div class="col-6 col-md-3">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center py-3 gap-1">
+          <div class="fs-2 fw-bold lh-1"><?= $summary['murid'] ?></div>
+          <div class="text-muted fw-semibold" style="font-size:0.75rem;letter-spacing:0.05em;">MURID</div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-md-2">
-      <div class="card text-center">
-        <div class="card-body py-2">
-          <div class="fs-4 fw-bold"><?= $summary['guru'] ?></div>
-          <small class="text-muted">Guru</small>
+    <div class="col-6 col-md-3">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center py-3 gap-1">
+          <div class="fs-2 fw-bold lh-1"><?= $summary['guru'] ?></div>
+          <div class="text-muted fw-semibold" style="font-size:0.75rem;letter-spacing:0.05em;">GURU</div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-md-2">
-      <div class="card text-center">
-        <div class="card-body py-2">
-          <div class="fs-4 fw-bold"><?= $summary['staf'] ?></div>
-          <small class="text-muted">Staf</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-2">
-      <div class="card text-center">
-        <div class="card-body py-2">
-          <div class="fs-4 fw-bold"><?= $summary['manual'] ?></div>
-          <small class="text-muted">Manual</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-2">
-      <div class="card text-center">
-        <div class="card-body py-2">
-          <div class="fs-4 fw-bold"><?= $summary['scan'] ?></div>
-          <small class="text-muted">Scan QR</small>
+    <div class="col-6 col-md-3">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center py-3 gap-1">
+          <div class="fs-2 fw-bold lh-1"><?= $summary['staf'] ?></div>
+          <div class="text-muted fw-semibold" style="font-size:0.75rem;letter-spacing:0.05em;">STAF</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Tabel -->
+  <!-- ── Tabel Data ── -->
   <div class="card">
     <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-12 col-lg-6">
+          <h5 class="card-title fw-semibold mb-0">Detail Kunjungan</h5>
+          <small class="text-muted">
+            Periode: <b><?= $bulan ? date('F Y', strtotime($bulan . '-01')) : 'Semua Data' ?></b>
+            &mdash; <?= $summary['total'] ?> data ditemukan
+          </small>
+        </div>
+        <div class="col-12 col-lg-6 d-flex justify-content-lg-end mt-2 mt-lg-0">
+          <div class="d-flex gap-2">
+            <a href="<?= base_url('admin/kunjungan/laporan/export') . ($bulan ? '?bulan=' . $bulan . '&preview=1' : '?preview=1') ?>"
+              target="_blank"
+              class="btn btn-outline-danger d-inline-flex align-items-center gap-1">
+              <i class="ti ti-eye" style="font-size:1rem;"></i>
+              <span>Preview PDF</span>
+            </a>
+            <a href="<?= base_url('admin/kunjungan/laporan/export') . ($bulan ? '?bulan=' . $bulan : '') ?>"
+              class="btn btn-danger d-inline-flex align-items-center gap-1">
+              <i class="ti ti-file-type-pdf" style="font-size:1rem;"></i>
+              <span>Export PDF</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div class="overflow-x-scroll">
         <table class="table table-hover table-striped">
           <thead class="table-light">
@@ -124,9 +129,9 @@
               $visitDate = Time::parse($visit['visit_date'], locale: 'id');
             ?>
             <tr>
-              <th><?= $i++ ?></th>
+              <th scope="row"><?= $i++ ?></th>
               <td><b><?= esc(trim($visit['first_name'] . ' ' . $visit['last_name'])) ?></b></td>
-              <td><?= esc($visit['no_identitas']) ?></td>
+              <td><?= esc($visit['no_identitas'] ?? '-') ?></td>
               <td><?= esc($visit['tipe_anggota']) ?></td>
               <td>
                 <b><?= $visitDate->toLocalizedString('dd/MM/y') ?></b><br>
@@ -145,16 +150,23 @@
           </tbody>
         </table>
       </div>
+
     </div>
   </div>
 
 <?php else: ?>
+
+  <!-- ── Empty State ── -->
   <div class="card">
     <div class="card-body text-center py-5">
-      <i class="ti ti-database-off fs-1 text-muted"></i>
-      <p class="mt-2 text-muted">Tidak ada data kunjungan<?= $bulan ? ' pada periode ini' : '' ?>.</p>
+      <i class="ti ti-database-off fs-1 text-muted d-block mb-2"></i>
+      <h6 class="fw-semibold">Tidak ada data kunjungan</h6>
+      <p class="text-muted mb-0">
+        <?= $bulan ? 'Tidak ada kunjungan pada periode <b>' . date('F Y', strtotime($bulan . '-01')) . '</b>.' : 'Pilih filter bulan atau tampilkan semua data.' ?>
+      </p>
     </div>
   </div>
+
 <?php endif; ?>
 
 <?= $this->endSection() ?>
