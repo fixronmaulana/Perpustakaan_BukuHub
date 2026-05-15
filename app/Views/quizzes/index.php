@@ -88,6 +88,13 @@
                        class="btn btn-sm btn-primary">
                       <i class="ti ti-list"></i> Kelola soal
                     </a>
+                    <!-- ── Tombol Edit Kuis (BARU) ── -->
+                    <button type="button"
+                            class="btn btn-sm btn-info text-white"
+                            title="Edit Kuis"
+                            onclick="bukaEditKuis(<?= htmlspecialchars(json_encode($quiz), ENT_QUOTES) ?>)">
+                      <i class="ti ti-edit"></i>
+                    </button>
                     <form action="<?= base_url("admin/kuis/{$quiz['id']}/toggle") ?>" method="post">
                       <?= csrf_field() ?>
                       <button type="submit" class="btn btn-sm <?= $quiz['is_active'] ? 'btn-warning' : 'btn-success' ?>"
@@ -171,16 +178,98 @@
   </div>
 </div>
 
+<!-- ── Modal Edit Kuis (BARU) ── -->
+<div class="modal fade" id="modalEditKuis" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="formEditKuis" method="post">
+        <?= csrf_field() ?>
+        <div class="modal-header">
+          <h5 class="modal-title fw-semibold">Edit Kuis</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Pilih Buku <span class="text-danger">*</span></label>
+            <select name="book_id" id="editSelectBuku" class="form-select" required>
+              <option value="">-- Pilih Buku --</option>
+              <?php foreach ($books as $book): ?>
+                <option value="<?= $book['id'] ?>">
+                  <?= esc($book['title']) ?> (<?= esc($book['year']) ?>) — <?= esc($book['author']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nama Kuis <span class="text-danger">*</span></label>
+            <input type="text" name="name" id="editNamaKuis" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi <span class="text-muted small">(opsional)</span></label>
+            <textarea name="description" id="editDeskripsi" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">Durasi (menit) <span class="text-danger">*</span></label>
+              <input type="number" name="duration_minutes" id="editDurasi"
+                     class="form-control" min="1" max="180" required>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">Maks. Percobaan <span class="text-danger">*</span></label>
+              <input type="number" name="max_attempts" id="editMaksPercobaan"
+                     class="form-control" min="1" max="10" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="ti ti-check me-1"></i> Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
+  // Select2 modal tambah kuis
   $('#selectBuku').select2({
     theme: 'bootstrap-5',
     dropdownParent: $('#modalTambahKuis'),
     placeholder: '-- Pilih Buku --',
     allowClear: true,
   });
+
+  // Select2 modal edit kuis
+  $('#editSelectBuku').select2({
+    theme: 'bootstrap-5',
+    dropdownParent: $('#modalEditKuis'),
+    placeholder: '-- Pilih Buku --',
+    allowClear: true,
+  });
+
+  // ── Fungsi buka modal edit kuis (BARU) ──
+  function bukaEditKuis(quiz) {
+    // Isi form dengan data kuis yang dipilih
+    document.getElementById('editNamaKuis').value      = quiz.name;
+    document.getElementById('editDeskripsi').value     = quiz.description ?? '';
+    document.getElementById('editDurasi').value        = quiz.duration_minutes;
+    document.getElementById('editMaksPercobaan').value = quiz.max_attempts;
+
+    // Set nilai select2 buku
+    $('#editSelectBuku').val(quiz.book_id).trigger('change');
+
+    // Set action form ke endpoint update kuis
+    document.getElementById('formEditKuis').action =
+      '<?= base_url('admin/kuis/') ?>' + quiz.id + '/edit';
+
+    // Tampilkan modal
+    new bootstrap.Modal(document.getElementById('modalEditKuis')).show();
+  }
 </script>
 <?= $this->endSection() ?>

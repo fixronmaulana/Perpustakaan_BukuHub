@@ -95,6 +95,7 @@ $routes->group('admin', ['filter' => 'session'], static function (RouteCollectio
     $routes->get('kuis',                        'Admin\QuizzesController::index');
     $routes->post('kuis',                       'Admin\QuizzesController::store');
     $routes->get('kuis/(:num)',                 'Admin\QuizzesController::show/$1');
+    $routes->post('kuis/(:num)/edit',           'Admin\QuizzesController::update/$1');
     $routes->post('kuis/(:num)/soal',           'Admin\QuizzesController::storeQuestion/$1');
     $routes->post('kuis/(:num)/soal/(:num)',    'Admin\QuizzesController::updateQuestion/$1/$2');
     $routes->post('kuis/(:num)/soal/(:num)/edit', 'Admin\QuizzesController::updateQuestion/$1/$2');

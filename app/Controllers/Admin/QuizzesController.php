@@ -74,6 +74,34 @@ class QuizzesController extends BaseController
         return redirect()->to('admin/kuis');
     }
 
+    public function update($id = null)
+    {
+        $quiz = $this->quizModel->find($id);
+        if (empty($quiz)) throw new PageNotFoundException('Kuis tidak ditemukan');
+ 
+        if (!$this->validate([
+            'book_id'          => 'required|integer',
+            'name'             => 'required|max_length[255]',
+            'description'      => 'permit_empty|max_length[1000]',
+            'duration_minutes' => 'required|integer|greater_than[0]',
+            'max_attempts'     => 'required|integer|greater_than[0]',
+        ])) {
+            session()->setFlashdata(['msg' => implode(' ', $this->validator->getErrors()), 'error' => true]);
+            return redirect()->back();
+        }
+ 
+        $this->quizModel->update($id, [
+            'book_id'          => $this->request->getPost('book_id'),
+            'name'             => $this->request->getPost('name'),
+            'description'      => $this->request->getPost('description'),
+            'duration_minutes' => $this->request->getPost('duration_minutes'),
+            'max_attempts'     => $this->request->getPost('max_attempts'),
+        ]);
+ 
+        session()->setFlashdata(['msg' => 'Kuis berhasil diperbarui.']);
+        return redirect()->to('admin/kuis');
+    }
+    
     public function show($id = null)
     {
         $quiz = $this->quizModel
