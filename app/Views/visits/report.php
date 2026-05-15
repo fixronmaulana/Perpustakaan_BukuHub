@@ -154,19 +154,24 @@
     </div>
   </div>
 
-<?php else: ?>
-
-  <!-- ── Empty State ── -->
-  <div class="card">
-    <div class="card-body text-center py-5">
-      <i class="ti ti-database-off fs-1 text-muted d-block mb-2"></i>
-      <h6 class="fw-semibold">Tidak ada data kunjungan</h6>
-      <p class="text-muted mb-0">
-        <?= $bulan ? 'Tidak ada kunjungan pada periode <b>' . date('F Y', strtotime($bulan . '-01')) . '</b>.' : 'Pilih filter bulan atau tampilkan semua data.' ?>
-      </p>
+  <?php elseif ($bulan && empty($visits)): ?>
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="ti ti-database-off fs-1 text-muted d-block mb-2"></i>
+        <h6 class="fw-semibold">Tidak ada data kunjungan</h6>
+        <p class="text-muted mb-0">
+          Tidak ada kunjungan pada periode <b><?= date('F Y', strtotime($bulan . '-01')) ?></b>.
+        </p>
+      </div>
     </div>
-  </div>
-
-<?php endif; ?>
+  <?php elseif (!$bulan): ?>
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <i class="ti ti-filter fs-1 text-muted d-block mb-2"></i>
+        <h6 class="fw-semibold">Pilih periode terlebih dahulu</h6>
+        <p class="text-muted mb-0">Silakan pilih bulan pada filter di atas lalu klik <b>Tampilkan</b>.</p>
+      </div>
+    </div>
+  <?php endif; ?>
 
 <?= $this->endSection() ?>

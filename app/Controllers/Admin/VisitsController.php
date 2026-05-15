@@ -50,28 +50,25 @@ class VisitsController extends BaseController
 
     public function report()
     {
-        $bulan = $this->request->getGet('bulan'); // format: 2026-05
-        
-        $query = $this->visitModel
-            ->select('visits.*, members.first_name, members.last_name, members.no_identitas, members.tipe_anggota')
-            ->join('members', 'visits.member_id = members.id', 'LEFT')
-            ->orderBy('visits.visit_date', 'ASC');
+        $bulan   = $this->request->getGet('bulan');
+        $visits  = null;
+        $summary = null;
 
         if ($bulan) {
-            $query->where('DATE_FORMAT(visits.visit_date, "%Y-%m")', $bulan);
+            $visits = $this->visitModel
+                ->select('visits.*, members.first_name, members.last_name, members.no_identitas, members.tipe_anggota')
+                ->join('members', 'visits.member_id = members.id', 'LEFT')
+                ->orderBy('visits.visit_date', 'ASC')
+                ->where('DATE_FORMAT(visits.visit_date, "%Y-%m")', $bulan)
+                ->findAll();
+
+            $summary = [
+                'total' => count($visits),
+                'murid' => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
+                'guru'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
+                'staf'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
+            ];
         }
-
-        $visits = $query->findAll();
-
-        // Hitung summary
-        $summary = [
-            'total'  => count($visits),
-            'murid'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
-            'guru'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
-            'staf'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
-            'manual' => count(array_filter($visits, fn($v) => $v['method'] === 'manual')),
-            'scan'   => count(array_filter($visits, fn($v) => $v['method'] === 'scan')),
-        ];
 
         return view('visits/report', [
             'visits'  => $visits,
@@ -96,22 +93,18 @@ class VisitsController extends BaseController
         $visits = $query->findAll();
 
         $summary = [
-            'total'  => count($visits),
-            'murid'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
-            'guru'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
-            'staf'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
+            'total' => count($visits),
+            'murid' => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
+            'guru'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
+            'staf'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
             'manual' => count(array_filter($visits, fn($v) => $v['method'] === 'manual')),
             'scan'   => count(array_filter($visits, fn($v) => $v['method'] === 'scan')),
         ];
 
-        // Label periode
-        if ($bulan) {
-            $periodeLabel = \CodeIgniter\I18n\Time::createFromFormat('Y-m', $bulan)->toLocalizedString('MMMM yyyy');
-        } else {
-            $periodeLabel = 'Semua Data';
-        }
+        $periodeLabel = $bulan
+            ? Time::createFromFormat('Y-m', $bulan)->toLocalizedString('MMMM yyyy')
+            : 'Semua Data';
 
-        // Generate HTML untuk PDF
         $html = view('visits/pdf_template', [
             'visits'       => $visits,
             'summary'      => $summary,
@@ -119,7 +112,6 @@ class VisitsController extends BaseController
             'bulan'        => $bulan,
         ]);
 
-        // DOMPDF
         $options = new \Dompdf\Options();
         $options->set('defaultFont', 'Arial');
         $options->set('isHtml5ParserEnabled', true);
@@ -129,7 +121,6 @@ class VisitsController extends BaseController
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        // Nama file
         $namaFile = $bulan
             ? 'laporan-kunjungan-' . $bulan . '.pdf'
             : 'laporan-kunjungan-semua.pdf';
@@ -151,7 +142,10 @@ class VisitsController extends BaseController
             'member_uid' => 'required',
             'visit_date' => [
                 'rules'  => 'required|valid_date',
-                'errors' => ['required' => 'Tanggal kunjungan wajib diisi.', 'valid_date' => 'Format tanggal tidak valid.'],
+                'errors' => [
+                    'required'   => 'Tanggal kunjungan wajib diisi.',
+                    'valid_date' => 'Format tanggal tidak valid.',
+                ],
             ],
             'notes' => 'permit_empty|max_length[500]',
         ])) {
@@ -186,7 +180,7 @@ class VisitsController extends BaseController
         $tanggalInput   = date('Y-m-d', strtotime($this->request->getPost('visit_date')));
         $sudahKunjungan = $this->visitModel
             ->where('member_id', $member['id'])
-            ->where("DATE(visit_date)", $tanggalInput)
+            ->where('DATE(visit_date)', $tanggalInput)
             ->first();
 
         if ($sudahKunjungan) {
@@ -201,11 +195,10 @@ class VisitsController extends BaseController
             'member_id'  => $member['id'],
             'visit_date' => date('Y-m-d H:i:s', strtotime($this->request->getPost('visit_date'))),
             'method'     => 'manual',
-            'notes'      => $this->request->getPost('notes') ?: '—',
+            'notes'      => $this->request->getPost('notes') ?: '-',
         ]);
         $visitId = $this->visitModel->getInsertID();
 
-        // ── Catat poin kunjungan ────────────────────────────
         $poinKunjungan = get_poin_setting('visit');
         catat_poin(
             $member['id'],
@@ -217,12 +210,12 @@ class VisitsController extends BaseController
         );
 
         session()->setFlashdata('success_visit', [
-        'nama' => trim($member['first_name'] . ' ' . $member['last_name']),
-        'no_identitas'  => $member['no_identitas'],
-        'poin' => $poinKunjungan
-]);
+            'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
+            'no_identitas' => $member['no_identitas'],
+            'poin'         => $poinKunjungan,
+        ]);
 
-return redirect()->to('admin/kunjungan');
+        return redirect()->to('admin/kunjungan');
     }
 
     public function scanQr()
@@ -272,7 +265,6 @@ return redirect()->to('admin/kunjungan');
         ]);
         $visitId = $this->visitModel->getInsertID();
 
-        // ── Catat poin kunjungan scan ───────────────────────
         $poinKunjungan = get_poin_setting('visit');
         catat_poin(
             $member['id'],
@@ -282,13 +274,11 @@ return redirect()->to('admin/kunjungan');
             $visitId,
             'visit'
         );
-        // ────────────────────────────────────────────────────
 
-        // Tambahkan 'poin' di dalam return success
         return $this->response->setJSON([
             'success' => true,
             'message' => 'Kunjungan berhasil dicatat.',
-            'poin'    => $poinKunjungan, // Tambahkan ini
+            'poin'    => $poinKunjungan,
             'member'  => [
                 'nama'         => trim($member['first_name'] . ' ' . $member['last_name']),
                 'no_identitas' => $member['no_identitas'],
@@ -325,9 +315,11 @@ return redirect()->to('admin/kunjungan');
         }
 
         $members = $this->memberModel
-            ->like('first_name',     $param, insensitiveSearch: true)
-            ->orLike('last_name',    $param, insensitiveSearch: true)
-            ->orLike('no_identitas', $param, insensitiveSearch: true)
+            ->groupStart()
+                ->like('first_name',     $param, insensitiveSearch: true)
+                ->orLike('last_name',    $param, insensitiveSearch: true)
+                ->orLike('no_identitas', $param, insensitiveSearch: true)
+            ->groupEnd()
             ->where('deleted_at', null)
             ->findAll(10);
 
