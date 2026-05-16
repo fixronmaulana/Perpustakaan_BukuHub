@@ -88,3 +88,50 @@ if (session()->getFlashdata('msg')) : ?>
   </div>
 </div>
 <?= $this->endSection() ?>
+<?= $this->section('scripts') ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+<?php
+$firstLoan    = $newLoans[0] ?? null;
+$totalBuku    = count($newLoans);
+$namaPeminjam = $firstLoan ? esc($firstLoan['first_name'] . ' ' . $firstLoan['last_name']) : '';
+$tglKembali   = $firstLoan ? Time::parse($firstLoan['due_date'])->toLocalizedString('d MMMM yyyy') : '';
+?>
+
+<?php if (!empty($newLoans)) : ?>
+Swal.fire({
+    width: '380px',
+    icon: 'success',
+    title: '<span style="font-size:1.5rem; font-weight:700;">Peminjaman Berhasil!</span>',
+    html: `
+        <p style="color:#6c757d; font-size:0.85rem; margin-top:-6px; margin-bottom:14px;">
+            Peminjaman telah tercatat dalam sistem
+        </p>
+        <div style="background:#cfe2ff; border-radius:10px; padding:14px 16px; margin-bottom:14px;">
+            <span style="font-size:0.78rem; color:#084298; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">
+                Reward Poin Diberikan
+            </span>
+            <div style="font-size:2.2rem; font-weight:700; color:#084298; line-height:1.4;">
+                <?= $poinPeminjaman ?>
+            </div>
+        </div>
+        <div style="font-size:0.85rem; color:#495057; margin-bottom:6px;">
+            <b><?= $namaPeminjam ?></b>
+        </div>
+        <div style="font-size:0.82rem; color:#6c757d;">
+            Batas Kembali: <b style="color:#212529;"><?= $tglKembali ?></b>
+        </div>
+    `,
+    iconColor: '#0d6efd',
+    showConfirmButton: true,
+    confirmButtonText: 'Selesai',
+    buttonsStyling: false,
+    customClass: {
+        popup: 'rounded-4',
+        confirmButton: 'btn btn-primary w-100 py-2 mt-3'
+    }
+});
+<?php endif; ?>
+</script>
+<?= $this->endSection() ?>

@@ -358,7 +358,8 @@ class LoansController extends ResourceController
         }, $newLoanIds);
 
         return view('loans/result', [
-            'newLoans' => $newLoans
+            'newLoans' => $newLoans,
+            'poinPeminjaman' => $poinPeminjaman
         ]);
     }
 

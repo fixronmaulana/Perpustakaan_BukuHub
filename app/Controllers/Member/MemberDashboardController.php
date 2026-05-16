@@ -371,9 +371,14 @@ class MemberDashboardController extends Controller
             }
         }
 
-        // Poin berbasis persentase 100 
         $skor = $total > 0 ? round($benar / $total * 100) : 0;
-        $poin = $skor; 
+        $poin = $skor;
+
+        // ── Ambil total poin sebelum submit ──────────────────
+        $totalSebelum = (int) ($this->pointModel
+            ->selectSum('points')
+            ->where('member_id', $member['id'])
+            ->first()['points'] ?? 0);
 
         $this->attemptModel->insert([
             'quiz_id'     => $quizId,
@@ -386,7 +391,7 @@ class MemberDashboardController extends Controller
         ]);
         $attemptId = $this->attemptModel->getInsertID();
 
-        // ── Catat poin kuis ─────────────────────────────────
+        // ── Catat poin kuis ──────────────────────────────────
         if ($poin > 0) {
             catat_poin(
                 $member['id'],
@@ -397,22 +402,24 @@ class MemberDashboardController extends Controller
                 'quiz_attempt'
             );
         }
-        // ────────────────────────────────────────────────────
+
+        $totalSesudah = $totalSebelum + $poin;
 
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([
-                'poin'  => $poin,
-                'benar' => $benar,
-                'salah' => $salah,
-                'total' => $total,
-                'skor'  => $skor,
+                'poin'          => $poin,
+                'benar'         => $benar,
+                'salah'         => $salah,
+                'total'         => $total,
+                'skor'          => $skor,
+                'total_sebelum' => $totalSebelum,
+                'total_sesudah' => $totalSesudah,
             ]);
         }
 
         session()->setFlashdata(['msg' => "Kuis selesai! Kamu mendapat {$poin} poin."]);
         return redirect()->to('member/pengembalian');
     }
-
     public function leaderboard()
     {
         $member   = $this->getMember();

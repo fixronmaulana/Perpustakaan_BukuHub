@@ -216,47 +216,32 @@ function kirimScan(uid) {
     if (data.success) {
       // --- MODAL REWARD POIN (SESUAI GAMBAR) ---
       Swal.fire({
-          title: '<span style="font-size: 1.25rem; font-weight: bold; color: #333;">Kunjungan Berhasil!</span>',
+          width: '360px',
+          icon: 'success',
+          title: '<span style="font-size:1.5rem; font-weight:700;">Kunjungan Berhasil!</span>',
           html: `
-              <p style="color: #666; font-size: 0.9rem; margin-top: -10px;">Kunjungan tercatat dalam sistem</p>
-              <div class="p-3 mb-3" style="background-color: #eef2ff; border-radius: 15px;">
-                  <div class="d-flex justify-content-center align-items-center mb-1">
-                      <i class="ti ti-star-poly style="color: #1e3a8a; font-size: 1.2rem;"></i>
-                      <span class="mx-2" style="color: #1e3a8a; font-weight: bold; font-size: 1rem;">Mendapat Reward Poin</span>
-                      <i class="ti ti-star-poly style="color: #1e3a8a; font-size: 1.2rem;"></i>
+              <p style="color:#6c757d; font-size:0.82rem; margin-top:-8px; margin-bottom:12px;">
+                  Kunjungan tercatat dalam sistem
+              </p>
+              <div style="background:#d1e7dd; border-radius:10px; padding:10px 16px; margin-bottom:12px;">
+                  <span style="font-size:0.78rem; color:#0f5132; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">
+                      Reward Poin Diberikan
+                  </span>
+                  <div style="font-size:1.8rem; font-weight:700; color:#0f5132; line-height:1.5;">
+                      ${data.poin}
                   </div>
-                  <h2 class="fw-bold" style="font-size: 2.5rem; color: #1e3a8a; margin: 5px 0;">+${data.poin}</h2>
-                  <p class="mb-0 text-muted" style="font-size: 0.85rem;">Poin diberikan ke ${data.member.nama}</p>
               </div>
-              
-              <div class="text-start mb-3" style="font-size: 0.85rem; color: #666;">
-                  <div class="d-flex justify-content-between border-bottom py-1">
-                      <span>Anggota</span>
-                      <span class="text-dark fw-bold">${data.member.nama}</span>
-                  </div>
-                  <div class="d-flex justify-content-between py-1">
-                      <span>ID</span>
-                      <span class="text-dark fw-bold">${data.member.no_identitas}</span>
-                  </div>
+              <div style="font-size:0.82rem; color:#495057;">
+                  <b>${data.member.nama}</b> &nbsp;|&nbsp; ${data.member.no_identitas}
               </div>
           `,
-          icon: 'success',
-          iconColor: '#1e3a8a',
+          iconColor: '#198754',
           showConfirmButton: true,
           confirmButtonText: 'Selesai',
           buttonsStyling: false,
           customClass: {
               popup: 'rounded-4',
-              confirmButton: 'btn btn-primary w-100 py-2' // Membuat tombol lebar penuh
-          },
-          didOpen: () => {
-              // Style khusus untuk menyamai gambar: Rounded sedang & warna #1e3a8a
-              const btn = Swal.getConfirmButton();
-              btn.style.backgroundColor = '#1e3a8a';
-              btn.style.borderRadius = '10px'; // Sesuai dengan gambar, bukan pill
-              btn.style.fontSize = '1rem';
-              btn.style.fontWeight = 'bold';
-              btn.style.border = 'none';
+              confirmButton: 'btn btn-success w-100 py-2 mt-2'
           }
       }).then(() => {
           html5QrcodeScanner.resume();

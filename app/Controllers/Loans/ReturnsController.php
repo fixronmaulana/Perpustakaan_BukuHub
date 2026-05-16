@@ -29,11 +29,6 @@ class ReturnsController extends ResourceController
         helper(['upload', 'point']);
     }
 
-    /**
-     * Return an array of resource objects, themselves in array format
-     *
-     * @return mixed
-     */
     public function index()
     {
         $itemPerPage = 20;
@@ -74,11 +69,6 @@ class ReturnsController extends ResourceController
         return view('returns/index', $data);
     }
 
-    /**
-     * Return the properties of a resource object
-     *
-     * @return mixed
-     */
     public function show($uid = null)
     {
         $loan = $this->loanModel
@@ -165,11 +155,6 @@ class ReturnsController extends ResourceController
         return view('returns/search_loan');
     }
 
-    /**
-     * Return a new resource object, with default properties
-     *
-     * @return mixed
-     */
     public function new()
     {
         $loanUid = $this->request->getVar('loan-uid');
@@ -203,11 +188,6 @@ class ReturnsController extends ResourceController
         return view('returns/create', $data);
     }
 
-    /**
-     * Create a new resource object, from "posted" parameters
-     *
-     * @return mixed
-     */
     public function create()
     {
         $date    = Time::parse($this->request->getVar('date') ?? 'now', locale: 'id');
@@ -221,7 +201,6 @@ class ReturnsController extends ResourceController
         $loanDueDate = Time::parse($loan['due_date'], locale: 'id');
         $isLate      = $date->isAfter($loanDueDate);
 
-        // Ambil data member untuk poin
         $member = $this->memberModel->find($loan['member_id']);
 
         if ($isLate) {
@@ -246,7 +225,7 @@ class ReturnsController extends ResourceController
 
             // ── Catat poin pengembalian terlambat ───────────
             if ($member) {
-                $poin = get_poin_setting('return_late'); // nilai negatif
+                $poin = get_poin_setting('return_late');
                 catat_poin(
                     $member['id'],
                     'return_late',
@@ -256,6 +235,20 @@ class ReturnsController extends ResourceController
                     'loan'
                 );
             }
+            // ────────────────────────────────────────────────
+
+            // ── Flashdata untuk modal terlambat ─────────────
+            session()->setFlashdata([
+                'msg'            => 'Success',
+                'error'          => false,
+                'success_return' => [
+                    'nama'      => $member['first_name'] . ' ' . ($member['last_name'] ?? ''),
+                    'poin'      => $poin ?? 0,
+                    'terlambat' => true,
+                    'hari'      => abs($daysLate),
+                    'denda'     => $totalFine,
+                ]
+            ]);
             // ────────────────────────────────────────────────
 
         } else {
@@ -281,17 +274,23 @@ class ReturnsController extends ResourceController
                 );
             }
             // ────────────────────────────────────────────────
+
+            // ── Flashdata untuk modal tepat waktu ───────────
+            session()->setFlashdata([
+                'msg'            => 'Success',
+                'error'          => false,
+                'success_return' => [
+                    'nama'      => $member['first_name'] . ' ' . ($member['last_name'] ?? ''),
+                    'poin'      => $poin ?? 0,
+                    'terlambat' => false,
+                ]
+            ]);
+            // ────────────────────────────────────────────────
         }
 
-        session()->setFlashdata(['msg' => 'Success', 'error' => false]);
         return redirect()->to('admin/returns');
     }
 
-    /**
-     * Delete the designated resource object from the model
-     *
-     * @return mixed
-     */
     public function delete($uid = null)
     {
         $loans = $this->loanModel

@@ -128,3 +128,50 @@ if (session()->getFlashdata('msg')) : ?>
   </div>
 </div>
 <?= $this->endSection() ?>
+<?= $this->section('scripts') ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+<?php if (session()->getFlashdata('success_return')) :
+    $data = session()->getFlashdata('success_return'); ?>
+
+Swal.fire({
+    width: '380px',
+    icon: '<?= $data['terlambat'] ? 'error' : 'success' ?>',
+    title: '<span style="font-size:1.5rem; font-weight:700;"><?= $data['terlambat'] ? 'Pengembalian Terlambat!' : 'Pengembalian Berhasil!' ?></span>',
+    html: `
+        <p style="color:#6c757d; font-size:0.85rem; margin-top:-6px; margin-bottom:14px;">
+            <?= $data['terlambat'] ? 'Pengembalian melebihi batas waktu' : 'Pengembalian telah tercatat dalam sistem' ?>
+        </p>
+        <div style="background:<?= $data['terlambat'] ? '#f8d7da' : '#ffe5d0' ?>; border-radius:10px; padding:14px 16px; margin-bottom:14px;">
+            <span style="font-size:0.78rem; color:<?= $data['terlambat'] ? '#842029' : '#7c3000' ?>; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">
+                <?= $data['terlambat'] ? 'Pengurangan Poin' : 'Reward Poin Diberikan' ?>
+            </span>
+            <div style="font-size:2.2rem; font-weight:700; color:<?= $data['terlambat'] ? '#842029' : '#7c3000' ?>; line-height:1.4;">
+                <?= $data['poin'] ?>
+            </div>
+        </div>
+        <div style="font-size:0.85rem; color:#495057; margin-bottom:6px;">
+            <b><?= esc($data['nama']) ?></b>
+        </div>
+        <?php if ($data['terlambat']) : ?>
+        <div style="font-size:0.82rem; color:#6c757d; margin-bottom:4px;">
+            Keterlambatan: <b style="color:#dc3545;"><?= $data['hari'] ?> hari</b>
+        </div>
+        <div style="font-size:0.82rem; color:#6c757d;">
+            Total denda: <b style="color:#dc3545;">Rp <?= number_format($data['denda'], 0, ',', '.') ?></b>
+        </div>
+        <?php endif; ?>
+    `,
+    iconColor: '<?= $data['terlambat'] ? '#dc3545' : '#fd7e14' ?>',
+    showConfirmButton: true,
+    confirmButtonText: 'Selesai',
+    buttonsStyling: false,
+    customClass: {
+        popup: 'rounded-4',
+        confirmButton: 'btn <?= $data['terlambat'] ? 'btn-danger' : 'btn-warning' ?> w-100 py-2 mt-3'
+    }
+});
+<?php endif; ?>
+</script>
+<?= $this->endSection() ?>

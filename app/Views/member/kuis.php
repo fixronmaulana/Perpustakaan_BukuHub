@@ -3,364 +3,203 @@
 <?= $this->section('head') ?>
 <title>Kuis — <?= esc($quiz['name']) ?></title>
 <style>
-/* ── Wrapper kuis ── */
-.kuis-wrapper {
-  max-width: 720px;
-  margin: 0 auto;
-}
+/* ══ EXAM MODE ══ */
+.sidebar, .topbar { display: none !important; }
+.member-konten    { margin-left: 0 !important; padding-left: 0 !important; }
+.area-halaman     { padding: 0 !important; margin: 0 !important; }
 
-/* ── Header info kuis ── */
-.kuis-header {
-  background: var(--putih);
-  border: 1px solid var(--batas);
-  border-radius: var(--radius);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+/* ══ Header exam mandiri ══ */
+.exam-topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: #1e3a8a; color: #fff;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1.5rem; gap: 1rem; flex-wrap: wrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
 }
-
-.kuis-judul { font-size: 1rem; font-weight: 700; color: var(--teks); }
-.kuis-sub   { font-size: 0.8rem; color: var(--teks-redup); margin-top: 2px; }
+.exam-topbar-kiri           { display: flex; align-items: center; gap: 12px; }
+.exam-topbar-kiri svg       { stroke: #93c5fd; flex-shrink: 0; }
+.exam-topbar-judul          { font-size: 0.95rem; font-weight: 700; color: #fff; }
+.exam-topbar-sub            { font-size: 0.78rem; color: #93c5fd; margin-top: 1px; }
+.exam-topbar-member         { font-size: 0.8rem; color: #bfdbfe; display: flex; align-items: center; gap: 6px; }
 
 /* Timer */
 .kuis-timer {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--navy);
-  background: #eff4ff;
-  border: 1px solid #c7d7fe;
-  border-radius: 8px;
-  padding: 6px 14px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 1.05rem; font-weight: 700; color: #fff;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 8px; padding: 6px 14px;
 }
-.kuis-timer svg { stroke: var(--navy); }
-.kuis-timer.mepet { color: #c0392b; background: #fde8e8; border-color: #f5c6c6; }
-.kuis-timer.mepet svg { stroke: #c0392b; }
+.kuis-timer svg { stroke: #fff; }
+.kuis-timer.mepet {
+  color: #fca5a5; background: rgba(239,68,68,0.2);
+  border-color: rgba(239,68,68,0.4); animation: kedip 1s infinite;
+}
+.kuis-timer.mepet svg { stroke: #fca5a5; }
+@keyframes kedip { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+/* ══ Body ══ */
+.kuis-body { max-width: 720px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 
 /* Progress */
 .kuis-progress-wrap {
-  background: var(--putih);
-  border: 1px solid var(--batas);
-  border-radius: var(--radius);
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.25rem;
+  background: var(--putih); border: 1px solid var(--batas);
+  border-radius: var(--radius); padding: 1rem 1.5rem; margin-bottom: 1.25rem;
 }
 .kuis-progress-label {
-  font-size: 0.82rem;
-  color: var(--teks-redup);
-  margin-bottom: 6px;
-  display: flex;
-  justify-content: space-between;
+  font-size: 0.82rem; color: var(--teks-redup);
+  margin-bottom: 6px; display: flex; justify-content: space-between;
 }
-.kuis-progress-bar-bg {
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 99px;
-  overflow: hidden;
-}
+.kuis-progress-bar-bg   { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
 .kuis-progress-bar-fill {
-  height: 100%;
-  background: var(--navy-main);
-  border-radius: 99px;
-  transition: width 0.4s ease;
+  height: 100%; background: var(--navy-main);
+  border-radius: 99px; transition: width 0.4s ease;
 }
+
+/* Dot indikator */
+.soal-dots { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.soal-dot  {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #e2e8f0; border: 2px solid #cbd5e1;
+  transition: background 0.2s, border-color 0.2s;
+}
+.soal-dot.aktif         { border-color: var(--navy-main); background: #fff; }
+.soal-dot.dijawab       { background: var(--navy-main); border-color: var(--navy-main); }
+.soal-dot.aktif.dijawab { background: #2563eb; border-color: #1e40af; }
 
 /* Kartu soal */
 .kartu-soal {
-  background: var(--putih);
-  border: 1px solid var(--batas);
-  border-radius: var(--radius);
-  padding: 1.75rem;
-  margin-bottom: 1.25rem;
+  background: var(--putih); border: 1px solid var(--batas);
+  border-radius: var(--radius); padding: 1.75rem; margin-bottom: 1.25rem;
 }
 .nomor-soal {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--navy-main);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.75rem;
+  font-size: 0.78rem; font-weight: 700; color: var(--navy-main);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem;
 }
-.teks-soal {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--teks);
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
+.teks-soal { font-size: 1rem; font-weight: 600; color: var(--teks); line-height: 1.6; margin-bottom: 1.5rem; }
 
-/* Opsi jawaban */
+/* Opsi */
 .opsi-list { display: flex; flex-direction: column; gap: 0.75rem; }
-
 .opsi-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0.85rem 1rem;
-  border: 2px solid var(--batas);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  user-select: none;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0.85rem 1rem; border: 2px solid var(--batas);
+  border-radius: 10px; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s; user-select: none;
 }
-.opsi-item:hover { border-color: var(--navy-main); background: #eff4ff; }
-.opsi-item.terpilih {
-  border-color: var(--navy-main);
-  background: #eff4ff;
-}
+.opsi-item:hover    { border-color: var(--navy-main); background: #eff4ff; }
+.opsi-item.terpilih { border-color: var(--navy-main); background: #eff4ff; }
 .opsi-item input[type="radio"] { display: none; }
-
 .opsi-huruf {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--teks);
-  flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 700; color: var(--teks); flex-shrink: 0;
   transition: background 0.15s, color 0.15s;
 }
-.opsi-item.terpilih .opsi-huruf {
-  background: var(--navy-main);
-  color: #fff;
-}
+.opsi-item.terpilih .opsi-huruf { background: var(--navy-main); color: #fff; }
 .opsi-teks { font-size: 0.9rem; color: var(--teks); }
 
 /* Navigasi */
-.kuis-nav {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
+.kuis-nav { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
 .kuis-nav button {
-  flex: 1;
-  padding: 0.75rem;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.15s;
+  flex: 1; padding: 0.75rem; border-radius: 10px;
+  font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: opacity 0.15s;
 }
-.btn-prev { background: #e2e8f0; color: var(--teks); }
-.btn-prev:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-next { background: var(--navy-main); color: #fff; }
-.btn-submit { background: #16a34a; color: #fff; }
+.btn-prev            { background: #e2e8f0; color: var(--teks); }
+.btn-prev:disabled   { opacity: 0.4; cursor: not-allowed; }
+.btn-next            { background: var(--navy-main); color: #fff; }
+.btn-submit          { background: #16a34a; color: #fff; }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* Modal hasil */
-.modal-hasil-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(3px);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+/* ══ Modal Konfirmasi Back ══ */
+.modal-back-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
+  z-index: 9999; align-items: center; justify-content: center; padding: 1rem;
 }
-.modal-hasil-overlay.tampil { display: flex; }
-
+.modal-back-overlay.tampil { display: flex; }
 @keyframes popIn {
-  from { transform: scale(0.8) translateY(20px); opacity: 0; }
-  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+  from { transform: scale(0.85) translateY(16px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);    opacity: 1; }
 }
-
-.modal-hasil {
-  background: #fff;
-  border-radius: 20px;
-  max-width: 420px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 25px 80px rgba(0,0,0,0.25);
-  animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
-  overflow: hidden;
+.modal-back-box {
+  background: #fff; border-radius: 20px; max-width: 400px; width: 100%;
+  text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+  animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1); overflow: hidden;
 }
-
-/* Header berwarna dinamis */
-.modal-hasil-header {
-  padding: 2rem 1.5rem 1.5rem;
-  position: relative;
+.modal-back-header {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  padding: 1.75rem 1.5rem 1.25rem;
 }
-.modal-hasil-header.bagus  { background: linear-gradient(135deg, #16a34a, #22c55e); }
-.modal-hasil-header.cukup  { background: linear-gradient(135deg, #d97706, #f59e0b); }
-.modal-hasil-header.kurang { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
-
-/* Icon centang */
-.hasil-centang {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-  border: 3px solid rgba(255,255,255,0.5);
+.modal-back-icon {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.45);
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 0.85rem;
 }
-.hasil-centang svg { stroke: #fff; }
-
-.hasil-judul {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 0.25rem;
+.modal-back-icon svg  { stroke: #fff; }
+.modal-back-judul     { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 0.2rem; }
+.modal-back-sub       { font-size: 0.82rem; color: rgba(255,255,255,0.85); }
+.modal-back-nama-kuis { font-size: 0.78rem; color: rgba(255,255,255,0.65); margin-top: 0.4rem; font-style: italic; }
+.modal-back-body      { padding: 1.4rem; }
+.modal-back-body p    { font-size: 0.87rem; color: #64748b; margin-bottom: 1.2rem; line-height: 1.65; }
+.modal-back-actions   { display: flex; flex-direction: column; gap: 0.6rem; }
+.btn-back-submit {
+  width: 100%; padding: 0.8rem; border: none; border-radius: 11px;
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: #fff; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: opacity 0.15s;
 }
-.hasil-subjudul {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.8);
-}
-
-/* Nama kuis */
-.hasil-nama-kuis {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.7);
-  margin-top: 0.5rem;
-  font-style: italic;
-}
-
-/* Body modal */
-.modal-hasil-body {
-  padding: 1.5rem;
-}
-
-/* Poin utama */
-.hasil-poin-wrap {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  border: 2px solid #bbf7d0;
-  border-radius: 14px;
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-.hasil-poin-label {
-  font-size: 0.78rem;
-  color: #16a34a;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  margin-bottom: 0.5rem;
-}
-.hasil-poin-angka {
-  font-size: 3rem;
-  font-weight: 900;
-  color: #15803d;
-  line-height: 1;
-}
-.hasil-poin-satuan {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #16a34a;
-}
-.hasil-poin-total {
-  font-size: 0.78rem;
-  color: #4ade80;
-  margin-top: 0.4rem;
-}
-
-/* Grid statistik */
-.hasil-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
-  margin-bottom: 1.25rem;
-}
-.hasil-stat {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0.6rem 0.5rem;
-}
-.hasil-stat-angka {
-  font-size: 1.3rem;
-  font-weight: 800;
-  line-height: 1.2;
-}
-.hasil-stat-angka.hijau { color: #16a34a; }
-.hasil-stat-angka.merah { color: #dc2626; }
-.hasil-stat-angka.biru  { color: #2563eb; }
-.hasil-stat-label {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  margin-top: 2px;
-}
-
-/* Info member */
-.hasil-info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 0.6rem 1rem;
-  margin-bottom: 1.25rem;
-  font-size: 0.82rem;
-  color: #64748b;
-}
-.hasil-info-row span { font-weight: 600; color: #1e293b; }
-
-/* Tombol selesai */
-.btn-selesai {
-  display: block;
-  width: 100%;
-  padding: 0.85rem;
+.btn-back-submit:hover { opacity: 0.88; }
+.btn-back-lanjut {
+  width: 100%; padding: 0.8rem; border: none; border-radius: 11px;
   background: linear-gradient(135deg, #1e3a8a, #2563eb);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: opacity 0.15s;
-  letter-spacing: 0.3px;
+  color: #fff; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: opacity 0.15s;
 }
-.btn-selesai:hover { opacity: 0.9; color: #fff; }
+.btn-back-lanjut:hover { opacity: 0.88; }
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('pageTitle') ?>Kerjakan Kuis<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<?php
-  $totalSoal = count($questions);
-?>
+<?php $totalSoal = count($questions); ?>
 
-<div class="kuis-wrapper">
-
-  <!-- Header -->
-  <div class="kuis-header">
+<!-- ══ Header Exam Mandiri ══ -->
+<div class="exam-topbar">
+  <div class="exam-topbar-kiri">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 11l3 3L22 4"/>
+      <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+    </svg>
     <div>
-      <div class="kuis-judul"><?= esc($quiz['name']) ?></div>
-      <div class="kuis-sub">
+      <div class="exam-topbar-judul"><?= esc($quiz['name']) ?></div>
+      <div class="exam-topbar-sub">
         <?= esc($quiz['book_title']) ?> · <?= $totalSoal ?> soal · Maks. 100 poin
       </div>
     </div>
-    <div class="kuis-timer" id="timerBox">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2"
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div class="exam-topbar-member">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <?= esc(trim($member['first_name'] . ' ' . $member['last_name'])) ?>
+    </div>
+    <div class="kuis-timer" id="timerBox">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
       </svg>
       <span id="timerTeks">--:--</span>
     </div>
   </div>
+</div>
 
-  <!-- Progress -->
+<!-- ══ Body ══ -->
+<div class="kuis-body">
+
+  <!-- Progress + Dot -->
   <div class="kuis-progress-wrap">
     <div class="kuis-progress-label">
       <span>Progress</span>
@@ -368,11 +207,16 @@
     </div>
     <div class="kuis-progress-bar-bg">
       <div class="kuis-progress-bar-fill" id="progressFill"
-           style="width: <?= round(1/$totalSoal*100) ?>%"></div>
+           style="width:<?= round(1 / $totalSoal * 100) ?>%"></div>
+    </div>
+    <div class="soal-dots" id="soalDots">
+      <?php for ($i = 0; $i < $totalSoal; $i++): ?>
+        <div class="soal-dot <?= $i === 0 ? 'aktif' : '' ?>" id="dot-<?= $i ?>"></div>
+      <?php endfor; ?>
     </div>
   </div>
 
-  <!-- Form kuis -->
+  <!-- Form -->
   <form id="formKuis" action="<?= base_url("member/kuis/{$quiz['id']}/submit") ?>" method="post">
     <?= csrf_field() ?>
     <input type="hidden" name="durasi_detik" id="durasiDetik" value="0">
@@ -380,113 +224,73 @@
 
     <?php foreach ($questions as $idx => $q): ?>
       <div class="kartu-soal soal-panel" id="soal-<?= $idx ?>"
-           style="display: <?= $idx === 0 ? 'block' : 'none' ?>">
-
+           style="display:<?= $idx === 0 ? 'block' : 'none' ?>">
         <div class="nomor-soal">Soal <?= $idx + 1 ?> / <?= $totalSoal ?></div>
         <div class="teks-soal"><?= esc($q['question']) ?></div>
-
         <div class="opsi-list">
           <?php foreach (['A','B','C','D'] as $opt):
             $key = 'option_' . strtolower($opt);
           ?>
             <label class="opsi-item" id="opsi-<?= $idx ?>-<?= $opt ?>">
-              <input type="radio" name="jawaban[<?= $q['id'] ?>]"
+              <input type="radio"
+                     name="jawaban[<?= $q['id'] ?>]"
                      value="<?= $opt ?>"
-                     onchange="pilihOpsi(<?= $idx ?>, '<?= $opt ?>')">
+                     onchange="pilihOpsi(<?= $idx ?>, '<?= $opt ?>', <?= $q['id'] ?>)">
               <div class="opsi-huruf"><?= $opt ?></div>
               <div class="opsi-teks"><?= esc($q[$key]) ?></div>
             </label>
           <?php endforeach; ?>
         </div>
-
       </div>
     <?php endforeach; ?>
 
-    <!-- Navigasi -->
     <div class="kuis-nav">
-      <button type="button" class="btn-prev" id="btnPrev"
-              onclick="pindahSoal(-1)" disabled>
+      <button type="button" class="btn-prev" id="btnPrev" onclick="pindahSoal(-1)" disabled>
         ← Sebelumnya
       </button>
-      <button type="button" class="btn-next" id="btnNext"
-              onclick="pindahSoal(1)"
+      <button type="button" class="btn-next" id="btnNext" onclick="pindahSoal(1)"
               style="display:<?= $totalSoal > 1 ? 'block' : 'none' ?>">
         Selanjutnya →
       </button>
-      <button type="button" class="btn-submit" id="btnSubmit"
-              style="display:<?= $totalSoal === 1 ? 'block' : 'none' ?>"
-              onclick="konfirmasiSubmit()">
+      <button type="button" class="btn-submit" id="btnSubmit" onclick="konfirmasiSubmit()"
+              style="display:<?= $totalSoal === 1 ? 'block' : 'none' ?>">
         Selesai & Kirim ✓
       </button>
     </div>
-
   </form>
 
 </div>
 
-<!-- Modal Hasil -->
-<div class="modal-hasil-overlay" id="modalHasil">
-  <div class="modal-hasil">
-
-    <!-- Header dinamis -->
-    <div class="modal-hasil-header" id="modalHeader">
-      <div class="hasil-centang" id="hasilCentang">
-        <!-- icon berubah via JS -->
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+<!-- ══ Modal Konfirmasi Back ══ -->
+<div class="modal-back-overlay" id="modalKonfirmasiBack">
+  <div class="modal-back-box">
+    <div class="modal-back-header">
+      <div class="modal-back-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
       </div>
-      <div class="hasil-judul" id="hasilJudul">Kuis Selesai!</div>
-      <div class="hasil-subjudul" id="hasilSubjudul">Kerja bagus, terus semangat!</div>
-      <div class="hasil-nama-kuis"><?= esc($quiz['name']) ?></div>
+      <div class="modal-back-judul">Kuis Belum Selesai!</div>
+      <div class="modal-back-sub">Kamu mencoba meninggalkan halaman kuis.</div>
+      <div class="modal-back-nama-kuis"><?= esc($quiz['name']) ?></div>
     </div>
-
-    <!-- Body -->
-    <div class="modal-hasil-body">
-
-      <!-- Poin utama -->
-      <div class="hasil-poin-wrap">
-        <div class="hasil-poin-label">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#16a34a">
-            <path d="M12 2l2.9 6.3L22 9.2l-5 4.9L18.2 22 12 18.6 5.8 22 7 14.1 2 9.2l7.1-.9L12 2z"/>
-          </svg>
-          Poin yang kamu dapatkan
-        </div>
-        <div>
-          <span class="hasil-poin-angka" id="hasilPoinAngka">0</span>
-          <span class="hasil-poin-satuan"> poin</span>
-        </div>
-        <div class="hasil-poin-total" id="hasilPoinTotal">dari total 0 poin</div>
+    <div class="modal-back-body">
+      <p>
+        Jika keluar sekarang, jawaban yang sudah diisi akan
+        <b>otomatis dikumpulkan</b> dan percobaan kuis akan dihitung.
+        Apakah kamu ingin mengumpulkan sekarang?
+      </p>
+      <div class="modal-back-actions">
+        <button class="btn-back-submit" onclick="submitDariBack()">
+          📤 Ya, Kumpulkan & Keluar
+        </button>
+        <button class="btn-back-lanjut" onclick="tutupModalBack()">
+          ← Lanjutkan Kuis
+        </button>
       </div>
-
-      <!-- Statistik 3 kolom -->
-      <div class="hasil-grid">
-        <div class="hasil-stat">
-          <div class="hasil-stat-angka hijau" id="hasilBenar">0</div>
-          <div class="hasil-stat-label">✓ Benar</div>
-        </div>
-        <div class="hasil-stat">
-          <div class="hasil-stat-angka merah" id="hasilSalah">0</div>
-          <div class="hasil-stat-label">✗ Salah</div>
-        </div>
-        <div class="hasil-stat">
-          <div class="hasil-stat-angka biru" id="hasilSkor">0%</div>
-          <div class="hasil-stat-label">Skor</div>
-        </div>
-      </div>
-
-      <!-- Info buku & member -->
-      <div class="hasil-info-row">
-        <div>Buku <span><?= esc($quiz['book_title']) ?></span></div>
-        <div>Anggota <span><?= esc(trim($member['first_name'] . ' ' . $member['last_name'])) ?></span></div>
-      </div>
-
-      <!-- Tombol -->
-      <a href="<?= base_url('member/pengembalian') ?>" class="btn-selesai">
-        Selesai & Kembali →
-      </a>
-
     </div>
   </div>
 </div>
@@ -494,18 +298,20 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 const TOTAL_SOAL   = <?= $totalSoal ?>;
 const DURASI_DETIK = <?= $quiz['duration_minutes'] * 60 ?>;
-const QUIZ_ID      = <?= $quiz['id'] ?>;
+const URL_KEMBALI  = '<?= base_url('member/pengembalian') ?>';
 
-let soalAktif  = 0;
-let jawaban    = {}; // { question_id: opsi }
-let timerSisa  = DURASI_DETIK;
-let timerStart = Date.now();
+let soalAktif   = 0;
+let jawaban     = {};
+let timerSisa   = DURASI_DETIK;
+let timerStart  = Date.now();
 let interval;
+let sudahSubmit = false;
 
-// ── Timer ────────────────────────────────────────────────
+// ── Timer ─────────────────────────────────────────────────
 function startTimer() {
   interval = setInterval(() => {
     timerSisa--;
@@ -515,14 +321,30 @@ function startTimer() {
     const s = String(timerSisa % 60).padStart(2, '0');
     document.getElementById('timerTeks').textContent = `${m}:${s}`;
 
-    if (timerSisa <= 60) {
-      document.getElementById('timerBox').classList.add('mepet');
-    }
-    if (timerSisa <= 0) {
-      clearInterval(interval);
-      submitKuis();
-    }
+    if (timerSisa <= 60) document.getElementById('timerBox').classList.add('mepet');
+    if (timerSisa <= 0)  { clearInterval(interval); submitKuis(); }
   }, 1000);
+}
+
+// ── Dot indikator ─────────────────────────────────────────
+function updateDots() {
+  for (let i = 0; i < TOTAL_SOAL; i++) {
+    const dot     = document.getElementById(`dot-${i}`);
+    const checked = document.querySelector(`#soal-${i} input[type="radio"]:checked`);
+    dot.className = 'soal-dot';
+    if (checked)         dot.classList.add('dijawab');
+    if (i === soalAktif) dot.classList.add('aktif');
+  }
+}
+
+// ── Pilih opsi ────────────────────────────────────────────
+function pilihOpsi(idx, opt, questionId) {
+  ['A','B','C','D'].forEach(o =>
+    document.getElementById(`opsi-${idx}-${o}`)?.classList.remove('terpilih')
+  );
+  document.getElementById(`opsi-${idx}-${opt}`)?.classList.add('terpilih');
+  jawaban[questionId] = opt;
+  updateDots();
 }
 
 // ── Navigasi soal ─────────────────────────────────────────
@@ -531,39 +353,43 @@ function pindahSoal(arah) {
   soalAktif += arah;
   document.getElementById(`soal-${soalAktif}`).style.display = 'block';
 
-  document.getElementById('btnPrev').disabled   = soalAktif === 0;
-  document.getElementById('btnNext').style.display    = soalAktif < TOTAL_SOAL - 1 ? '' : 'none';
-  document.getElementById('btnSubmit').style.display  = soalAktif === TOTAL_SOAL - 1 ? '' : 'none';
+  ['A','B','C','D'].forEach(o =>
+    document.getElementById(`opsi-${soalAktif}-${o}`)?.classList.remove('terpilih')
+  );
+  const checked = document.querySelector(`#soal-${soalAktif} input[type="radio"]:checked`);
+  if (checked) document.getElementById(`opsi-${soalAktif}-${checked.value}`)?.classList.add('terpilih');
+
+  document.getElementById('btnPrev').disabled        = soalAktif === 0;
+  document.getElementById('btnNext').style.display   = soalAktif < TOTAL_SOAL - 1 ? '' : 'none';
+  document.getElementById('btnSubmit').style.display = soalAktif === TOTAL_SOAL - 1 ? '' : 'none';
 
   const persen = Math.round((soalAktif + 1) / TOTAL_SOAL * 100);
-  document.getElementById('progressFill').style.width = persen + '%';
+  document.getElementById('progressFill').style.width  = persen + '%';
   document.getElementById('labelProgress').textContent = `Soal ${soalAktif + 1} dari ${TOTAL_SOAL}`;
+  updateDots();
 }
 
-// ── Pilih opsi ───────────────────────────────────────────
-function pilihOpsi(idx, opt) {
-  // Hapus terpilih di soal ini
-  ['A','B','C','D'].forEach(o => {
-    document.getElementById(`opsi-${idx}-${o}`)?.classList.remove('terpilih');
-  });
-  document.getElementById(`opsi-${idx}-${opt}`)?.classList.add('terpilih');
-}
-
-// ── Konfirmasi submit ────────────────────────────────────
+// ── Konfirmasi submit normal ──────────────────────────────
 function konfirmasiSubmit() {
   const belumDijawab = TOTAL_SOAL - Object.keys(jawaban).length;
-  if (belumDijawab > 0) {
-    if (!confirm(`Masih ada ${belumDijawab} soal yang belum dijawab. Yakin ingin mengirim?`)) return;
-  } else {
-    if (!confirm('Yakin ingin mengirim jawaban?')) return;
-  }
+  const pesan = belumDijawab > 0
+    ? `Masih ada ${belumDijawab} soal yang belum dijawab. Yakin ingin mengirim?`
+    : 'Semua soal sudah dijawab. Yakin ingin mengirim?';
+  if (!confirm(pesan)) return;
   submitKuis();
 }
 
-// ── Submit via AJAX ──────────────────────────────────────
+// ── Submit via AJAX ───────────────────────────────────────
 function submitKuis() {
+  if (sudahSubmit) return;
+  sudahSubmit = true;
+
   clearInterval(interval);
   document.getElementById('durasiDetik').value = Math.floor((Date.now() - timerStart) / 1000);
+
+  const btnSubmit       = document.getElementById('btnSubmit');
+  btnSubmit.disabled    = true;
+  btnSubmit.textContent = 'Mengirim...';
 
   const form     = document.getElementById('formKuis');
   const formData = new FormData(form);
@@ -575,63 +401,154 @@ function submitKuis() {
   })
   .then(r => r.json())
   .then(data => tampilHasil(data))
-  .catch(() => { form.submit(); }); // fallback jika AJAX gagal
+  .catch(() => { form.submit(); });
 }
 
-// ── Tampil modal hasil ───────────────────────────────────
+// ── Tampil hasil dengan SweetAlert2 (konsisten dengan pengembalian) ──
 function tampilHasil(data) {
-  // Isi statistik
-  document.getElementById('hasilPoinAngka').textContent = data.poin;
-  document.getElementById('hasilPoinTotal').textContent = `dari total 100 poin`;
-  document.getElementById('hasilBenar').textContent     = data.benar;
-  document.getElementById('hasilSalah').textContent     = data.salah;
-  document.getElementById('hasilSkor').textContent      = data.skor + '%';
+  window.onbeforeunload = null;
+  document.getElementById('modalKonfirmasiBack').classList.remove('tampil');
 
-  const header = document.getElementById('modalHeader');
+  // Tentukan warna & teks berdasarkan skor
+  const bagus  = data.skor >= 70;
+  const cukup  = data.skor >= 40 && data.skor < 70;
 
-  if (data.skor >= 70) {
-    header.className        = 'modal-hasil-header bagus';
-    document.getElementById('hasilJudul').textContent    = 'Luar Biasa! 🎉';
-    document.getElementById('hasilSubjudul').textContent = 'Kamu berhasil menjawab dengan sangat baik!';
-  } else if (data.skor >= 40) {
-    header.className        = 'modal-hasil-header cukup';
-    document.getElementById('hasilJudul').textContent    = 'Cukup Baik! 👍';
-    document.getElementById('hasilSubjudul').textContent = 'Tingkatkan lagi di percobaan berikutnya!';
-  } else {
-    header.className        = 'modal-hasil-header kurang';
-    document.getElementById('hasilJudul').textContent    = 'Terus Belajar! 📚';
-    document.getElementById('hasilSubjudul').textContent = 'Jangan menyerah, coba lagi ya!';
-  }
+  const iconColor  = bagus ? '#16a34a' : cukup ? '#d97706' : '#2563eb';
+  const warnaBg    = bagus ? '#d1fae5' : cukup ? '#fef3c7' : '#dbeafe';
+  const warnaTeks  = bagus ? '#065f46' : cukup ? '#78350f' : '#1e3a8a';
+  const btnClass   = bagus ? 'btn-success' : cukup ? 'btn-warning' : 'btn-primary';
+  const judulTeks  = bagus ? 'Luar Biasa! 🎉' : cukup ? 'Cukup Baik! 👍' : 'Terus Belajar! 📚';
+  const subTeks    = bagus
+    ? 'Kamu menjawab dengan sangat baik!'
+    : cukup
+      ? 'Tingkatkan lagi di percobaan berikutnya!'
+      : 'Jangan menyerah, kamu pasti bisa!';
+  const iconSwal   = bagus ? 'success' : cukup ? 'warning' : 'info';
 
-  // Animasi angka poin (count up)
-  let current = 0;
-  const target  = data.poin;
-  const step    = Math.ceil(target / 30);
-  const counter = setInterval(() => {
-    current = Math.min(current + step, target);
-    document.getElementById('hasilPoinAngka').textContent = current;
-    if (current >= target) clearInterval(counter);
-  }, 30);
+  Swal.fire({
+    width: '380px',
+    icon: iconSwal,
+    iconColor: iconColor,
+    title: `<span style="font-size:1.5rem; font-weight:700;">${judulTeks}</span>`,
+    html: `
+      <p style="color:#6c757d; font-size:0.85rem; margin-top:-6px; margin-bottom:14px;">
+        ${subTeks}
+      </p>
 
-  document.getElementById('modalHasil').classList.add('tampil');
+      <!-- Kotak reward poin -->
+      <div style="background:${warnaBg}; border-radius:10px; padding:14px 16px; margin-bottom:14px;">
+        <span style="font-size:0.78rem; color:${warnaTeks}; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">
+          Reward Poin Kuis
+        </span>
+        <div style="font-size:2.2rem; font-weight:700; color:${warnaTeks}; line-height:1.4;">
+          ${data.poin}
+        </div>
+        <div style="font-size:0.8rem; color:${warnaTeks}; opacity:0.8; margin-top:2px;">
+          Total poin kuis yang didapat
+        </div>
+      </div>
+
+      <!-- Poin sebelum → sesudah -->
+      <div style="font-size:0.85rem; color:#6c757d; margin-bottom:14px;">
+        ${data.total_sebelum} <span style="color:#16a34a; font-weight:700;">→</span>
+        <b style="color:#15803d;">${data.total_sesudah}</b>
+      </div>
+
+      <!-- Statistik benar / salah / skor -->
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 6px;">
+          <div style="font-size:1.3rem; font-weight:800; color:#16a34a;">${data.benar}</div>
+          <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">✓ Benar</div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 6px;">
+          <div style="font-size:1.3rem; font-weight:800; color:#dc2626;">${data.salah}</div>
+          <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">✗ Salah</div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 6px;">
+          <div style="font-size:1.3rem; font-weight:800; color:#2563eb;">${data.skor}%</div>
+          <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">Skor</div>
+        </div>
+      </div>
+
+      <!-- Info buku & anggota -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; text-align:left;">
+          <div style="font-size:0.68rem; color:#94a3b8; margin-bottom:2px;">Buku</div>
+          <div style="font-size:0.82rem; font-weight:700; color:#1e293b;"><?= esc($quiz['book_title']) ?></div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; text-align:left;">
+          <div style="font-size:0.68rem; color:#94a3b8; margin-bottom:2px;">Anggota</div>
+          <div style="font-size:0.82rem; font-weight:700; color:#1e293b;"><?= esc(trim($member['first_name'] . ' ' . $member['last_name'])) ?></div>
+        </div>
+      </div>
+    `,
+    showConfirmButton: true,
+    confirmButtonText: 'Selesai',
+    buttonsStyling: false,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    customClass: {
+      popup:         'rounded-4',
+      confirmButton: 'swal-btn-selesai',
+    },
+    didRender: () => {
+      // Warna tombol selalu hijau, pakai inline style agar tidak bergantung Bootstrap
+      const btnColor = bagus ? '#16a34a' : cukup ? '#d97706' : '#1e3a8a';
+      const btn = document.querySelector('.swal-btn-selesai');
+      if (btn) {
+        btn.style.cssText = `
+          display: block;
+          width: 100%;
+          padding: 0.65rem 1rem;
+          margin-top: 12px;
+          background: ${btnColor};
+          color: #fff;
+          border: none;
+          border-radius: 10px;
+          font-size: 0.95rem;
+          font-weight: 700;
+          cursor: pointer;
+          letter-spacing: 0.3px;
+          transition: opacity 0.15s;
+        `;
+        btn.onmouseover = () => btn.style.opacity = '0.88';
+        btn.onmouseout  = () => btn.style.opacity = '1';
+      }
+    },
+  }).then(() => {
+    window.location.href = URL_KEMBALI;
+  });
 }
 
-// ── Sinkron jawaban dari radio ke objek jawaban ──────────
-document.getElementById('formKuis').addEventListener('change', function(e) {
-  if (e.target.type === 'radio') {
-    const name = e.target.name; // jawaban[id]
-    const id   = name.match(/\d+/)[0];
-    jawaban[id] = e.target.value;
+// ── Modal Konfirmasi Back ─────────────────────────────────
+function submitDariBack() {
+  document.getElementById('modalKonfirmasiBack').classList.remove('tampil');
+  submitKuis();
+}
+
+function tutupModalBack() {
+  document.getElementById('modalKonfirmasiBack').classList.remove('tampil');
+  history.pushState({ kuisAktif: true }, '', window.location.href);
+}
+
+// ── Init ──────────────────────────────────────────────────
+startTimer();
+updateDots();
+
+history.pushState({ kuisAktif: true }, '', window.location.href);
+
+window.addEventListener('popstate', function(e) {
+  if (!sudahSubmit) {
+    history.pushState({ kuisAktif: true }, '', window.location.href);
+    document.getElementById('modalKonfirmasiBack').classList.add('tampil');
   }
 });
 
-// ── Init ─────────────────────────────────────────────────
-startTimer();
-
-// Cegah keluar halaman tidak sengaja
 window.addEventListener('beforeunload', function(e) {
-  e.preventDefault();
-  e.returnValue = '';
+  if (!sudahSubmit) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
 });
 </script>
 <?= $this->endSection() ?>
