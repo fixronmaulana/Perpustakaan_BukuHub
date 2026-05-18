@@ -261,27 +261,6 @@
         </tbody>
       </table>
     </div>
-
-    <hr>
-    <h6 class="fw-semibold mb-3">📌 Variabel yang tersedia dalam template</h6>
-    <div class="row">
-      <?php
-      $vars = [
-        '{nama}'            => 'Nama lengkap member',
-        '{judul_buku}'      => 'Judul buku yang dipinjam',
-        '{tgl_pinjam}'      => 'Tanggal peminjaman',
-        '{tgl_jatuh_tempo}' => 'Tanggal jatuh tempo',
-        '{hari_tersisa}'    => 'Sisa hari sebelum jatuh tempo',
-        '{hari_terlambat}'  => 'Jumlah hari keterlambatan',
-      ];
-      foreach ($vars as $var => $desc) : ?>
-        <div class="col-12 col-md-4 mb-2">
-          <code class="text-primary"><?= $var ?></code><br>
-          <small class="text-muted"><?= $desc ?></small>
-        </div>
-      <?php endforeach; ?>
-    </div>
-
   </div>
 </div>
 

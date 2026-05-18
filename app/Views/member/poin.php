@@ -74,38 +74,6 @@ $warnaBorder = [
       <canvas style="padding: 1rem;" id="chartPoin"></canvas>
     </div>
   </div>
-
-  <div class="kotak-konten">
-    <div class="kepala-kotak">
-      <h3 style="margin:0">Breakdown Aktivitas</h3>
-    </div>
-    <div style="padding-top: 0.5rem">
-      <?php
-        $breakdown = [
-          'visit'         => ['label' => 'Kunjungan',    'icon' => 'ti-door-enter',        'warna' => '#16a34a', 'bg' => '#f0fdf4'],
-          'loan'          => ['label' => 'Peminjaman',   'icon' => 'ti-book',              'warna' => '#2563eb', 'bg' => '#eff6ff'],
-          'return_ontime' => ['label' => 'Tepat Waktu',  'icon' => 'ti-check',             'warna' => '#16a34a', 'bg' => '#f0fdf4'],
-          'return_late'   => ['label' => 'Terlambat',    'icon' => 'ti-clock-exclamation', 'warna' => '#dc2626', 'bg' => '#fef2f2'],
-          'quiz'          => ['label' => 'Kuis Buku',    'icon' => 'ti-help-circle',       'warna' => '#7c3aed', 'bg' => '#f5f3ff'],
-        ];
-        foreach ($breakdown as $type => $info):
-          $poin = $poinPerAktivitas[$type] ?? 0;
-          $isPos = $poin >= 0;
-      ?>
-        <div style="display:flex;align-items:center;gap:12px;padding:0.85rem 1rem;border-bottom:1px solid #f1f5f9">
-          <div style="width:36px;height:36px;border-radius:8px;background:<?= $info['bg'] ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <i class="ti <?= $info['icon'] ?>" style="color:<?= $info['warna'] ?>;font-size:1.1rem"></i>
-          </div>
-          <div style="flex:1">
-            <div style="font-size:0.85rem;font-weight:600;color:#1e293b"><?= $info['label'] ?></div>
-          </div>
-          <div style="font-size:0.95rem;font-weight:700;color:<?= $isPos ? '#16a34a' : '#dc2626' ?>">
-            <?= ($isPos ? '+' : '') . $poin ?>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
-  </div>
 </div>
 
 <div class="kotak-konten">
