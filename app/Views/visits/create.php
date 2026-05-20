@@ -214,7 +214,7 @@ function kirimScan(uid) {
     pesanSpan.textContent  = data.message;
 
     if (data.success) {
-      // --- MODAL REWARD POIN (SESUAI GAMBAR) ---
+      // --- MODAL REWARD POIN ---
       Swal.fire({
           width: '360px',
           icon: 'success',
@@ -249,14 +249,13 @@ function kirimScan(uid) {
           hasilDiv.style.display = 'none';
       });
 
-      // Update tampilan alert lama (opsional tetap dipertahankan)
       alertDiv.className = 'alert alert-success alert-dismissible fade show';
       infoDiv.style.display = 'block';
       document.getElementById('namaMemberScan').textContent      = data.member.nama;
       document.getElementById('identitasMemberScan').textContent = data.member.no_identitas + ' — ' + data.member.tipe;
 
     } else {
-      // --- MODAL PERINGATAN (MISAL SUDAH ABSEN) ---
+      // --- MODAL PERINGATAN SUDAH KUNJUNGAN ---
       Swal.fire({
         title: 'Perhatian',
         text: data.message,

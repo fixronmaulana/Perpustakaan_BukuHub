@@ -19,21 +19,27 @@
         <h5 class="card-title fw-semibold mb-0">
           <i class="ti ti-file-analytics me-1"></i> Laporan Kunjungan
         </h5>
-        <small class="text-muted">Filter data kunjungan berdasarkan periode bulan</small>
+        <small class="text-muted">Filter data kunjungan berdasarkan rentang tanggal</small>
       </div>
       <div class="col-12 col-lg-6">
         <form action="" method="get" class="d-flex gap-2 justify-content-lg-end align-items-end flex-wrap">
           <div>
-            <label class="form-label mb-1 small fw-semibold">Filter Bulan</label>
-            <input type="month" class="form-control" name="bulan"
-                   value="<?= esc($bulan ?? '') ?>"
-                   max="<?= date('Y-m') ?>">
+            <label class="form-label mb-1 small fw-semibold">Dari Tanggal</label>
+            <input type="date" class="form-control" name="dari_tanggal"
+                   value="<?= esc($dariTanggal ?? '') ?>"
+                   max="<?= date('Y-m-d') ?>">
+          </div>
+          <div>
+            <label class="form-label mb-1 small fw-semibold">Sampai Tanggal</label>
+            <input type="date" class="form-control" name="sampai_tanggal"
+                   value="<?= esc($sampaiTanggal ?? '') ?>"
+                   max="<?= date('Y-m-d') ?>">
           </div>
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary">
               <i class="ti ti-search me-1"></i> Tampilkan
             </button>
-            <?php if ($bulan): ?>
+            <?php if ($dariTanggal && $sampaiTanggal): ?>
               <a href="<?= base_url('admin/kunjungan/laporan') ?>" class="btn btn-outline-secondary">
                 <i class="ti ti-x"></i> Reset
               </a>
@@ -90,19 +96,22 @@
         <div class="col-12 col-lg-6">
           <h5 class="card-title fw-semibold mb-0">Detail Kunjungan</h5>
           <small class="text-muted">
-            Periode: <b><?= $bulan ? date('F Y', strtotime($bulan . '-01')) : 'Semua Data' ?></b>
-            &mdash; <?= $summary['total'] ?> data ditemukan
+            <?php if ($dariTanggal && $sampaiTanggal): ?>
+              Periode: <b><?= date('d/m/Y', strtotime($dariTanggal)) ?></b>
+              &mdash; <b><?= date('d/m/Y', strtotime($sampaiTanggal)) ?></b>
+              &nbsp;&mdash;&nbsp; <?= $summary['total'] ?> data ditemukan
+            <?php endif; ?>
           </small>
         </div>
         <div class="col-12 col-lg-6 d-flex justify-content-lg-end mt-2 mt-lg-0">
           <div class="d-flex gap-2">
-            <a href="<?= base_url('admin/kunjungan/laporan/export') . ($bulan ? '?bulan=' . $bulan . '&preview=1' : '?preview=1') ?>"
+            <a href="<?= base_url('admin/kunjungan/laporan/export') ?>?dari_tanggal=<?= $dariTanggal ?>&sampai_tanggal=<?= $sampaiTanggal ?>&preview=1"
               target="_blank"
               class="btn btn-outline-danger d-inline-flex align-items-center gap-1">
               <i class="ti ti-eye" style="font-size:1rem;"></i>
               <span>Preview PDF</span>
             </a>
-            <a href="<?= base_url('admin/kunjungan/laporan/export') . ($bulan ? '?bulan=' . $bulan : '') ?>"
+            <a href="<?= base_url('admin/kunjungan/laporan/export') ?>?dari_tanggal=<?= $dariTanggal ?>&sampai_tanggal=<?= $sampaiTanggal ?>"
               class="btn btn-danger d-inline-flex align-items-center gap-1">
               <i class="ti ti-file-type-pdf" style="font-size:1rem;"></i>
               <span>Export PDF</span>
@@ -154,22 +163,24 @@
     </div>
   </div>
 
-  <?php elseif ($bulan && empty($visits)): ?>
+  <?php elseif ($dariTanggal && $sampaiTanggal && empty($visits)): ?>
     <div class="card">
       <div class="card-body text-center py-5">
         <i class="ti ti-database-off fs-1 text-muted d-block mb-2"></i>
         <h6 class="fw-semibold">Tidak ada data kunjungan</h6>
         <p class="text-muted mb-0">
-          Tidak ada kunjungan pada periode <b><?= date('F Y', strtotime($bulan . '-01')) ?></b>.
+          Tidak ada kunjungan pada periode
+          <b><?= date('d/m/Y', strtotime($dariTanggal)) ?></b> —
+          <b><?= date('d/m/Y', strtotime($sampaiTanggal)) ?></b>.
         </p>
       </div>
     </div>
-  <?php elseif (!$bulan): ?>
+  <?php elseif (!$dariTanggal || !$sampaiTanggal): ?>
     <div class="card">
       <div class="card-body text-center py-5">
         <i class="ti ti-filter fs-1 text-muted d-block mb-2"></i>
-        <h6 class="fw-semibold">Pilih periode terlebih dahulu</h6>
-        <p class="text-muted mb-0">Silakan pilih bulan pada filter di atas lalu klik <b>Tampilkan</b>.</p>
+        <h6 class="fw-semibold">Pilih rentang tanggal terlebih dahulu</h6>
+        <p class="text-muted mb-0">Isi <b>Dari Tanggal</b> dan <b>Sampai Tanggal</b> lalu klik <b>Tampilkan</b>.</p>
       </div>
     </div>
   <?php endif; ?>

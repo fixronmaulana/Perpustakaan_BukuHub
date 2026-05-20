@@ -50,16 +50,18 @@ class VisitsController extends BaseController
 
     public function report()
     {
-        $bulan   = $this->request->getGet('bulan');
+        $dariTanggal = $this->request->getGet('dari_tanggal');
+        $sampaiTanggal = $this->request->getGet('sampai_tanggal');
         $visits  = null;
         $summary = null;
 
-        if ($bulan) {
+        if ($dariTanggal && $sampaiTanggal) {
             $visits = $this->visitModel
                 ->select('visits.*, members.first_name, members.last_name, members.no_identitas, members.tipe_anggota')
                 ->join('members', 'visits.member_id = members.id', 'LEFT')
                 ->orderBy('visits.visit_date', 'ASC')
-                ->where('DATE_FORMAT(visits.visit_date, "%Y-%m")', $bulan)
+                ->where('DATE(visits.visit_date) >=', $dariTanggal)
+                ->where('DATE(visits.visit_date) <=', $sampaiTanggal)
                 ->findAll();
 
             $summary = [
@@ -71,45 +73,50 @@ class VisitsController extends BaseController
         }
 
         return view('visits/report', [
-            'visits'  => $visits,
-            'summary' => $summary,
-            'bulan'   => $bulan,
+            'visits'        => $visits,
+            'summary'       => $summary,
+            'dariTanggal'   => $dariTanggal,
+            'sampaiTanggal' => $sampaiTanggal,
         ]);
     }
 
     public function exportPdf()
     {
-        $bulan = $this->request->getGet('bulan');
+        $dariTanggal   = $this->request->getGet('dari_tanggal');
+        $sampaiTanggal = $this->request->getGet('sampai_tanggal');
 
         $query = $this->visitModel
             ->select('visits.*, members.first_name, members.last_name, members.no_identitas, members.tipe_anggota')
             ->join('members', 'visits.member_id = members.id', 'LEFT')
             ->orderBy('visits.visit_date', 'ASC');
 
-        if ($bulan) {
-            $query->where('DATE_FORMAT(visits.visit_date, "%Y-%m")', $bulan);
+        if ($dariTanggal && $sampaiTanggal) {
+            $query->where('DATE(visits.visit_date) >=', $dariTanggal)
+                ->where('DATE(visits.visit_date) <=', $sampaiTanggal);
         }
 
         $visits = $query->findAll();
 
         $summary = [
-            'total' => count($visits),
-            'murid' => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
-            'guru'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
-            'staf'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
+            'total'  => count($visits),
+            'murid'  => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Murid')),
+            'guru'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Guru')),
+            'staf'   => count(array_filter($visits, fn($v) => $v['tipe_anggota'] === 'Staf')),
             'manual' => count(array_filter($visits, fn($v) => $v['method'] === 'manual')),
             'scan'   => count(array_filter($visits, fn($v) => $v['method'] === 'scan')),
         ];
 
-        $periodeLabel = $bulan
-            ? Time::createFromFormat('Y-m', $bulan)->toLocalizedString('MMMM yyyy')
-            : 'Semua Data';
+        // Label periode
+        if ($dariTanggal && $sampaiTanggal) {
+            $periodeLabel = date('d/m/Y', strtotime($dariTanggal)) . ' — ' . date('d/m/Y', strtotime($sampaiTanggal));
+        } else {
+            $periodeLabel = 'Semua Data';
+        }
 
         $html = view('visits/pdf_template', [
             'visits'       => $visits,
             'summary'      => $summary,
             'periodeLabel' => $periodeLabel,
-            'bulan'        => $bulan,
         ]);
 
         $options = new \Dompdf\Options();
@@ -121,14 +128,13 @@ class VisitsController extends BaseController
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        $namaFile = $bulan
-            ? 'laporan-kunjungan-' . $bulan . '.pdf'
+        $namaFile = $dariTanggal && $sampaiTanggal
+            ? 'laporan-kunjungan-' . $dariTanggal . '-sd-' . $sampaiTanggal . '.pdf'
             : 'laporan-kunjungan-semua.pdf';
 
         $isPreview = $this->request->getGet('preview') === '1';
         $dompdf->stream($namaFile, ['Attachment' => !$isPreview]);
     }
-
     public function create()
     {
         return view('visits/create', [

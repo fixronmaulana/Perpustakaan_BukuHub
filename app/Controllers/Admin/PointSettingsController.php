@@ -25,7 +25,6 @@ class PointSettingsController extends BaseController
         $bulanIni = (int) date('n');
         $tahunIni = (int) date('Y');
 
-        // Ambil hadiah bulan ini (untuk form edit)
         $hadiahBulanIni = $this->rewardModel->getHadiahBulan($bulanIni, $tahunIni);
 
         // Riwayat hadiah bulan-bulan sebelumnya
@@ -64,7 +63,7 @@ class PointSettingsController extends BaseController
         return redirect()->to('admin/pengaturan-poin');
     }
 
-    // ── Simpan / update hadiah ──────────────────────────────
+    // ── Simpan / update hadiah
     public function storeHadiah()
     {
         if (!$this->validate([
