@@ -127,13 +127,20 @@
         <thead>
           <tr>
             <th>Judul Buku</th>
+            <th>Tgl Pinjam</th>
             <th>Tenggat</th>
             <th class="teks-center">Status</th>
           </tr>
         </thead>
         <tbody>
           <?php if (empty($pinjamanAktif)): ?>
-            <tr><td colspan="3" class="text-center py-4">Tidak ada peminjaman aktif</td></tr>
+            <tr>
+              <td colspan="4">
+                <div class="kondisi-kosong" style="padding: 40px 0; text-align: center;">
+                  <p style="color: #94a3b8;">Tidak ada peminjaman aktif</p>
+                </div>
+              </td>
+            </tr>
           <?php else: ?>
             <?php foreach ($pinjamanAktif as $loan):
               $dueDate = Time::parse($loan['due_date']);
@@ -147,6 +154,9 @@
                 <td class="judul-tabel-wrapper">
                   <div class="judul-tabel"><?= esc($loan['title']) ?> (<?= esc($loan['year']) ?>)</div>
                   <div class="penulis-tabel">Author: <?= esc($loan['author']) ?></div>
+                </td>
+                <td style="white-space:nowrap">
+                  <?= Time::parse($loan['loan_date'])->format('d/m/Y') ?>
                 </td>
                 <td style="white-space:nowrap" class="<?= $isLate ? 'tgl-terlambat' : 'tgl-normal' ?>">
                   <?= $dueDate->format('d/m/Y') ?>
@@ -180,7 +190,13 @@
         </thead>
         <tbody>
           <?php if (empty($pengembalianTerakhir)): ?>
-            <tr><td colspan="4" class="text-center py-4">Belum ada riwayat pengembalian</td></tr>
+            <tr>
+              <td colspan="4">
+                <div class="kondisi-kosong" style="padding: 40px 0; text-align: center;">
+                  <p style="color: #94a3b8;">Belum ada riwayat pengembalian</p>
+                </div>
+              </td>
+            </tr>
           <?php else: ?>
             <?php foreach ($pengembalianTerakhir as $ret):
               $isLate = $ret['is_late'];

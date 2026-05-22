@@ -65,7 +65,13 @@
       </thead>
       <tbody>
         <?php if (empty($returns)): ?>
-          <tr><td colspan="8" class="text-center py-5">Belum ada riwayat pengembalian</td></tr>
+          <tr>
+            <td colspan="8">
+              <div class="kondisi-kosong" style="padding: 40px 0; text-align: center;">
+                <p style="color: #94a3b8;">Belum ada riwayat pengembalian</p>
+              </div>
+            </td>
+          </tr>
         <?php else: ?>
           <?php $i = 1; foreach ($returns as $ret): 
             $isLate = $ret['is_late']; 
