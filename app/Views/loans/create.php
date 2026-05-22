@@ -70,32 +70,21 @@
                     </div>
                     <div id="bookStock" class="form-text">Stok: <?= $book['stock']; ?></div>
                   </div>
-                  <div class="col-5">
-                    <label class="form-label">Lama meminjam</label>
-                    <div class="my-2 <?php if ($validation->hasError("duration-{$book['slug']}")) : ?>is-invalid<?php endif ?>">
-                      <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="7days-<?= $book['slug']; ?>" name="duration-<?= $book['slug']; ?>" value="7" <?= ($oldInput['duration-' . $book['slug']] ?? '') == '7' ? 'checked' : ''; ?> required>
-                        <label class="form-check-label" for="7days-<?= $book['slug']; ?>">
-                          7 hari
-                        </label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="14days-<?= $book['slug']; ?>" name="duration-<?= $book['slug']; ?>" value="14" <?= ($oldInput['duration-' . $book['slug']] ?? '') == '14' ? 'checked' : ''; ?> required>
-                        <label class="form-check-label" for="14days-<?= $book['slug']; ?>">
-                          14 hari
-                        </label>
-                      </div>
-                      <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="30days-<?= $book['slug']; ?>" name="duration-<?= $book['slug']; ?>" value="30" <?= ($oldInput['duration-' . $book['slug']] ?? '') == '30' ? 'checked' : ''; ?> required>
-                        <label class="form-check-label" for="30days-<?= $book['slug']; ?>">
-                          30 hari
-                        </label>
-                      </div>
-                    </div>
-                    <div class="invalid-feedback">
+                 <div class="col-3">
+                  <label for="duration-<?= $book['slug']; ?>" class="form-label">Lama meminjam (hari)</label>
+                  <input type="number"
+                      class="form-control <?php if ($validation->hasError("duration-{$book['slug']}")) : ?>is-invalid<?php endif ?>"
+                      id="duration-<?= $book['slug']; ?>"
+                      name="duration-<?= $book['slug']; ?>"
+                      value="<?= $oldInput['duration-' . $book['slug']] ?? 5; ?>"
+                      min="1"
+                      max="30"
+                      required>
+                  <div class="invalid-feedback">
                       <?= $validation->getError("duration-{$book['slug']}"); ?>
-                    </div>
                   </div>
+                  <div class="form-text">Min: 1 hari, Maks: 30 hari</div>
+              </div>
                 </div>
               </div>
             </div>

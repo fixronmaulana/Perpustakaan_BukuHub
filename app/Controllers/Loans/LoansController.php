@@ -338,7 +338,7 @@ class LoansController extends ResourceController
             $loanId = $this->loanModel->getInsertID();
             array_push($newLoanIds, $loanId);
 
-            // ── Catat poin peminjaman ───────────────────────
+            // ── Catat poin peminjaman 
             catat_poin(
                 $member['id'],
                 'loan',
@@ -347,7 +347,6 @@ class LoansController extends ResourceController
                 $loanId,
                 'loan'
             );
-            // ────────────────────────────────────────────────
         }
 
         $newLoans = array_map(function ($id) {
