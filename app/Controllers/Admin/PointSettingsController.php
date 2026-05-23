@@ -11,6 +11,17 @@ class PointSettingsController extends BaseController
     protected PointSettingModel $pointSettingModel;
     protected RewardModel       $rewardModel;
 
+    /**
+     * Aktivitas yang nilainya HARUS positif (> 0)
+     */
+    private array $positiveActivities = ['visit', 'loan', 'return_ontime'];
+
+    /**
+     * Aktivitas yang nilainya HARUS negatif (< 0)
+     * User input angka positif → otomatis dikonversi negatif
+     */
+    private array $negativeActivities = ['return_late'];
+
     public function __construct()
     {
         $this->pointSettingModel = new PointSettingModel();
@@ -27,7 +38,6 @@ class PointSettingsController extends BaseController
 
         $hadiahBulanIni = $this->rewardModel->getHadiahBulan($bulanIni, $tahunIni);
 
-        // Riwayat hadiah bulan-bulan sebelumnya
         $riwayatHadiah = $this->rewardModel
             ->orderBy('tahun', 'DESC')
             ->orderBy('bulan', 'DESC')
@@ -52,6 +62,41 @@ class PointSettingsController extends BaseController
             return redirect()->back();
         }
 
+        $errors = [];
+
+        foreach ($data as $activityType => $rawValue) {
+            $value = (int) $rawValue;
+
+            // ── Validasi aktivitas positif ──────────────────────────
+            if (in_array($activityType, $this->positiveActivities)) {
+                if ($value <= 0) {
+                    $label = $this->getLabelByType($activityType);
+                    $errors[] = "Poin <b>{$label}</b> harus bernilai positif (lebih dari 0).";
+                }
+            }
+
+            // ── Aktivitas negatif: konversi otomatis ke negatif ─────
+            if (in_array($activityType, $this->negativeActivities)) {
+                // Jika user input positif, jadikan negatif
+                if ($value > 0) {
+                    $data[$activityType] = -$value;
+                }
+                // Jika user input 0, tolak
+                if ($value === 0) {
+                    $label = $this->getLabelByType($activityType);
+                    $errors[] = "Poin <b>{$label}</b> tidak boleh bernilai 0.";
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            session()->setFlashdata([
+                'msg'   => implode('<br>', $errors),
+                'error' => true,
+            ]);
+            return redirect()->back()->withInput();
+        }
+
         foreach ($data as $activityType => $points) {
             $row = $this->pointSettingModel->where('activity_type', $activityType)->first();
             if ($row) {
@@ -63,7 +108,21 @@ class PointSettingsController extends BaseController
         return redirect()->to('admin/pengaturan-poin');
     }
 
-    // ── Simpan / update hadiah
+    /**
+     * Ambil label aktivitas untuk pesan error  
+     */
+    private function getLabelByType(string $type): string
+    {
+        $labels = [
+            'visit'         => 'Kunjungan',
+            'loan'          => 'Peminjaman',
+            'return_ontime' => 'Pengembalian Tepat Waktu',
+            'return_late'   => 'Pengembalian Terlambat',
+        ];
+        return $labels[$type] ?? $type;
+    }
+
+    // ── Simpan / update hadiah ─────────────────────────────
     public function storeHadiah()
     {
         if (!$this->validate([
@@ -81,14 +140,12 @@ class PointSettingsController extends BaseController
         $bulan = (int) $this->request->getPost('bulan');
         $tahun = (int) $this->request->getPost('tahun');
 
-        // Cek apakah sudah ada hadiah untuk rank + bulan + tahun ini
         $existing = $this->rewardModel
             ->where('rank',  $rank)
             ->where('bulan', $bulan)
             ->where('tahun', $tahun)
             ->first();
 
-        // Handle upload foto
         $foto     = null;
         $fileFoto = $this->request->getFile('foto');
         if ($fileFoto && $fileFoto->isValid() && !$fileFoto->hasMoved()) {
@@ -96,13 +153,12 @@ class PointSettingsController extends BaseController
             $fileFoto->move(FCPATH . 'uploads/hadiah/', $namaFile);
             $foto = $namaFile;
 
-            // Hapus foto lama jika update
             if ($existing && !empty($existing['foto'])) {
                 $pathLama = FCPATH . 'uploads/hadiah/' . $existing['foto'];
                 if (file_exists($pathLama)) unlink($pathLama);
             }
         } elseif ($existing) {
-            $foto = $existing['foto']; // pertahankan foto lama
+            $foto = $existing['foto'];
         }
 
         $data = [

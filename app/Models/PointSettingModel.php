@@ -15,6 +15,13 @@ class PointSettingModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 
+    /**
+     * Aktivitas positif: poin harus > 0
+     * Aktivitas negatif: poin harus < 0
+     */
+    public const POSITIVE_ACTIVITIES = ['visit', 'loan', 'return_ontime'];
+    public const NEGATIVE_ACTIVITIES = ['return_late'];
+
     // Ambil poin berdasarkan activity_type
     public function getPoints(string $activityType): int
     {
@@ -31,5 +38,21 @@ class PointSettingModel extends Model
             $map[$row['activity_type']] = $row;
         }
         return $map;
+    }
+
+    /**
+     * Cek apakah activity_type termasuk aktivitas positif
+     */
+    public function isPositiveActivity(string $activityType): bool
+    {
+        return in_array($activityType, self::POSITIVE_ACTIVITIES);
+    }
+
+    /**
+     * Cek apakah activity_type termasuk aktivitas negatif
+     */
+    public function isNegativeActivity(string $activityType): bool
+    {
+        return in_array($activityType, self::NEGATIVE_ACTIVITIES);
     }
 }
