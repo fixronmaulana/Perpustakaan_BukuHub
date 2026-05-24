@@ -195,6 +195,11 @@ function cetakKartu() {
       @media print{
         @page{size:landscape;margin:0}
         body{background:white}
+        * {
+          -webkit-print-color-adjust: exact !important;  
+          print-color-adjust: exact !important;           
+          color-adjust: exact !important;                 
+        }
       }
     </style></head><body>${kartu.outerHTML}</body></html>`);
   win.document.close();
