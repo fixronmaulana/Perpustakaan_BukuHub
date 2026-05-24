@@ -17,6 +17,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+
 class MembersController extends ResourceController
 {
     protected MemberModel $memberModel;
@@ -25,6 +26,16 @@ class MembersController extends ResourceController
     protected LoanModel $loanModel;
     protected FineModel $fineModel;
     protected UserModel $userModel;
+
+    /**
+     * Mapping gender input Excel → nilai database
+     * Key  : yang ditulis user di Excel (Laki-laki / Perempuan)
+     * Value: yang disimpan ke database  (Male / Female)
+     */
+    private const GENDER_MAP = [
+        'Laki-laki' => 'Male',
+        'Perempuan' => 'Female',
+    ];
 
     public function __construct()
     {
@@ -41,6 +52,7 @@ class MembersController extends ResourceController
     public function index()
     {
         $itemPerPage = 20;
+        $currentPage = (int) ($this->request->getGet('page_members') ?? 1);
 
         if ($this->request->getGet('search')) {
             $keyword = $this->request->getGet('search');
@@ -61,7 +73,7 @@ class MembersController extends ResourceController
         return view('members/index', [
             'members'     => $members,
             'pager'       => $this->memberModel->pager,
-            'currentPage' => $this->request->getVar('page_categories') ?? 1,
+            'currentPage' => $currentPage,
             'itemPerPage' => $itemPerPage,
             'search'      => $this->request->getGet('search'),
         ]);
@@ -296,7 +308,6 @@ class MembersController extends ResourceController
         $member = $this->memberModel->where('uid', $uid)->first();
         if (empty($member)) throw new PageNotFoundException('Member not found');
 
-        // Cek peminjaman aktif
         $pinjamanAktif = $this->loanModel->where([
             'member_id'   => $member['id'],
             'return_date' => null,
@@ -325,19 +336,20 @@ class MembersController extends ResourceController
         return redirect()->to('admin/members');
     }
 
-    // IMPORT ANGGOTA
+    // ── IMPORT ANGGOTA ────────────────────────────────────────────────
+
     public function importForm()
     {
         return view('members/import');
     }
- 
+
     public function importTemplate()
     {
         $spreadsheet = new Spreadsheet();
         $sheet       = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Template Anggota');
- 
-        // Header — gunakan setCellValue dengan koordinat string
+
+        // Header
         $sheet->setCellValue('A1', 'first_name');
         $sheet->setCellValue('B1', 'last_name');
         $sheet->setCellValue('C1', 'no_identitas');
@@ -345,45 +357,66 @@ class MembersController extends ResourceController
         $sheet->setCellValue('E1', 'gender');
         $sheet->setCellValue('F1', 'email');
         $sheet->setCellValue('G1', 'phone');
- 
+
         // Style header
         $sheet->getStyle('A1:G1')->applyFromArray([
             'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill'      => ['fillType' => 'solid', 'startColor' => ['rgb' => '1E3A8A']],
             'alignment' => ['horizontal' => 'center'],
         ]);
- 
+
         // Lebar kolom
         foreach (range('A', 'G') as $col) {
             $sheet->getColumnDimension($col)->setWidth(22);
         }
- 
-        // Contoh data baris 2
+
+        $sheet->getStyle("C1:C10000")->getNumberFormat()
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+        $sheet->getStyle("G1:G10000")->getNumberFormat()
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+
+        // Contoh data baris 2 — gender pakai Laki-laki/Perempuan
         $sheet->setCellValue('A2', 'Budi');
         $sheet->setCellValue('B2', 'Santoso');
-        $sheet->setCellValue('C2', '12345678');
+        $sheet->setCellValueExplicit('C2', '12345678', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
         $sheet->setCellValue('D2', 'Murid');
-        $sheet->setCellValue('E2', 'Male');
+        $sheet->setCellValue('E2', 'Laki-laki');
         $sheet->setCellValue('F2', 'budi@email.com');
-        $sheet->setCellValue('G2', '081234567890');
- 
+        $sheet->setCellValueExplicit('G2', '6281234567890', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
+        // Dropdown validasi kolom D (tipe_anggota)
+        $validation = $sheet->getCell('D2')->getDataValidation();
+        $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST)
+            ->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION)
+            ->setAllowBlank(false)
+            ->setShowDropDown(false)
+            ->setFormula1('"Murid,Guru,Staf"');
+
+        // Dropdown validasi kolom E (gender) — Laki-laki/Perempuan
+        $validationGender = $sheet->getCell('E2')->getDataValidation();
+        $validationGender->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST)
+            ->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION)
+            ->setAllowBlank(false)
+            ->setShowDropDown(false)
+            ->setFormula1('"Laki-laki,Perempuan"');  // ← diubah dari Male,Female
+
         $sheet->freezePane('A2');
- 
+
         $writer   = new Xlsx($spreadsheet);
         $filename = 'template_import_anggota.xlsx';
- 
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
- 
+
         $writer->save('php://output');
         exit;
     }
- 
+
     public function importProcess()
     {
         $file = $this->request->getFile('file_excel');
- 
+
         if (!$file || !$file->isValid()) {
             return view('members/import', [
                 'hasilImport' => [
@@ -392,88 +425,122 @@ class MembersController extends ResourceController
                 ],
             ]);
         }
- 
+
         $tmpPath = WRITEPATH . 'uploads/' . $file->getRandomName();
         $file->move(WRITEPATH . 'uploads/', basename($tmpPath));
- 
+
         $spreadsheet = IOFactory::load($tmpPath);
         $rows        = $spreadsheet->getActiveSheet()->toArray();
         @unlink($tmpPath);
- 
+
         array_shift($rows); // skip header
- 
+
+        // ── Hapus baris kosong di akhir sebelum hitung total ──────────
+        $rows = array_filter($rows, fn($row) => !empty(array_filter($row)));
+        $rows = array_values($rows);
+
         $total = $berhasil = $gagal = 0;
         $errors = [];
- 
+
         foreach ($rows as $nomor => $row) {
             $baris = $nomor + 2;
-            if (empty(array_filter($row))) continue;
- 
+
             $total++;
             $firstName   = trim($row[0] ?? '');
             $lastName    = trim($row[1] ?? '');
-            $noIdentitas = trim($row[2] ?? '');
+            $noIdentitas = trim((string) ($row[2] ?? ''));  // cast string: cegah 0 di depan hilang
             $tipeAnggota = trim($row[3] ?? '');
-            $gender      = trim($row[4] ?? '');
+            $genderInput = trim($row[4] ?? '');             // Laki-laki / Perempuan
             $email       = trim($row[5] ?? '');
-            $phone       = trim($row[6] ?? '');
- 
-            // Validasi wajib
-            if (empty($firstName) || empty($noIdentitas) || empty($tipeAnggota) || empty($gender)) {
+            $phone       = trim((string) ($row[6] ?? ''));  // cast string: cegah 0 di depan hilang
+
+            // Validasi kolom wajib
+            if (empty($firstName) || empty($noIdentitas) || empty($tipeAnggota) || empty($genderInput)) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas ?: '—', 'pesan' => 'Kolom wajib tidak boleh kosong (first_name, no_identitas, tipe_anggota, gender).'];
                 continue;
             }
- 
+
+            // Validasi tipe_anggota
             if (!in_array($tipeAnggota, ['Murid', 'Guru', 'Staf'])) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "tipe_anggota '{$tipeAnggota}' tidak valid. Gunakan: Murid, Guru, atau Staf."];
                 continue;
             }
- 
-            if (!in_array($gender, ['Male', 'Female'])) {
+
+            // Validasi gender — harus Laki-laki atau Perempuan
+            if (!array_key_exists($genderInput, self::GENDER_MAP)) {
                 $gagal++;
-                $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "gender '{$gender}' tidak valid. Gunakan: Male atau Female."];
+                $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "gender '{$genderInput}' tidak valid. Gunakan: Laki-laki atau Perempuan."];
                 continue;
             }
- 
+
+            // Konversi gender ke nilai database (Male / Female)
+            $genderDb = self::GENDER_MAP[$genderInput];
+
+            // Cek duplikat no_identitas
             if ($this->memberModel->where('no_identitas', $noIdentitas)->first()) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "No. Identitas '{$noIdentitas}' sudah terdaftar."];
                 continue;
             }
- 
+
+            // Cek duplikat username di Shield
             if ($this->userModel->findByCredentials(['username' => $noIdentitas])) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "Username '{$noIdentitas}' sudah terdaftar di sistem."];
                 continue;
             }
- 
+
             try {
-                $shieldUser = new User(['username' => $noIdentitas, 'email' => $email ?: $noIdentitas . '@member.local', 'password' => $noIdentitas]);
+                $shieldUser = new User([
+                    'username' => $noIdentitas,
+                    'email'    => $email ?: $noIdentitas . '@member.local',
+                    'password' => $noIdentitas,
+                ]);
                 $this->userModel->save($shieldUser);
                 $shieldUser = $this->userModel->findById($this->userModel->getInsertID());
                 $shieldUser->addGroup('member');
                 $shieldUser->activate();
                 $userId = $shieldUser->id;
- 
-                $uid         = sha1($firstName . $noIdentitas . rand(0, 1000) . md5($gender));
+
+                $uid         = sha1($firstName . $noIdentitas . rand(0, 1000) . md5($genderDb));
                 $qrGenerator = new QRGenerator();
                 $qrCodeLabel = $firstName . ($lastName ? ' ' . $lastName : '');
-                $qrCode      = $qrGenerator->generateQRCode(data: $uid, labelText: $qrCodeLabel, dir: MEMBERS_QR_CODE_PATH, filename: $qrCodeLabel);
- 
-                $this->memberModel->save(['uid' => $uid, 'user_id' => $userId, 'first_name' => $firstName, 'last_name' => $lastName, 'no_identitas' => $noIdentitas, 'tipe_anggota' => $tipeAnggota, 'email' => $email, 'phone' => $phone, 'gender' => $gender, 'qr_code' => $qrCode]);
- 
+                $qrCode      = $qrGenerator->generateQRCode(
+                    data: $uid,
+                    labelText: $qrCodeLabel,
+                    dir: MEMBERS_QR_CODE_PATH,
+                    filename: $qrCodeLabel
+                );
+
+                $this->memberModel->save([
+                    'uid'          => $uid,
+                    'user_id'      => $userId,
+                    'first_name'   => $firstName,
+                    'last_name'    => $lastName,
+                    'no_identitas' => $noIdentitas,
+                    'tipe_anggota' => $tipeAnggota,
+                    'email'        => $email,
+                    'phone'        => $phone,
+                    'gender'       => $genderDb,   // simpan Male/Female ke database
+                    'qr_code'      => $qrCode,
+                ]);
+
                 $berhasil++;
             } catch (\Throwable $e) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => 'Error: ' . $e->getMessage()];
             }
         }
- 
+
         return view('members/import', [
-            'hasilImport' => ['total' => $total, 'berhasil' => $berhasil, 'gagal' => $gagal, 'errors' => $errors],
+            'hasilImport' => [
+                'total'    => $total,
+                'berhasil' => $berhasil,
+                'gagal'    => $gagal,
+                'errors'   => $errors,
+            ],
         ]);
     }
 }
- 

@@ -10,7 +10,6 @@
   <a href="<?= base_url('admin/members') ?>" class="btn btn-outline-primary">
     <i class="ti ti-arrow-left"></i> Kembali
   </a>
-
 </div>
 
 <div class="row">
@@ -182,9 +181,10 @@
         <h6 class="fw-semibold mb-2">Nilai yang Diizinkan</h6>
         <ul class="small text-muted mb-0">
           <li><code>tipe_anggota</code> → <b>Murid</b>, <b>Guru</b>, atau <b>Staf</b></li>
-          <li><code>gender</code> → <b>Male</b> atau <b>Female</b></li>
+          <li><code>gender</code> → <b>Laki-laki</b> atau <b>Perempuan</b></li>
           <li><code>no_identitas</code> harus unik, dipakai sebagai username &amp; password login</li>
           <li>Baris pertama adalah header, <b>jangan dihapus</b></li>
+          <li>Kolom <code>no_identitas</code> dan <code>phone</code> sudah diformat sebagai <b>Teks</b> — pastikan <b>paste as text</b> (Paste Special → Values) saat copy dari data induk sekolah agar angka 0 di depan tidak hilang</li>
           <li>Email kosong akan diisi otomatis: <code>no_identitas@member.local</code></li>
         </ul>
       </div>
@@ -257,11 +257,11 @@ function tampilkanFile(file) {
     alert('Format tidak didukung. Gunakan .xlsx, .xls, atau .csv');
     return;
   }
-  namaFile.textContent  = file.name;
-  ukuran.textContent    = (file.size / 1024).toFixed(1) + ' KB';
-  dropIsi.style.display = 'none';
+  namaFile.textContent   = file.name;
+  ukuran.textContent     = (file.size / 1024).toFixed(1) + ' KB';
+  dropIsi.style.display  = 'none';
   dropFile.style.display = 'block';
-  btnProses.disabled    = false;
+  btnProses.disabled     = false;
 }
 
 function hapusFile() {
