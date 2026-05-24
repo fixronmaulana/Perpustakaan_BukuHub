@@ -529,74 +529,86 @@ class MemberDashboardController extends Controller
     }
 
     public function poin()
-{
-    $member   = $this->getMember();
-    $bulanIni = (int) date('n');
-    $tahunIni = (int) date('Y');
+    {
+        $member   = $this->getMember();
+        $bulanIni = (int) date('n');
+        $tahunIni = (int) date('Y');
 
-    // Riwayat poin dengan pagination
-    $riwayat = $this->pointModel
-        ->where('member_id', $member['id'])
-        ->orderBy('created_at', 'DESC')
-        ->paginate(15, 'poin');
-
-    $pager = $this->pointModel->pager;
-
-    // Total poin bulan ini
-    $totalBulanIni = $this->pointModel->getTotalPoinBulanIni($member['id']);
-
-    // Total poin all time
-    $totalAllTime = $this->pointModel->getTotalPoinAllTime($member['id']);
-
-    // Rank bulan ini
-    $rankBulanIni = $this->_hitungRankRealtime($member['id'], $bulanIni, $tahunIni);
-
-    // Chart: poin per bulan (6 bulan terakhir)
-    $db = \Config\Database::connect();
-    $chartPoin = [];
-    $namaBulan = ['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-    for ($i = 5; $i >= 0; $i--) {
-        $ts    = mktime(0, 0, 0, $bulanIni - $i, 1, $tahunIni);
-        $bln   = (int) date('n', $ts);
-        $thn   = (int) date('Y', $ts);
-        $total = $db->table('point_transactions')
-            ->selectSum('points')
+        // Riwayat poin dengan pagination
+        $riwayat = $this->pointModel
             ->where('member_id', $member['id'])
-            ->where('MONTH(created_at)', $bln)
-            ->where('YEAR(created_at)',  $thn)
-            ->get()->getRow()->points ?? 0;
-        $chartPoin[] = [
-            'bulan' => $namaBulan[$bln] . ' ' . $thn,
-            'total' => (int) $total,
-        ];
-    }
+            ->orderBy('created_at', 'DESC')
+            ->paginate(15, 'poin');
 
-    // Breakdown poin per aktivitas (bulan ini)
-    $poinPerAktivitas = [];
-    $tipes = ['visit', 'loan', 'return_ontime', 'return_late', 'quiz'];
-    foreach ($tipes as $tipe) {
-        $hasil = $db->table('point_transactions')
-            ->selectSum('points')
+        $pager = $this->pointModel->pager;
+
+        // Total poin bulan ini
+        $totalBulanIni = $this->pointModel->getTotalPoinBulanIni($member['id']);
+
+        // Total poin all time
+        $totalAllTime = $this->pointModel->getTotalPoinAllTime($member['id']);
+
+        // Rank bulan ini
+        $rankBulanIni = $this->_hitungRankRealtime($member['id'], $bulanIni, $tahunIni);
+
+        // Chart: poin per bulan (6 bulan terakhir)
+        $db = \Config\Database::connect();
+        $chartPoin = [];
+        $namaBulan = ['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        for ($i = 5; $i >= 0; $i--) {
+            $ts    = mktime(0, 0, 0, $bulanIni - $i, 1, $tahunIni);
+            $bln   = (int) date('n', $ts);
+            $thn   = (int) date('Y', $ts);
+            $total = $db->table('point_transactions')
+                ->selectSum('points')
+                ->where('member_id', $member['id'])
+                ->where('MONTH(created_at)', $bln)
+                ->where('YEAR(created_at)',  $thn)
+                ->get()->getRow()->points ?? 0;
+            $chartPoin[] = [
+                'bulan' => $namaBulan[$bln] . ' ' . $thn,
+                'total' => (int) $total,
+            ];
+        }
+
+        // Breakdown poin per aktivitas (bulan ini)
+        $poinPerAktivitas = [];
+        $tipes = ['visit', 'loan', 'return_ontime', 'return_late', 'quiz'];
+        foreach ($tipes as $tipe) {
+            $hasil = $db->table('point_transactions')
+                ->selectSum('points')
+                ->where('member_id', $member['id'])
+                ->where('activity_type', $tipe)
+                ->where('MONTH(created_at)', $bulanIni)
+                ->where('YEAR(created_at)',  $tahunIni)
+                ->get()->getRow()->points ?? 0;
+            $poinPerAktivitas[$tipe] = (int) $hasil;
+        }
+
+        return view('member/poin', [
+            'member'           => $member,
+            'activeNav'        => 'poin',
+            'riwayat'          => $riwayat,
+            'pager'            => $pager,
+            'totalBulanIni'    => $totalBulanIni,
+            'totalAllTime'     => $totalAllTime,
+            'rankBulanIni'     => $rankBulanIni,
+            'chartPoin'        => $chartPoin,
+            'poinPerAktivitas' => $poinPerAktivitas,
+        ]);
+    }
+    public function notifikasi()
+    {
+        $member = $this->getMember();
+
+        $notifikasi = $this->pointModel
             ->where('member_id', $member['id'])
-            ->where('activity_type', $tipe)
-            ->where('MONTH(created_at)', $bulanIni)
-            ->where('YEAR(created_at)',  $tahunIni)
-            ->get()->getRow()->points ?? 0;
-        $poinPerAktivitas[$tipe] = (int) $hasil;
-    }
+            ->orderBy('created_at', 'DESC')
+            ->limit(10)
+            ->findAll();
 
-    return view('member/poin', [
-        'member'           => $member,
-        'activeNav'        => 'poin',
-        'riwayat'          => $riwayat,
-        'pager'            => $pager,
-        'totalBulanIni'    => $totalBulanIni,
-        'totalAllTime'     => $totalAllTime,
-        'rankBulanIni'     => $rankBulanIni,
-        'chartPoin'        => $chartPoin,
-        'poinPerAktivitas' => $poinPerAktivitas,
-    ]);
-}
+        return $this->response->setJSON($notifikasi);
+    }
     public function kunjungan()
     {
         $member   = $this->getMember();

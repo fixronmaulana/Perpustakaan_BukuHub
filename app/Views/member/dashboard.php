@@ -258,54 +258,6 @@
       </table>
     </div>
   </div>
-
-  <div class="kotak-konten">
-    <div class="kepala-kotak">
-      <h3>Riwayat Poin</h3>
-      <a href="<?= base_url('member/poin') ?>" class="tautan-lihat-semua">Lihat Semua →</a>
-    </div>
-
-    <?php
-      $labelPoin = ['visit' => 'Kunjungan Perpustakaan', 'loan' => 'Peminjaman Buku', 'return_ontime' => 'Pengembalian Tepat Waktu', 'return_late' => 'Pengembalian Terlambat', 'quiz' => 'Kuis Buku'];
-      $chipPoin = ['visit' => 'Kunjungan', 'loan' => 'Peminjaman', 'return_ontime' => 'Pengembalian', 'return_late' => 'Terlambat', 'quiz' => 'Kuis'];
-    ?>
-
-    <?php if (empty($riwayatPoin)): ?>
-      <div class="kondisi-kosong" style="padding:2rem 0">
-        <svg viewBox="0 0 24 24" style="width:40px; opacity:0.2; margin-bottom:10px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <p>Belum ada riwayat poin</p>
-      </div>
-    <?php else: ?>
-      <div class="timeline-wrap" style="padding: 1.25rem;">
-        <?php foreach ($riwayatPoin as $p):
-          $isPos = $p['points'] >= 0;
-          $label = $labelPoin[$p['activity_type']] ?? $p['activity_type'];
-          $chip  = $chipPoin[$p['activity_type']]  ?? $p['activity_type'];
-        ?>
-          <div class="tl-item">
-            <div class="tl-left">
-              <div class="tl-dot <?= $isPos ? 'pos' : 'neg' ?>"></div>
-              <div class="tl-line"></div>
-            </div>
-            <div class="tl-body">
-              <div class="tl-row">
-                <div class="tl-label"><?= esc($label) ?></div>
-                <div class="tl-poin <?= $isPos ? 'pos' : 'neg' ?>"><?= ($isPos ? '+' : '−') . abs($p['points']) ?></div>
-              </div>
-              <div class="tl-meta">
-                <span class="tl-chip <?= $isPos ? 'pos' : 'neg' ?>"><?= esc($chip) ?></span>
-                <span class="tl-tgl"><?= Time::parse($p['created_at'])->format('d M Y, H:i') ?></span>
-              </div>
-              <?php if (!empty($p['description'])): ?>
-                <div class="tl-desc" style="font-size:0.75rem; color:#94a3b8; margin-top:4px"><?= esc($p['description']) ?></div>
-              <?php endif; ?>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-  </div>
-
 </div>
 
 <?= $this->endSection() ?>

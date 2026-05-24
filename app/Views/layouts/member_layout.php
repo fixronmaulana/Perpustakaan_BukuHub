@@ -15,7 +15,6 @@
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar" id="sidebar">
 
-  <!-- Brand -->
   <div class="sidebar-brand">
     <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="sidebar-logo">
     <div>
@@ -26,7 +25,6 @@
 
   <nav class="sidebar-nav">
 
-    <!-- MENU UTAMA -->
     <span class="sidebar-label">Menu Utama</span>
 
     <a href="<?= base_url('member/dashboard') ?>"
@@ -41,7 +39,6 @@
       Kartu Anggota
     </a>
 
-    <!-- AKTIVITAS -->
     <span class="sidebar-label">Aktivitas</span>
 
     <a href="<?= base_url('member/peminjaman') ?>"
@@ -62,7 +59,6 @@
       Kunjungan
     </a>
 
-    <!-- KOLEKSI -->
     <span class="sidebar-label">Koleksi</span>
 
     <a href="<?= base_url('member/daftarbuku') ?>"
@@ -71,7 +67,6 @@
       Daftar Buku
     </a>
 
-    <!-- GAMIFIKASI -->
     <span class="sidebar-label">Gamifikasi</span>
 
     <a href="<?= base_url('member/poin') ?>"
@@ -85,12 +80,16 @@
       <i class="ti ti-trophy"></i>
       Leaderboard
     </a>
+
   </nav>
 </aside>
+
 <!-- ══ KONTEN UTAMA ══ -->
 <div class="member-konten">
 
   <header class="topbar">
+
+    <!-- Kiri: Toggle + Judul -->
     <div style="display:flex;align-items:center;">
       <button class="tombol-toggle-sidebar"
               onclick="document.getElementById('sidebar').classList.toggle('terbuka')">
@@ -107,55 +106,100 @@
         ?>, <?= isset($member['first_name']) ? esc($member['first_name']) : 'Anggota' ?></p>
       </div>
     </div>
-    <!-- Dropdown Profil -->
-    <div class="profil-dropdown" id="profilDropdown">
-      
-      <!-- Trigger: Avatar + Nama + Email -->
-      <button class="profil-trigger" onclick="toggleProfilDropdown(event)" aria-label="Menu Profil">
-        
-        <!-- Avatar: Foto atau Inisial -->
-        <?php
-          $inisial = '';
-          if (!empty($member['first_name'])) $inisial .= strtoupper(substr(trim($member['first_name']), 0, 1));
-          $inisial = $inisial ?: 'A';
-          $adaFoto = !empty($member['foto_profil']);
-        ?>
-        
-        <?php if ($adaFoto): ?>
-          <img src="<?= base_url('uploads/foto_profil/' . esc($member['foto_profil'])) ?>" 
-               alt="Foto Profil" 
-               class="profil-avatar"
-               onerror="this.onerror=null; this.closest('.profil-trigger').querySelector('.profil-inisial').style.display='flex'; this.style.display='none';">
-        <?php endif; ?>
-        
-        <div class="profil-inisial" style="<?= $adaFoto ? 'display:none;' : 'display:flex;' ?>">
-          <?= esc($inisial) ?>
+
+    <!-- Kanan: Notifikasi + Profil -->
+    <div style="display:flex;align-items:center;gap:8px;">
+
+      <!-- Tombol Notifikasi -->
+      <div class="notif-wrapper" id="notifWrapper" style="position:relative;">
+        <button id="notifTrigger"
+                onclick="toggleNotif(event)"
+                aria-label="Notifikasi poin"
+                style="background:rgba(255,255,255,0.1);border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background 0.15s;">
+          <i class="ti ti-bell" style="color:#fff;font-size:18px;" aria-hidden="true"></i>
+          <span id="notifBadge"
+                style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:999px;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 4px;border:2px solid transparent;">
+            0
+          </span>
+        </button>
+
+        <!-- Dropdown Notifikasi -->
+        <div id="notifDropdown"
+             style="display:none;position:absolute;right:0;top:calc(100% + 10px);width:340px;background:#fff;border:0.5px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);z-index:999;overflow:hidden;">
+
+          <!-- Header dropdown -->
+          <div style="padding:14px 16px;border-bottom:0.5px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <i class="ti ti-bell" style="font-size:16px;color:#6366f1;" aria-hidden="true"></i>
+              <span style="font-size:14px;font-weight:600;color:#1e293b;">Notifikasi Poin</span>
+              <span id="notifCountChip" style="display:none;background:#eef2ff;color:#4f46e5;font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;"></span>
+            </div>
+            <a href="<?= base_url('member/poin') ?>" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600;">
+              Lihat semua →
+            </a>
+          </div>
+
+          <!-- List notifikasi -->
+          <div id="notifList" style="max-height:380px;overflow-y:auto;">
+            <div style="padding:32px 16px;text-align:center;">
+              <i class="ti ti-loader-2" style="font-size:28px;color:#cbd5e1;display:block;margin-bottom:8px;" aria-hidden="true"></i>
+              <p style="font-size:13px;color:#94a3b8;margin:0;">Memuat notifikasi...</p>
+            </div>
+          </div>
+
+          <!-- Footer dropdown -->
+          <div style="padding:10px 16px;border-top:0.5px solid #f1f5f9;text-align:center;">
+            <a href="<?= base_url('member/poin') ?>" style="font-size:12px;color:#6366f1;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+              Lihat semua riwayat poin
+              <i class="ti ti-arrow-right" style="font-size:12px;" aria-hidden="true"></i>
+            </a>
+          </div>
+
         </div>
-        
-        <!-- Info Nama + Email -->
-        <div class="profil-info">
-          <span class="profil-nama"><?= esc($member['first_name'] ?? 'Anggota') ?></span>
-          <span class="profil-email"><?= esc($member['email'] ?? '') ?></span>
-        </div>
-        
-        <!-- Chevron Icon -->
-        <svg class="profil-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        
-      </button>
-      
-      <!-- Dropdown Menu -->
-      <div class="dropdown-menu" id="dropdownMenu">
-        <a href="<?= base_url('member/profil') ?>" class="dropdown-item">
-          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Profil Saya
-        </a>
-        <a href="<?= url_to('logout') ?>" class="dropdown-item item-keluar">
-          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Keluar
-        </a>
       </div>
-      
+
+      <!-- Dropdown Profil -->
+      <div class="profil-dropdown" id="profilDropdown">
+
+        <button class="profil-trigger" onclick="toggleProfilDropdown(event)" aria-label="Menu Profil">
+          <?php
+            $inisial = '';
+            if (!empty($member['first_name'])) $inisial .= strtoupper(substr(trim($member['first_name']), 0, 1));
+            $inisial = $inisial ?: 'A';
+            $adaFoto = !empty($member['foto_profil']);
+          ?>
+          <?php if ($adaFoto): ?>
+            <img src="<?= base_url('uploads/foto_profil/' . esc($member['foto_profil'])) ?>"
+                 alt="Foto Profil"
+                 class="profil-avatar"
+                 onerror="this.onerror=null; this.closest('.profil-trigger').querySelector('.profil-inisial').style.display='flex'; this.style.display='none';">
+          <?php endif; ?>
+          <div class="profil-inisial" style="<?= $adaFoto ? 'display:none;' : 'display:flex;' ?>">
+            <?= esc($inisial) ?>
+          </div>
+          <div class="profil-info">
+            <span class="profil-nama"><?= esc($member['first_name'] ?? 'Anggota') ?></span>
+            <span class="profil-email"><?= esc($member['email'] ?? '') ?></span>
+          </div>
+          <svg class="profil-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div class="dropdown-menu" id="dropdownMenu">
+          <a href="<?= base_url('member/profil') ?>" class="dropdown-item">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Profil Saya
+          </a>
+          <a href="<?= url_to('logout') ?>" class="dropdown-item item-keluar">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Keluar
+          </a>
+        </div>
+
+      </div>
+
     </div>
+    <!-- /Kanan -->
+
   </header>
 
   <main class="area-halaman">
@@ -165,36 +209,10 @@
 </div>
 
 <?= $this->renderSection('scripts') ?>
-<script>
-  document.addEventListener('click', function(e) {
-    const sidebar = document.getElementById('sidebar');
-    const toggle  = document.querySelector('.tombol-toggle-sidebar');
-    if (sidebar && sidebar.classList.contains('terbuka')
-        && !sidebar.contains(e.target)
-        && toggle && !toggle.contains(e.target)) {
-      sidebar.classList.remove('terbuka');
-    }
-  });
-</script>
-<script>
-// Toggle Dropdown Profil
-function toggleProfilDropdown(e) {
-  e.stopPropagation();
-  const dropdown = document.getElementById('profilDropdown');
-  dropdown.classList.toggle('active');
-}
 
-// Tutup dropdown jika klik di luar
+<script>
+// ── Toggle Sidebar ────────────────────────────────────────
 document.addEventListener('click', function(e) {
-  const dropdown = document.getElementById('profilDropdown');
-  const trigger  = document.querySelector('.profil-trigger');
-  
-  if (dropdown && dropdown.classList.contains('active')
-      && !dropdown.contains(e.target)) {
-    dropdown.classList.remove('active');
-  }
-  
-  // Toggle sidebar logic (existing)
   const sidebar = document.getElementById('sidebar');
   const toggle  = document.querySelector('.tombol-toggle-sidebar');
   if (sidebar && sidebar.classList.contains('terbuka')
@@ -204,13 +222,175 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Tutup dropdown dengan tombol Escape
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    const dropdown = document.getElementById('profilDropdown');
-    if (dropdown) dropdown.classList.remove('active');
+// ── Toggle Dropdown Profil ────────────────────────────────
+function toggleProfilDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('profilDropdown').classList.toggle('active');
+  document.getElementById('notifDropdown').style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+  const profil = document.getElementById('profilDropdown');
+  if (profil && profil.classList.contains('active') && !profil.contains(e.target)) {
+    profil.classList.remove('active');
   }
 });
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('profilDropdown')?.classList.remove('active');
+    document.getElementById('notifDropdown').style.display = 'none';
+  }
+});
+
+// ── Notifikasi Poin ───────────────────────────────────────
+const ikonNotif = {
+  visit:         'ti-building',
+  loan:          'ti-arrows-exchange',
+  return_ontime: 'ti-check',
+  return_late:   'ti-clock-x',
+  quiz:          'ti-school'
+};
+
+const labelNotif = {
+  visit:         'Kunjungan Perpustakaan',
+  loan:          'Peminjaman Buku',
+  return_ontime: 'Pengembalian Tepat Waktu',
+  return_late:   'Pengembalian Terlambat',
+  quiz:          'Kuis Buku'
+};
+
+// Key localStorage per member
+const NOTIF_KEY = 'notif_last_read_<?= $member['id'] ?? 0 ?>';
+
+function getLastRead() {
+  return parseInt(localStorage.getItem(NOTIF_KEY) || '0');
+}
+
+function tandaiSudahDibaca() {
+  localStorage.setItem(NOTIF_KEY, Date.now().toString());
+}
+
+function toggleNotif(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('notifDropdown');
+  const isOpen   = dropdown.style.display === 'block';
+  document.getElementById('profilDropdown')?.classList.remove('active');
+  if (isOpen) {
+    dropdown.style.display = 'none';
+  } else {
+    dropdown.style.display = 'block';
+    // Tandai sudah dibaca + sembunyikan badge
+    tandaiSudahDibaca();
+    sembunyikanBadge();
+    muatNotifikasi();
+  }
+}
+
+function sembunyikanBadge() {
+  const badge     = document.getElementById('notifBadge');
+  const countChip = document.getElementById('notifCountChip');
+  badge.style.display     = 'none';
+  countChip.style.display = 'none';
+}
+
+function tampilkanBadge(jumlah) {
+  if (jumlah <= 0) return;
+  const badge = document.getElementById('notifBadge');
+  badge.textContent   = jumlah;
+  badge.style.display = 'inline-block';
+}
+
+// Saat halaman load: hitung notif belum dibaca
+function cekNotifBelumDibaca() {
+  fetch('<?= base_url('member/notifikasi') ?>')
+    .then(r => r.json())
+    .then(data => {
+      if (!data || data.length === 0) return;
+      const lastRead  = getLastRead();
+      const belumDibaca = data.filter(n => {
+        return new Date(n.created_at).getTime() > lastRead;
+      });
+      tampilkanBadge(belumDibaca.length);
+    })
+    .catch(() => {});
+}
+
+function muatNotifikasi() {
+  const list = document.getElementById('notifList');
+  list.innerHTML = `
+    <div style="padding:32px 16px;text-align:center;">
+      <i class="ti ti-loader-2" style="font-size:28px;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
+      <p style="font-size:13px;color:#94a3b8;margin:0;">Memuat notifikasi...</p>
+    </div>`;
+
+  fetch('<?= base_url('member/notifikasi') ?>')
+    .then(r => r.json())
+    .then(data => {
+      const countChip = document.getElementById('notifCountChip');
+
+      if (!data || data.length === 0) {
+        countChip.style.display = 'none';
+        list.innerHTML = `
+          <div style="padding:32px 16px;text-align:center;">
+            <i class="ti ti-bell-off" style="font-size:32px;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
+            <p style="font-size:13px;color:#94a3b8;margin:0;">Belum ada notifikasi</p>
+          </div>`;
+        return;
+      }
+
+      countChip.textContent   = data.length + ' aktivitas';
+      countChip.style.display = 'inline-block';
+
+      list.innerHTML = data.map(n => {
+        const isPos     = n.points >= 0;
+        const label     = labelNotif[n.activity_type] ?? n.activity_type;
+        const ikon      = ikonNotif[n.activity_type]  ?? 'ti-star';
+        const tgl       = new Date(n.created_at).toLocaleDateString('id-ID', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        const warnaTeks = isPos ? '#15803d' : '#b91c1c';
+        const warnaBg   = isPos ? '#dcfce7'  : '#fee2e2';
+        const ikonBg    = isPos ? '#f0fdf4'  : '#fef2f2';
+        const ikonClr   = isPos ? '#16a34a'  : '#dc2626';
+        const poin      = (isPos ? '+' : '−') + Math.abs(n.points);
+
+        return `
+          <div style="padding:12px 16px;border-bottom:0.5px solid #f1f5f9;display:flex;align-items:flex-start;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:8px;background:${ikonBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="ti ${ikon}" style="font-size:16px;color:${ikonClr};"></i>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;color:#1e293b;">${label}</div>
+              ${n.description ? `<div style="font-size:12px;color:#64748b;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.description}</div>` : ''}
+              <div style="font-size:11px;color:#94a3b8;margin-top:4px;">${tgl}</div>
+            </div>
+            <span style="background:${warnaBg};color:${warnaTeks};font-size:12px;font-weight:700;border-radius:8px;padding:3px 8px;flex-shrink:0;margin-top:2px;">${poin}</span>
+          </div>`;
+      }).join('');
+    })
+    .catch(() => {
+      document.getElementById('notifList').innerHTML = `
+        <div style="padding:32px 16px;text-align:center;">
+          <i class="ti ti-wifi-off" style="font-size:28px;color:#fca5a5;display:block;margin-bottom:8px;"></i>
+          <p style="font-size:13px;color:#ef4444;margin:0;">Gagal memuat notifikasi</p>
+        </div>`;
+    });
+}
+
+// Tutup notif dropdown jika klik di luar
+document.addEventListener('click', function(e) {
+  const wrapper  = document.getElementById('notifWrapper');
+  const dropdown = document.getElementById('notifDropdown');
+  if (wrapper && !wrapper.contains(e.target)) {
+    dropdown.style.display = 'none';
+  }
+});
+
+// Jalankan cek badge saat halaman load
+cekNotifBelumDibaca();
 </script>
+
 </body>
 </html>

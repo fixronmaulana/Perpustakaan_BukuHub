@@ -56,6 +56,7 @@ $routes->group('member', ['filter' => 'memberFilter'], static function (RouteCol
     $routes->get('daftarbuku', 'Member\MemberDashboardController::daftarbuku');
     $routes->get('daftarbuku/(:segment)', 'Member\MemberDashboardController::detailBuku/$1');
     $routes->get('poin',        'Member\MemberDashboardController::poin');
+    $routes->get('notifikasi',  'Member\MemberDashboardController::notifikasi');
     $routes->get('leaderboard', 'Member\MemberDashboardController::leaderboard');
     $routes->get('kuis/(:num)',        'Member\MemberDashboardController::kuis/$1');
     $routes->post('kuis/(:num)/submit','Member\MemberDashboardController::submitKuis/$1');
