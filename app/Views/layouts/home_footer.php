@@ -7,8 +7,8 @@
     <!-- Kolom 1: Brand + Kontak -->
     <div>
       <div class="nama-merek-kaki">
-      <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="logo-smk-nav">
-        <span>Perpustakaan SMK Al-Munawwir IIBS</span>
+      <img src="<?= base_url('assets/images/logo-perpus.png') ?>" alt="Logo SMK" class="logo-smk-nav">
+        <!-- <span>Perpustakaan SMK Al-Munawwir IIBS</span> -->
       </div>
       <p class="deskripsi-kaki">
         Pusat sumber belajar yang mendukung prestasi akademik siswa dan guru

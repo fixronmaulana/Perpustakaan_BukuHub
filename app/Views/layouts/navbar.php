@@ -2,11 +2,11 @@
 <nav class="bilah-navigasi">
 
   <a href="<?= base_url('/') ?>" class="merek-perpus">
-    <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="logo-smk-nav">
-    <div class="teks-merek">
+    <img src="<?= base_url('assets/images/logo-perpus.png') ?>" alt="Logo SMK" class="logo-smk-nav">
+    <!-- <div class="teks-merek">
       <span class="teks-atas">Perpustakaan</span>
       <span class="teks-bawah">SMK Al-Munawwir IIBS</span>
-    </div>
+    </div> -->
   </a>
 
   <ul class="daftar-menu" id="daftarMenu">
