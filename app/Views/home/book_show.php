@@ -72,27 +72,16 @@
       <!-- Garis -->
       <div class="garis-detail"></div>
 
-      <!-- Deskripsi dummy -->
+      <!-- ===== DESKRIPSI ASLI DARI DATABASE ===== -->
       <div class="deskripsi-detail">
         <h3>Deskripsi Buku</h3>
-        <p>
-          Buku ini merupakan salah satu koleksi unggulan perpustakaan SMK Al-Munawwir IIBS.
-          Karya dari <strong><?= esc($book['author']) ?></strong> ini hadir untuk memperkaya
-          wawasan dan pengetahuan para pembaca, khususnya di bidang
-          <strong><?= esc($book['category'] ?? 'ilmu pengetahuan') ?></strong>.
-        </p>
-        <p>
-          Diterbitkan pada tahun <strong><?= esc($book['year']) ?></strong> oleh
-          <strong><?= esc($book['publisher']) ?></strong>, buku ini telah menjadi
-          referensi penting bagi siswa dan guru di lingkungan sekolah.
-          Dengan gaya penulisan yang mudah dipahami, buku ini cocok dibaca oleh
-          semua kalangan yang ingin mendalami topik ini lebih jauh.
-        </p>
-        <p>
-          Tersedia di perpustakaan kami dan dapat dipinjam oleh anggota aktif
-          perpustakaan SMK Al-Munawwir IIBS.
-        </p>
+        <?php if (!empty($book['description'])) : ?>
+          <p><?= nl2br(esc($book['description'])) ?></p>
+        <?php else : ?>
+          <p class="text-muted fst-italic">Deskripsi buku ini belum tersedia.</p>
+        <?php endif; ?>
       </div>
+      <!-- ===== END DESKRIPSI ===== -->
 
       <!-- Garis -->
       <div class="garis-detail"></div>

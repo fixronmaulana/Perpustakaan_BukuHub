@@ -184,7 +184,6 @@
           <li><code>gender</code> → <b>Laki-laki</b> atau <b>Perempuan</b></li>
           <li><code>no_identitas</code> harus unik, dipakai sebagai username &amp; password login</li>
           <li>Baris pertama adalah header, <b>jangan dihapus</b></li>
-          <li>Kolom <code>no_identitas</code> dan <code>phone</code> sudah diformat sebagai <b>Teks</b> — pastikan <b>paste as text</b> (Paste Special → Values) saat copy dari data induk sekolah agar angka 0 di depan tidak hilang</li>
           <li>Email kosong akan diisi otomatis: <code>no_identitas@member.local</code></li>
         </ul>
       </div>

@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= base_url('assets/css/member.css') ?>">
+  <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/images/logo-perpus3.png') ?>" />
   <?= $this->renderSection('head') ?>
 </head>
 <body>
@@ -243,7 +244,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// ── Notifikasi Poin ───────────────────────────────────────
+// Notifikasi Poin 
 const ikonNotif = {
   visit:         'ti-building',
   loan:          'ti-arrows-exchange',

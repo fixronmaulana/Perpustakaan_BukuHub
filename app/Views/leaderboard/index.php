@@ -45,9 +45,19 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 <!-- Tabel -->
 <div class="card">
   <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
       <h5 class="card-title fw-semibold mb-0">Semua Peringkat</h5>
-      <span class="text-muted small"><?= count($leaderboard) ?> anggota</span>
+      <div class="d-flex align-items-center gap-3">
+        <!-- Search -->
+        <div class="input-group input-group-sm" style="width:220px">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="ti ti-search" style="font-size:.85rem;color:#94a3b8"></i>
+          </span>
+          <input type="text" id="cariMember" class="form-control border-start-0 ps-0"
+                 placeholder="Cari nama anggota..." oninput="filterDanPaginasi()">
+        </div>
+        <span class="text-muted small" id="jumlahAnggota"><?= count($leaderboard) ?> anggota</span>
+      </div>
     </div>
 
     <div class="table-responsive">
@@ -76,7 +86,7 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="tabelBody">
           <?php if (empty($leaderboard)): ?>
             <tr>
               <td colspan="8" class="text-center py-5 text-muted">
@@ -95,13 +105,12 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
               $poinTepat      = (int) ($row['poin_tepat']      ?? 0);
               $poinTerlambat  = (int) ($row['poin_terlambat']  ?? 0);
               $poinKuis       = (int) ($row['poin_kuis']       ?? 0);
-              // Warna baris top 3
               $bgBaris = '';
               if ($rank === 1) $bgBaris = 'background:#fffbeb';
               elseif ($rank === 2) $bgBaris = 'background:#f8fafc';
               elseif ($rank === 3) $bgBaris = 'background:#fff7ed';
             ?>
-              <tr style="<?= $bgBaris ?>">
+              <tr style="<?= $bgBaris ?>" data-nama="<?= strtolower($nama) ?>">
                 <!-- Rank -->
                 <td class="text-center">
                   <?php if ($rank === 1): ?>
@@ -207,12 +216,155 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
         </tbody>
       </table>
     </div>
+
+    <!-- Pagination Bootstrap -->
+    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="pagerArea" style="display:none!important">
+      <div class="text-muted small" id="pagerInfo"></div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="pagerList"></ul>
+      </nav>
+    </div>
+
   </div>
 </div>
 
 <script>
-document.getElementById('selectBulan').addEventListener('change', function() {
-  document.getElementById('tahunInput').value = this.options[this.selectedIndex].dataset.tahun;
+/* ═══════════════════════════════════════════════════════════
+   LEADERBOARD ADMIN — Client-side Pagination + Search
+═══════════════════════════════════════════════════════════ */
+(function () {
+  const PER_PAGE   = 20;
+  let currentPage  = 1;
+  let filteredRows = [];
+
+  const semuaBaris = Array.from(
+    document.querySelectorAll('#tabelBody tr[data-nama]')
+  );
+
+  // Sembunyikan semua baris dulu
+  semuaBaris.forEach(tr => tr.style.display = 'none');
+
+  /* ── Filter ── */
+  function filter(keyword) {
+    const q  = keyword.trim().toLowerCase();
+    filteredRows = q
+      ? semuaBaris.filter(tr => tr.dataset.nama.includes(q))
+      : [...semuaBaris];
+  }
+
+  /* ── Render halaman ── */
+  function render(page) {
+    currentPage = page;
+    const total     = filteredRows.length;
+    const totalPage = Math.ceil(total / PER_PAGE) || 1;
+
+    if (currentPage < 1)         currentPage = 1;
+    if (currentPage > totalPage) currentPage = totalPage;
+
+    const start = (currentPage - 1) * PER_PAGE;
+    const end   = Math.min(start + PER_PAGE, total);
+
+    semuaBaris.forEach(tr => tr.style.display = 'none');
+    filteredRows.slice(start, end).forEach(tr => tr.style.display = '');
+
+    // Counter anggota
+    document.getElementById('jumlahAnggota').textContent = total + ' anggota';
+
+    // Info halaman
+    const infoEl = document.getElementById('pagerInfo');
+    infoEl.textContent = total > 0
+      ? 'Menampilkan ' + (start + 1) + '–' + end + ' dari ' + total + ' anggota'
+      : '';
+
+    // Pagination
+    renderPager(currentPage, totalPage, total);
+  }
+
+  /* ── Render tombol pagination Bootstrap ── */
+  function renderPager(page, totalPage, total) {
+    const area = document.getElementById('pagerArea');
+    const list = document.getElementById('pagerList');
+
+    if (totalPage <= 1) {
+      area.style.setProperty('display', 'none', 'important');
+      return;
+    }
+    area.style.removeProperty('display');
+    area.style.display = 'flex';
+
+    // Algoritma halaman dengan ellipsis
+    function pages(cur, tot) {
+      const delta = 2;
+      const range = [];
+      const result = [];
+      let l;
+      for (let i = 1; i <= tot; i++) {
+        if (i === 1 || i === tot || (i >= cur - delta && i <= cur + delta)) {
+          range.push(i);
+        }
+      }
+      for (const i of range) {
+        if (l) {
+          if (i - l === 2) result.push(l + 1);
+          else if (i - l !== 1) result.push('...');
+        }
+        result.push(i);
+        l = i;
+      }
+      return result;
+    }
+
+    const pageNums = pages(page, totalPage);
+    let html = '';
+
+    // Prev
+    html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
+      <a class="page-link" href="#" onclick="lbGoPage(${page - 1});return false;">‹</a>
+    </li>`;
+
+    // Nomor
+    for (const p of pageNums) {
+      if (p === '...') {
+        html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+      } else if (p === page) {
+        html += `<li class="page-item active"><span class="page-link">${p}</span></li>`;
+      } else {
+        html += `<li class="page-item">
+          <a class="page-link" href="#" onclick="lbGoPage(${p});return false;">${p}</a>
+        </li>`;
+      }
+    }
+
+    // Next
+    html += `<li class="page-item ${page === totalPage ? 'disabled' : ''}">
+      <a class="page-link" href="#" onclick="lbGoPage(${page + 1});return false;">›</a>
+    </li>`;
+
+    list.innerHTML = html;
+  }
+
+  /* ── Public: pindah halaman ── */
+  window.lbGoPage = function (page) {
+    render(page);
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  /* ── Public: dipanggil saat input search ── */
+  window.filterDanPaginasi = function () {
+    const q = document.getElementById('cariMember').value;
+    filter(q);
+    render(1);
+  };
+
+  // Init
+  filter('');
+  render(1);
+})();
+
+/* ── Select bulan ── */
+document.getElementById('selectBulan').addEventListener('change', function () {
+  document.getElementById('tahunInput').value =
+    this.options[this.selectedIndex].dataset.tahun;
   this.form.submit();
 });
 </script>

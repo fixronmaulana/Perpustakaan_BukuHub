@@ -117,7 +117,7 @@ class QuizzesController extends BaseController
             ->orderBy('id', 'ASC')
             ->findAll();
 
-        // Hitung poin per soal otomatis (100 / jumlah soal)
+        // poin per soal (100 / jumlah soal)
         $totalSoal    = count($questions);
         $poinPerSoal  = $totalSoal > 0 ? round(100 / $totalSoal, 1) : 0;
 
@@ -211,8 +211,12 @@ class QuizzesController extends BaseController
         $quiz = $this->quizModel->find($id);
         if (empty($quiz)) throw new PageNotFoundException('Kuis tidak ditemukan');
 
-        $this->quizModel->update($id, ['is_active' => $quiz['is_active'] ? 0 : 1]);
+        $this->quizModel->update($id, [
+            'is_active' => $quiz['is_active'] ? 0 : 1
+        ]);
+
         $status = $quiz['is_active'] ? 'dinonaktifkan' : 'diaktifkan';
+        
         session()->setFlashdata(['msg' => "Kuis berhasil {$status}."]);
         return redirect()->back();
     }

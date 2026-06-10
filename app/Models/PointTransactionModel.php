@@ -53,7 +53,7 @@ class PointTransactionModel extends Model
         return (int) ($result['points'] ?? 0);
     }
 
-    // Riwayat poin dengan pagination
+    // Riwayat poin 
     public function getRiwayat(int $memberId, int $limit = 20)
     {
         return $this->where('member_id', $memberId)

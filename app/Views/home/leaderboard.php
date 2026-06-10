@@ -106,7 +106,7 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       <input type="text" class="lb-search-input" id="cariMember"
-             placeholder="Cari nama anggota..." onkeyup="filterMember()">
+             placeholder="Cari nama anggota..." onkeyup="filterDanPaginasi()">
     </div>
     <div class="lb-filter-right">
       <span class="lb-filter-label">Periode:</span>
@@ -174,11 +174,11 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
               <tr class="<?= $rowClass ?>" data-nama="<?= strtolower($nama) ?>">
                 <td class="center">
                   <?php if ($rank === 1): ?>
-                    <span class="lb-rank-badge gold">1</span>
+                    <span class="lb-rank-badge gold">🥇</span>
                   <?php elseif ($rank === 2): ?>
-                    <span class="lb-rank-badge silver">2</span>
+                    <span class="lb-rank-badge silver">🥈</span>
                   <?php elseif ($rank === 3): ?>
-                    <span class="lb-rank-badge bronze">3</span>
+                    <span class="lb-rank-badge bronze">🥉</span>
                   <?php else: ?>
                     <span class="lb-rank-num"><?= $rank ?></span>
                   <?php endif; ?>
@@ -239,6 +239,16 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
     </div>
   </div>
 
+  <!-- Pagination -->
+  <div class="bungkus-pager" id="pagerWrap" style="display:none">
+    <nav>
+      <ul id="pagerList"></ul>
+    </nav>
+  </div>
+
+  <!-- Info halaman -->
+  <div class="lb-pager-info" id="pagerInfo"></div>
+
   <?php if (!auth()->loggedIn()): ?>
   <div class="lb-cta">
     Ingin tahu peringkat kamu?
@@ -281,26 +291,190 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
 </div>
 <?php endforeach; ?>
 
+<style>
+/* ── Info halaman (misal: "Menampilkan 1–20 dari 57 anggota") ── */
+.lb-pager-info {
+  text-align: center;
+  font-size: .78rem;
+  color: #94a3b8;
+  margin-top: .5rem;
+}
+
+/* ── Tombol pagination pakai style .bungkus-pager yang sudah ada,
+      tambahan: tombol ellipsis dan active state ── */
+.bungkus-pager nav ul li.ellipsis span {
+  background: transparent;
+  border-color: transparent;
+  color: #94a3b8;
+  cursor: default;
+  pointer-events: none;
+}
+.bungkus-pager nav ul li.active span {
+  background: var(--navy);
+  color: var(--putih);
+  border-color: var(--navy);
+  cursor: default;
+}
+.bungkus-pager nav ul li a:disabled,
+.bungkus-pager nav ul li a[data-disabled="true"] {
+  opacity: .35;
+  pointer-events: none;
+  cursor: default;
+}
+</style>
+
 <?= $this->include('layouts/home_footer') ?>
 
 <script>
-function filterMember() {
-  const q    = document.getElementById('cariMember').value.toLowerCase();
-  const rows = document.querySelectorAll('#tabelBody tr[data-nama]');
-  let vis    = 0;
-  rows.forEach(tr => {
-    const match = tr.dataset.nama.includes(q);
-    tr.style.display = match ? '' : 'none';
-    if (match) vis++;
-  });
-  document.getElementById('jumlahAnggota').textContent = vis + ' anggota';
-}
+/* ═══════════════════════════════════════════════════════════
+   LEADERBOARD — Client-side Pagination + Search
+═══════════════════════════════════════════════════════════ */
+(function () {
+  const PER_PAGE    = 20;
+  let currentPage   = 1;
+  let filteredRows  = [];
 
-document.getElementById('selectBulan').addEventListener('change', function() {
-  document.getElementById('tahunInput').value = this.options[this.selectedIndex].dataset.tahun;
+  // Ambil semua baris data (exclude baris "kosong/placeholder")
+  const semuaBaris = Array.from(
+    document.querySelectorAll('#tabelBody tr[data-nama]')
+  );
+
+  // Sembunyikan semua baris dulu — akan ditampilkan oleh render()
+  semuaBaris.forEach(tr => tr.style.display = 'none');
+
+  /* ── Filter berdasarkan kata kunci pencarian ── */
+  function filter(keyword) {
+    const q = keyword.trim().toLowerCase();
+    filteredRows = q
+      ? semuaBaris.filter(tr => tr.dataset.nama.includes(q))
+      : [...semuaBaris];
+  }
+
+  /* ── Render halaman tertentu ── */
+  function render(page) {
+    currentPage = page;
+    const total     = filteredRows.length;
+    const totalPage = Math.ceil(total / PER_PAGE) || 1;
+
+    // Pastikan page valid
+    if (currentPage < 1)          currentPage = 1;
+    if (currentPage > totalPage)  currentPage = totalPage;
+
+    const start = (currentPage - 1) * PER_PAGE;
+    const end   = Math.min(start + PER_PAGE, total);
+
+    // Sembunyikan semua, tampilkan yang di halaman ini
+    semuaBaris.forEach(tr => tr.style.display = 'none');
+    filteredRows.slice(start, end).forEach(tr => tr.style.display = '');
+
+    // Update counter
+    document.getElementById('jumlahAnggota').textContent = total + ' anggota';
+
+    // Update info halaman
+    const infoEl = document.getElementById('pagerInfo');
+    if (total === 0) {
+      infoEl.textContent = '';
+    } else {
+      infoEl.textContent =
+        'Menampilkan ' + (start + 1) + '–' + end + ' dari ' + total + ' anggota';
+    }
+
+    // Render tombol pagination
+    renderPager(currentPage, totalPage);
+  }
+
+  /* ── Render tombol pagination ── */
+  function renderPager(page, totalPage) {
+    const wrap   = document.getElementById('pagerWrap');
+    const list   = document.getElementById('pagerList');
+
+    if (totalPage <= 1) {
+      wrap.style.display = 'none';
+      return;
+    }
+    wrap.style.display = 'flex';
+
+    // Algoritma halaman yang ditampilkan (dengan ellipsis)
+    function pages(cur, tot) {
+      const delta = 2;
+      const range = [];
+      const rangeWithDots = [];
+      let l;
+      for (let i = 1; i <= tot; i++) {
+        if (i === 1 || i === tot || (i >= cur - delta && i <= cur + delta)) {
+          range.push(i);
+        }
+      }
+      for (const i of range) {
+        if (l) {
+          if (i - l === 2) rangeWithDots.push(l + 1);
+          else if (i - l !== 1) rangeWithDots.push('...');
+        }
+        rangeWithDots.push(i);
+        l = i;
+      }
+      return rangeWithDots;
+    }
+
+    const pageNums = pages(page, totalPage);
+    let html = '';
+
+    // Tombol Prev
+    if (page > 1) {
+      html += `<li><a href="#" onclick="lbGoPage(${page - 1});return false;">‹</a></li>`;
+    } else {
+      html += `<li><a href="#" data-disabled="true" aria-disabled="true">‹</a></li>`;
+    }
+
+    // Nomor halaman
+    for (const p of pageNums) {
+      if (p === '...') {
+        html += `<li class="ellipsis"><span>…</span></li>`;
+      } else if (p === page) {
+        html += `<li class="active"><span>${p}</span></li>`;
+      } else {
+        html += `<li><a href="#" onclick="lbGoPage(${p});return false;">${p}</a></li>`;
+      }
+    }
+
+    // Tombol Next
+    if (page < totalPage) {
+      html += `<li><a href="#" onclick="lbGoPage(${page + 1});return false;">›</a></li>`;
+    } else {
+      html += `<li><a href="#" data-disabled="true" aria-disabled="true">›</a></li>`;
+    }
+
+    list.innerHTML = html;
+  }
+
+  /* ── Public: pindah halaman ── */
+  window.lbGoPage = function(page) {
+    render(page);
+    // Scroll ke atas tabel
+    document.querySelector('.lb-tabel-section')
+      .scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  /* ── Public: dipanggil saat onkeyup di input search ── */
+  window.filterDanPaginasi = function() {
+    const q = document.getElementById('cariMember').value;
+    filter(q);
+    render(1); // kembali ke halaman 1 setiap kali filter berubah
+  };
+
+  // Inisialisasi: tampilkan halaman pertama
+  filter('');
+  render(1);
+})();
+
+/* ── Event listener select bulan ── */
+document.getElementById('selectBulan').addEventListener('change', function () {
+  document.getElementById('tahunInput').value =
+    this.options[this.selectedIndex].dataset.tahun;
   this.form.submit();
 });
 
+/* ── Modal Hadiah ── */
 function bukaModalHadiah(rank) {
   const m = document.getElementById('modalHadiah' + rank);
   if (m) m.classList.add('tampil');
@@ -310,26 +484,30 @@ function tutupModalHadiah(rank) {
   if (m) m.classList.remove('tampil');
 }
 document.addEventListener('click', e => {
-  if (e.target.classList.contains('lb-modal-overlay')) e.target.classList.remove('tampil');
+  if (e.target.classList.contains('lb-modal-overlay'))
+    e.target.classList.remove('tampil');
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape')
-    document.querySelectorAll('.lb-modal-overlay.tampil').forEach(m => m.classList.remove('tampil'));
+    document.querySelectorAll('.lb-modal-overlay.tampil')
+      .forEach(m => m.classList.remove('tampil'));
 });
 
+/* ── Hitung mundur ── */
 <?php if ($isRealtime): ?>
-(function() {
+(function () {
   function tick() {
     const now   = new Date();
     const akhir = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const sisa  = akhir - now;
     if (sisa <= 0) return;
-    document.getElementById('cdHari').textContent  = String(Math.floor(sisa/86400000)).padStart(2,'0');
-    document.getElementById('cdJam').textContent   = String(Math.floor((sisa%86400000)/3600000)).padStart(2,'0');
-    document.getElementById('cdMenit').textContent = String(Math.floor((sisa%3600000)/60000)).padStart(2,'0');
-    document.getElementById('cdDetik').textContent = String(Math.floor((sisa%60000)/1000)).padStart(2,'0');
+    document.getElementById('cdHari').textContent  = String(Math.floor(sisa / 86400000)).padStart(2, '0');
+    document.getElementById('cdJam').textContent   = String(Math.floor((sisa % 86400000) / 3600000)).padStart(2, '0');
+    document.getElementById('cdMenit').textContent = String(Math.floor((sisa % 3600000) / 60000)).padStart(2, '0');
+    document.getElementById('cdDetik').textContent = String(Math.floor((sisa % 60000) / 1000)).padStart(2, '0');
   }
-  tick(); setInterval(tick, 1000);
+  tick();
+  setInterval(tick, 1000);
 })();
 <?php endif; ?>
 </script>

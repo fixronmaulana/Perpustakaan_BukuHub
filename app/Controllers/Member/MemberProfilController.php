@@ -68,7 +68,6 @@ class MemberProfilController extends Controller
         if ($foto && $foto->isValid() && ! $foto->hasMoved()) {
             $uploadPath = FCPATH . 'uploads/foto_profil/';
 
-            // Hapus foto lama jika ada
             if (! empty($member['foto_profil'])) {
                 $fotoLama = $uploadPath . $member['foto_profil'];
                 if (file_exists($fotoLama)) {
@@ -115,7 +114,7 @@ class MemberProfilController extends Controller
         $passwordLama = $this->request->getPost('password_lama');
         $passwordBaru = $this->request->getPost('password_baru');
 
-        // Verifikasi password lama lewat Shield
+        // Verifikasi password lama  
         $users      = auth()->getProvider();
         $userShield = $users->findById(auth()->id());
         $passwords  = service('passwords');
@@ -127,7 +126,7 @@ class MemberProfilController extends Controller
             return redirect()->to(base_url('member/profil'));
         }
 
-        // Simpan password baru ke Shield
+        // Simpan password baru
         $userShield->fill(['password' => $passwordBaru]);
         $users->save($userShield);
 

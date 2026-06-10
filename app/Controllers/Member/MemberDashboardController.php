@@ -46,7 +46,7 @@ class MemberDashboardController extends Controller
         helper(['point']);
     }
 
-    // ── Helper: cek info kuis per transaksi ──────────────────
+    // Helper: cek info kuis per transaksi 
     private function getKuisInfo(array $ret, int $memberId, float $batasJam = 24): array
     {
         $quiz = $this->quizModel
@@ -75,14 +75,9 @@ class MemberDashboardController extends Controller
         $selisihJam      = abs($nowTimestamp - $returnTimestamp) / 3600;
         $masihAktif      = $selisihJam <= $batasJam;
 
-        // Expired: lewat 24 jam DAN belum pernah dikerjakan sama sekali
-        // Kalau sudah dikerjakan (sudah_kuis = true), tetap tampil Selesai
         $sudahDikerjakan = $attemptsLoan > 0;
         $percobaanHabis  = $attemptsLoan >= $quiz['max_attempts'];
 
-        // Expired: lewat 24 jam DAN percobaan belum habis
-        // Berlaku untuk semua kondisi — belum maupun sudah dikerjakan tapi masih bisa ulangi
-        // Yang tidak expired: percobaan sudah habis (tampil Selesai)
         $expired = !$masihAktif && !$percobaanHabis;
 
         return [
@@ -288,6 +283,7 @@ class MemberDashboardController extends Controller
         $member = $this->getMember();
         $loanId = (int) $this->request->getGet('loan_id');
 
+        // Kuis harus ada dan aktif
         $quiz = $this->quizModel
             ->select('quizzes.*, books.title as book_title')
             ->join('books', 'quizzes.book_id = books.id', 'LEFT')
@@ -300,7 +296,7 @@ class MemberDashboardController extends Controller
             return redirect()->to('member/pengembalian');
         }
 
-        // Cek expired lewat loan
+        // Cek kadaluarsa kuis lewat loan
         if ($loanId) {
             $loan = $this->loanModel->find($loanId);
             if ($loan && !empty($loan['return_date'])) {
@@ -312,6 +308,7 @@ class MemberDashboardController extends Controller
             }
         }
 
+        // cek jumlah percobaan
         $attemptsLoan = $loanId
             ? $this->attemptModel
                 ->where('quiz_id', $quizId)
@@ -325,6 +322,7 @@ class MemberDashboardController extends Controller
             return redirect()->to('member/pengembalian');
         }
 
+        // ambil soal
         $questions = $this->questionModel
             ->where('quiz_id', $quizId)
             ->orderBy('id', 'ASC')
@@ -374,7 +372,7 @@ class MemberDashboardController extends Controller
         $skor = $total > 0 ? round($benar / $total * 100) : 0;
         $poin = $skor;
 
-        // ── Ambil total poin sebelum submit ──────────────────
+        //  Ambil total poin sebelum submit 
         $totalSebelum = (int) ($this->pointModel
             ->selectSum('points')
             ->where('member_id', $member['id'])
@@ -389,9 +387,9 @@ class MemberDashboardController extends Controller
             'started_at'  => Time::now()->subSeconds($durasiDetik)->toDateTimeString(),
             'finished_at' => Time::now()->toDateTimeString(),
         ]);
+        
         $attemptId = $this->attemptModel->getInsertID();
 
-        // ── Catat poin kuis ──────────────────────────────────
         if ($poin > 0) {
             catat_poin(
                 $member['id'],
@@ -434,11 +432,12 @@ class MemberDashboardController extends Controller
             // Bulan berjalan — kalkulasi real-time
             $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
         } else {
-            // Bulan lalu — pakai lazy snapshot
+            // Bulan lalu pakai snapshot
             if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
                 $this->leaderboardModel->buatSnapshot($bulan, $tahun);
             }
             $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun);
+            $leaderboard = $this->_tambahBreakdown($leaderboard, $bulan, $tahun);
         }
 
         // Rank member yang login di bulan yang dipilih
@@ -474,51 +473,76 @@ class MemberDashboardController extends Controller
         ]);
     }
 
-    // ── Helper: hitung leaderboard real-time bulan ini ───────
-    private function _getLeaderboardRealtime(int $bulan, int $tahun): array
-{
-    $members = $this->memberModel->where('deleted_at', null)->findAll();
-    $db      = \Config\Database::connect();
-    $data    = [];
-
-    foreach ($members as $m) {
-        $bd = $db->table('point_transactions')
-            ->select("
-                SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
-                SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
-                SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
-                SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
-                SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis,
-                SUM(points) as total_points
-            ")
-            ->where('member_id', $m['id'])
-            ->where('MONTH(created_at)', $bulan)
-            ->where('YEAR(created_at)',  $tahun)
-            ->get()->getRowArray();
-
-        $data[] = [
-            'member_id'       => $m['id'],
-            'first_name'      => $m['first_name'],
-            'last_name'       => $m['last_name'],
-            'no_identitas'    => $m['no_identitas'],
-            'tipe_anggota'    => $m['tipe_anggota'],
-            'foto_profil'     => $m['foto_profil'],
-
-            // 🔥 TAMBAHAN
-            'poin_kunjungan'  => (int) ($bd['poin_kunjungan']  ?? 0),
-            'poin_peminjaman' => (int) ($bd['poin_peminjaman'] ?? 0),
-            'poin_tepat'      => (int) ($bd['poin_tepat']      ?? 0),
-            'poin_terlambat'  => (int) ($bd['poin_terlambat']  ?? 0),
-            'poin_kuis'       => (int) ($bd['poin_kuis']       ?? 0),
-            'total_points'    => (int) ($bd['total_points']    ?? 0),
-        ];
+    private function _tambahBreakdown(array $leaderboard, int $bulan, int $tahun): array
+    {
+        $db = \Config\Database::connect();
+        foreach ($leaderboard as &$row) {
+            $bd = $db->table('point_transactions')
+                ->select("
+                    SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
+                    SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
+                    SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
+                    SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
+                    SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis
+                ")
+                ->where('member_id', $row['member_id'])
+                ->where('MONTH(created_at)', $bulan)
+                ->where('YEAR(created_at)',  $tahun)
+                ->get()->getRowArray();
+            $row['poin_kunjungan']  = (int) ($bd['poin_kunjungan']  ?? 0);
+            $row['poin_peminjaman'] = (int) ($bd['poin_peminjaman'] ?? 0);
+            $row['poin_tepat']      = (int) ($bd['poin_tepat']      ?? 0);
+            $row['poin_terlambat']  = (int) ($bd['poin_terlambat']  ?? 0);
+            $row['poin_kuis']       = (int) ($bd['poin_kuis']       ?? 0);
+        }
+        unset($row);
+        return $leaderboard;
     }
 
-    usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
-    return $data;
-}
+    private function _getLeaderboardRealtime(int $bulan, int $tahun): array
+    {
+        $members = $this->memberModel->where('deleted_at', null)->findAll();
+        $db      = \Config\Database::connect();
+        $data    = [];
 
-    // ── Helper: hitung rank member real-time ─────────────────
+        foreach ($members as $m) {
+            $bd = $db->table('point_transactions')
+                ->select("
+                    SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
+                    SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
+                    SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
+                    SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
+                    SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis,
+                    SUM(points) as total_points
+                ")
+                ->where('member_id', $m['id'])
+                ->where('MONTH(created_at)', $bulan)
+                ->where('YEAR(created_at)',  $tahun)
+                ->get()->getRowArray();
+
+            $data[] = [
+                'member_id'       => $m['id'],
+                'first_name'      => $m['first_name'],
+                'last_name'       => $m['last_name'],
+                'no_identitas'    => $m['no_identitas'],
+                'tipe_anggota'    => $m['tipe_anggota'],
+                'foto_profil'     => $m['foto_profil'],
+
+                // TAMBAHAN
+                'poin_kunjungan'  => (int) ($bd['poin_kunjungan']  ?? 0),
+                'poin_peminjaman' => (int) ($bd['poin_peminjaman'] ?? 0),
+                'poin_tepat'      => (int) ($bd['poin_tepat']      ?? 0),
+                'poin_terlambat'  => (int) ($bd['poin_terlambat']  ?? 0),
+                'poin_kuis'       => (int) ($bd['poin_kuis']       ?? 0),
+                'total_points'    => (int) ($bd['total_points']    ?? 0),
+            ];
+        }
+
+        usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
+        return $data;
+    }
+
+    // Helper: hitung rank member real-time 
     private function _hitungRankRealtime(int $memberId, int $bulan, int $tahun): int
     {
         $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
@@ -542,10 +566,8 @@ class MemberDashboardController extends Controller
 
         $pager = $this->pointModel->pager;
 
-        // Total poin bulan ini
         $totalBulanIni = $this->pointModel->getTotalPoinBulanIni($member['id']);
 
-        // Total poin all time
         $totalAllTime = $this->pointModel->getTotalPoinAllTime($member['id']);
 
         // Rank bulan ini

@@ -69,6 +69,11 @@ $coverImageFilePath = BOOK_COVER_URI . $book['book_cover'];
           <h5>Penerbit: <?= $book['publisher']; ?></h5>
           <h5>Kategori: <?= $book['category']; ?></h5>
           <h5>Rak: <?= $book['rack']; ?>, Lantai <?= $book['floor']; ?></h5>
+
+          <div class="mt-3">
+            <h5>Deskripsi / Abstrak: <br> <?= !empty($book['description']) ? nl2br(esc($book['description'])) : '<span class="text-muted fst-italic">Tidak ada deskripsi</span>'; ?></h5>
+          </div>
+
         </div>
       </div>
     </div>

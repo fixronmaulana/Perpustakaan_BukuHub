@@ -144,15 +144,16 @@ class BooksController extends ResourceController
     public function create()
     {
         if (!$this->validate([
-            'cover'     => 'is_image[cover]|mime_in[cover,image/jpg,image/jpeg,image/gif,image/png,image/webp]|max_size[cover,5120]',
-            'title'     => 'required|string|max_length[127]',
-            'author'    => 'required|alpha_numeric_punct|max_length[64]',
-            'publisher' => 'required|string|max_length[64]',
-            'isbn'      => 'required|numeric|min_length[10]|max_length[13]',
-            'year'      => 'required|numeric|min_length[4]|max_length[4]|less_than_equal_to[2100]',
-            'rack'      => 'required|numeric',
-            'category'  => 'required|numeric',
-            'stock'     => 'required|numeric|greater_than_equal_to[1]',
+            'cover'       => 'is_image[cover]|mime_in[cover,image/jpg,image/jpeg,image/gif,image/png,image/webp]|max_size[cover,5120]',
+            'title'       => 'required|string|max_length[127]',
+            'author'      => 'required|alpha_numeric_punct|max_length[64]',
+            'publisher'   => 'required|string|max_length[64]',
+            'isbn'        => 'required|numeric|min_length[10]|max_length[13]',
+            'year'        => 'required|numeric|min_length[4]|max_length[4]|less_than_equal_to[2100]',
+            'description' => 'permit_empty|string|max_length[5000]',
+            'rack'        => 'required|numeric',
+            'category'    => 'required|numeric',
+            'stock'       => 'required|numeric|greater_than_equal_to[1]',
         ])) {
             $categories = $this->categoryModel->findAll();
             $racks = $this->rackModel->findAll();
@@ -176,17 +177,18 @@ class BooksController extends ResourceController
         $slug = url_title($this->request->getVar('title') . ' ' . rand(0, 1000), '-', true);
 
         if (!$this->bookModel->save([
-            'slug' => $slug,
-            'title' => $this->request->getVar('title'),
-            'author' => $this->request->getVar('author'),
-            'publisher' => $this->request->getVar('publisher'),
-            'isbn' => $this->request->getVar('isbn'),
-            'year' => $this->request->getVar('year'),
-            'rack_id' => $this->request->getVar('rack'),
+            'slug'        => $slug,
+            'title'       => $this->request->getVar('title'),
+            'author'      => $this->request->getVar('author'),
+            'publisher'   => $this->request->getVar('publisher'),
+            'isbn'        => $this->request->getVar('isbn'),
+            'year'        => $this->request->getVar('year'),
+            'description' => $this->request->getVar('description'),
+            'rack_id'     => $this->request->getVar('rack'),
             'category_id' => $this->request->getVar('category'),
-            'book_cover' => $coverImageFileName ?? null,
+            'book_cover'  => $coverImageFileName ?? null,
         ]) || !$this->bookStockModel->save([
-            'book_id' => $this->bookModel->getInsertID(),
+            'book_id'  => $this->bookModel->getInsertID(),
             'quantity' => $this->request->getVar('stock')
         ])) {
             $categories = $this->categoryModel->findAll();
@@ -250,15 +252,16 @@ class BooksController extends ResourceController
         }
 
         if (!$this->validate([
-            'cover'     => 'is_image[cover]|mime_in[cover,image/jpg,image/jpeg,image/gif,image/png,image/webp]|max_size[cover,5120]',
-            'title'     => 'required|string|max_length[127]',
-            'author'    => 'required|alpha_numeric_punct|max_length[64]',
-            'publisher' => 'required|string|max_length[64]',
-            'isbn'      => 'required|numeric|min_length[10]|max_length[13]',
-            'year'      => 'required|numeric|min_length[4]|max_length[4]|less_than_equal_to[2100]',
-            'rack'      => 'required|numeric',
-            'category'  => 'required|numeric',
-            'stock'     => 'required|numeric|greater_than_equal_to[1]',
+            'cover'       => 'is_image[cover]|mime_in[cover,image/jpg,image/jpeg,image/gif,image/png,image/webp]|max_size[cover,5120]',
+            'title'       => 'required|string|max_length[127]',
+            'author'      => 'required|alpha_numeric_punct|max_length[64]',
+            'publisher'   => 'required|string|max_length[64]',
+            'isbn'        => 'required|numeric|min_length[10]|max_length[13]',
+            'year'        => 'required|numeric|min_length[4]|max_length[4]|less_than_equal_to[2100]',
+            'description' => 'permit_empty|string|max_length[5000]',
+            'rack'        => 'required|numeric',
+            'category'    => 'required|numeric',
+            'stock'       => 'required|numeric|greater_than_equal_to[1]',
         ])) {
             $categories = $this->categoryModel->findAll();
             $racks = $this->rackModel->findAll();
@@ -292,19 +295,20 @@ class BooksController extends ResourceController
             : $book['slug'];
 
         if (!$this->bookModel->save([
-            'id'  => $book['id'],
-            'slug' => $slug,
-            'title' => $this->request->getVar('title'),
-            'author' => $this->request->getVar('author'),
-            'publisher' => $this->request->getVar('publisher'),
-            'isbn' => $this->request->getVar('isbn'),
-            'year' => $this->request->getVar('year'),
-            'rack_id' => $this->request->getVar('rack'),
+            'id'          => $book['id'],
+            'slug'        => $slug,
+            'title'       => $this->request->getVar('title'),
+            'author'      => $this->request->getVar('author'),
+            'publisher'   => $this->request->getVar('publisher'),
+            'isbn'        => $this->request->getVar('isbn'),
+            'year'        => $this->request->getVar('year'),
+            'description' => $this->request->getVar('description'),
+            'rack_id'     => $this->request->getVar('rack'),
             'category_id' => $this->request->getVar('category'),
-            'book_cover' => $coverImageFileName ?? null,
+            'book_cover'  => $coverImageFileName ?? null,
         ]) || !$this->bookStockModel->save([
-            'id' => $bookStock['id'],
-            'book_id' => $book['id'],
+            'id'       => $bookStock['id'],
+            'book_id'  => $book['id'],
             'quantity' => $this->request->getVar('stock')
         ])) {
             $categories = $this->categoryModel->findAll();

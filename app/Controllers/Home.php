@@ -30,7 +30,27 @@ class Home extends BaseController
 
     public function index(): string
     {
-        return view('home/home', ['activeNav' => 'beranda']);
+        $books = $this->bookModel
+            ->select('books.*, book_stock.quantity, categories.name as category, racks.name as rack, racks.floor')
+            ->join('book_stock', 'books.id = book_stock.book_id', 'LEFT')
+            ->join('categories', 'books.category_id = categories.id', 'LEFT')
+            ->join('racks', 'books.rack_id = racks.id', 'LEFT')
+            ->orderBy('books.id', 'DESC') // Mengurutkan dari yang terbaru dimasukkan
+            ->limit(4) 
+            ->findAll();
+
+            // Menggunakan countAllResults() untuk menghitung semua baris di tabel books
+            $totalBooks = $this->bookModel->countAllResults();
+
+            // Menghitung anggota yang tidak dihapus (anggota aktif)
+            $totalMembers = $this->memberModel->where('deleted_at', null)->countAllResults();
+
+            return view('home/home', [
+                'books'     => $books,
+                'totalBooks'   => $totalBooks,
+                'totalMembers' => $totalMembers,
+                'activeNav' => 'beranda'
+            ]);
     }
 
     public function book(): string
@@ -100,15 +120,14 @@ class Home extends BaseController
         $bulanIni = (int) date('n');
         $tahunIni = (int) date('Y');
 
-        // Pilih bulan dari query string
         $bulan = (int) ($this->request->getGet('bulan') ?? $bulanIni);
         $tahun = (int) ($this->request->getGet('tahun') ?? $tahunIni);
 
         if ($bulan === $bulanIni && $tahun === $tahunIni) {
-            // Bulan berjalan — real-time
+            // Bulan berjalan real-time
             $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
         } else {
-            // Bulan lalu — lazy snapshot
+            // Bulan lalu lazy snapshot
             if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
                 $this->leaderboardModel->buatSnapshot($bulan, $tahun);
             }
@@ -128,10 +147,8 @@ class Home extends BaseController
             ];
         }
 
-        // Ambil hadiah aktif bulan yang dipilih
         $hadiah = $this->rewardModel->getHadiahBulan($bulan, $tahun);
 
-        // Untuk snapshot (bulan lalu), tambah breakdown dari point_transactions
         if ($bulan !== $bulanIni || $tahun !== $tahunIni) {
             $db = \Config\Database::connect();
             foreach ($leaderboard as &$row) {

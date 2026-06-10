@@ -308,6 +308,7 @@ class MembersController extends ResourceController
         $member = $this->memberModel->where('uid', $uid)->first();
         if (empty($member)) throw new PageNotFoundException('Member not found');
 
+        // Cek peminjaman aktif (belum dikembalikan)
         $pinjamanAktif = $this->loanModel->where([
             'member_id'   => $member['id'],
             'return_date' => null,
@@ -316,6 +317,16 @@ class MembersController extends ResourceController
         if ($pinjamanAktif > 0) {
             session()->setFlashdata([
                 'msg'   => 'Anggota tidak dapat dihapus karena masih memiliki ' . $pinjamanAktif . ' peminjaman aktif.',
+                'error' => true,
+            ]);
+            return redirect()->back();
+        }
+
+        $totalRiwayat = $this->loanModel->where('member_id', $member['id'])->countAllResults();
+
+        if ($totalRiwayat > 0) {
+            session()->setFlashdata([
+                'msg'   => 'Anggota tidak dapat dihapus karena memiliki riwayat peminjaman buku.',
                 'error' => true,
             ]);
             return redirect()->back();
@@ -336,8 +347,6 @@ class MembersController extends ResourceController
         return redirect()->to('admin/members');
     }
 
-    // ── IMPORT ANGGOTA ────────────────────────────────────────────────
-
     public function importForm()
     {
         return view('members/import');
@@ -349,7 +358,6 @@ class MembersController extends ResourceController
         $sheet       = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Template Anggota');
 
-        // Header
         $sheet->setCellValue('A1', 'first_name');
         $sheet->setCellValue('B1', 'last_name');
         $sheet->setCellValue('C1', 'no_identitas');
@@ -358,14 +366,12 @@ class MembersController extends ResourceController
         $sheet->setCellValue('F1', 'email');
         $sheet->setCellValue('G1', 'phone');
 
-        // Style header
         $sheet->getStyle('A1:G1')->applyFromArray([
             'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill'      => ['fillType' => 'solid', 'startColor' => ['rgb' => '1E3A8A']],
             'alignment' => ['horizontal' => 'center'],
         ]);
 
-        // Lebar kolom
         foreach (range('A', 'G') as $col) {
             $sheet->getColumnDimension($col)->setWidth(22);
         }
@@ -375,7 +381,7 @@ class MembersController extends ResourceController
         $sheet->getStyle("G1:G10000")->getNumberFormat()
             ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
 
-        // Contoh data baris 2 — gender pakai Laki-laki/Perempuan
+        // Contoh data baris 2
         $sheet->setCellValue('A2', 'Budi');
         $sheet->setCellValue('B2', 'Santoso');
         $sheet->setCellValueExplicit('C2', '12345678', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
@@ -384,7 +390,7 @@ class MembersController extends ResourceController
         $sheet->setCellValue('F2', 'budi@email.com');
         $sheet->setCellValueExplicit('G2', '6281234567890', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
 
-        // Dropdown validasi kolom D (tipe_anggota)
+        // validasi tipe_anggota
         $validation = $sheet->getCell('D2')->getDataValidation();
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST)
             ->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION)
@@ -392,13 +398,12 @@ class MembersController extends ResourceController
             ->setShowDropDown(false)
             ->setFormula1('"Murid,Guru,Staf"');
 
-        // Dropdown validasi kolom E (gender) — Laki-laki/Perempuan
         $validationGender = $sheet->getCell('E2')->getDataValidation();
         $validationGender->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST)
             ->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION)
             ->setAllowBlank(false)
             ->setShowDropDown(false)
-            ->setFormula1('"Laki-laki,Perempuan"');  // ← diubah dari Male,Female
+            ->setFormula1('"Laki-laki,Perempuan"'); 
 
         $sheet->freezePane('A2');
 
@@ -433,9 +438,8 @@ class MembersController extends ResourceController
         $rows        = $spreadsheet->getActiveSheet()->toArray();
         @unlink($tmpPath);
 
-        array_shift($rows); // skip header
+        array_shift($rows); 
 
-        // ── Hapus baris kosong di akhir sebelum hitung total ──────────
         $rows = array_filter($rows, fn($row) => !empty(array_filter($row)));
         $rows = array_values($rows);
 
@@ -448,11 +452,11 @@ class MembersController extends ResourceController
             $total++;
             $firstName   = trim($row[0] ?? '');
             $lastName    = trim($row[1] ?? '');
-            $noIdentitas = trim((string) ($row[2] ?? ''));  // cast string: cegah 0 di depan hilang
+            $noIdentitas = trim((string) ($row[2] ?? ''));  
             $tipeAnggota = trim($row[3] ?? '');
-            $genderInput = trim($row[4] ?? '');             // Laki-laki / Perempuan
+            $genderInput = trim($row[4] ?? '');             
             $email       = trim($row[5] ?? '');
-            $phone       = trim((string) ($row[6] ?? ''));  // cast string: cegah 0 di depan hilang
+            $phone       = trim((string) ($row[6] ?? '')); 
 
             // Validasi kolom wajib
             if (empty($firstName) || empty($noIdentitas) || empty($tipeAnggota) || empty($genderInput)) {
@@ -461,31 +465,30 @@ class MembersController extends ResourceController
                 continue;
             }
 
-            // Validasi tipe_anggota
+            // tipe_anggota
             if (!in_array($tipeAnggota, ['Murid', 'Guru', 'Staf'])) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "tipe_anggota '{$tipeAnggota}' tidak valid. Gunakan: Murid, Guru, atau Staf."];
                 continue;
             }
 
-            // Validasi gender — harus Laki-laki atau Perempuan
+            // gender
             if (!array_key_exists($genderInput, self::GENDER_MAP)) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "gender '{$genderInput}' tidak valid. Gunakan: Laki-laki atau Perempuan."];
                 continue;
             }
 
-            // Konversi gender ke nilai database (Male / Female)
             $genderDb = self::GENDER_MAP[$genderInput];
 
-            // Cek duplikat no_identitas
+            // Cek duplikat
             if ($this->memberModel->where('no_identitas', $noIdentitas)->first()) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "No. Identitas '{$noIdentitas}' sudah terdaftar."];
                 continue;
             }
 
-            // Cek duplikat username di Shield
+            // Cek duplikat username
             if ($this->userModel->findByCredentials(['username' => $noIdentitas])) {
                 $gagal++;
                 $errors[] = ['baris' => $baris, 'no_identitas' => $noIdentitas, 'pesan' => "Username '{$noIdentitas}' sudah terdaftar di sistem."];
@@ -523,7 +526,7 @@ class MembersController extends ResourceController
                     'tipe_anggota' => $tipeAnggota,
                     'email'        => $email,
                     'phone'        => $phone,
-                    'gender'       => $genderDb,   // simpan Male/Female ke database
+                    'gender'       => $genderDb,  
                     'qr_code'      => $qrCode,
                 ]);
 

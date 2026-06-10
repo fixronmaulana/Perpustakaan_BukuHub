@@ -47,7 +47,9 @@ class QRGenerator
         string $filename = 'My QR Code',
         string $logoPath = null
     ) {
-        if (!file_exists($dir)) mkdir($dir);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
 
         $filename = url_title(substr($filename, 0, 16), lowercase: true) . '_'
             . substr(sha1($filename . rand(0, 1000)), 19, 5) . '_'

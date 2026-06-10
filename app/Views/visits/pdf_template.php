@@ -10,39 +10,62 @@
       font-size: 10px;
       color: #1a1a1a;
       background: #fff;
-      /* Margin utama — DOMPDF baca ini, bukan @page */
       margin: 18mm 16mm 18mm 16mm;
     }
 
-    /* ── KOP ─────────────────────────────────────── */
     .kop {
       width: 100%;
-      text-align: center;
+      border-bottom: 3px solid #1e3a8a;
       padding-bottom: 8px;
       margin-bottom: 6px;
-      border-bottom: 3px solid #1e3a8a;
     }
-    .kop .nama-instansi {
-      font-size: 15px;
+    .kop-inner {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .kop-inner td {
+      vertical-align: middle;
+      padding: 0;
+    }
+    .kop-logo {
+      width: 76px;
+      text-align: left;
+    }
+    .kop-logo img {
+      width: 88px;
+      height: 88px;
+      display: block;
+    }
+    .kop-teks {
+      text-align: center;
+    }
+    .kop-teks .nama-instansi {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 20px;
       font-weight: bold;
-      color: #1e3a8a;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
     }
-    .kop .judul-laporan {
-      font-size: 12px;
+    .kop-teks .judul-laporan {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 17px;
       font-weight: bold;
       color: #1a1a1a;
-      margin-top: 3px;
+      margin-top: 4px;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .kop .sub-judul {
-      font-size: 10px;
+    .kop-teks .sub-judul {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
       color: #555;
-      margin-top: 2px;
+      margin-top: 3px;
+      font-style: italic;
+    }
+    .kop-spacer {
+      width: 76px;
     }
 
-    /* ── INFO BAR ────────────────────────────────── */
     .info-bar {
       width: 100%;
       border-collapse: collapse;
@@ -52,15 +75,11 @@
     }
     .info-bar td:last-child { text-align: right; }
 
-    /* ── SUMMARY ─────────────────────────────────── */
     .summary-title {
       font-size: 9px;
       font-weight: bold;
-      color: #1e3a8a;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border-left: 3px solid #1e3a8a;
-      padding-left: 6px;
       margin-bottom: 5px;
     }
     .summary-table {
@@ -74,12 +93,8 @@
       border: 1px solid #dce3f5;
       width: 16.66%;
     }
-    .summary-table td.total-cell {
-      background-color: #1e3a8a;
-    }
-    .summary-table td.normal-cell {
-      background-color: #f0f4ff;
-    }
+    .summary-table td.total-cell { background-color: #1e3a8a; }
+    .summary-table td.normal-cell { background-color: #f0f4ff; }
     .s-value {
       font-size: 16px;
       font-weight: bold;
@@ -96,22 +111,16 @@
     }
     .total-cell .s-label { color: #c8d4f0; }
 
-    /* ── DIVIDER ─────────────────────────────────── */
     .divider {
       border: none;
       border-top: 1px solid #dce3f5;
       margin: 8px 0;
     }
-
-    /* ── TABEL DATA ──────────────────────────────── */
     .table-title {
       font-size: 9px;
       font-weight: bold;
-      color: #1e3a8a;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border-left: 3px solid #1e3a8a;
-      padding-left: 6px;
       margin-bottom: 5px;
     }
     table.data {
@@ -143,7 +152,6 @@
       border-bottom: 2px solid #1e3a8a;
     }
 
-    /* Lebar kolom — total 100% dalam area cetak A4 portrait */
     col.c-no   { width: 5%;  }
     col.c-nama { width: 21%; }
     col.c-noid { width: 14%; }
@@ -156,26 +164,11 @@
     .badge-scan   { background:#1e3a8a; color:#fff; padding:2px 5px; border-radius:3px; font-size:7.5px; }
     .badge-manual { background:#6b7280; color:#fff; padding:2px 5px; border-radius:3px; font-size:7.5px; }
 
-    /* ── FOOTER ──────────────────────────────────── */
-    .footer {
-      margin-top: 14px;
-    }
-    .footer-ttd {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .footer-ttd td {
-      vertical-align: top;
-      font-size: 9px;
-      color: #444;
-    }
-    .footer-ttd .ttd-right {
-      text-align: center;
-      width: 180px;
-    }
-    .ttd-space {
-      height: 45px;
-    }
+    .footer { margin-top: 14px; }
+    .footer-ttd { width: 100%; border-collapse: collapse; }
+    .footer-ttd td { vertical-align: top; font-size: 9px; color: #444; }
+    .footer-ttd .ttd-right { text-align: center; width: 180px; }
+    .ttd-space { height: 45px; }
     .ttd-line {
       border-top: 1px solid #333;
       padding-top: 3px;
@@ -193,15 +186,22 @@
   </style>
 </head>
 <body>
-
-  <!-- KOP -->
   <div class="kop">
-    <div class="nama-instansi">Perpustakaan Al-Munawwir</div>
-    <div class="judul-laporan">Laporan Data Kunjungan</div>
-    <div class="sub-judul">Periode: <?= esc($periodeLabel) ?></div>
+    <table class="kop-inner">
+      <tr>
+        <td class="kop-logo">
+          <img src="<?= base_url('assets/images/logo-perpus2.png') ?>" alt="Logo Perpustakaan">
+        </td>
+        <td class="kop-teks">
+          <div class="nama-instansi">Perpustakaan SMK Al-Munawwir IIBS</div>
+          <div class="judul-laporan">Laporan Data Kunjungan</div>
+          <div class="sub-judul">Periode: <?= esc($periodeLabel) ?></div>
+        </td>
+        <td class="kop-spacer"></td>
+      </tr>
+    </table>
   </div>
 
-  <!-- INFO BAR -->
   <table class="info-bar">
     <tr>
       <td>Dicetak pada: <?= date('d/m/Y, H:i') ?> WIB</td>
@@ -209,7 +209,6 @@
     </tr>
   </table>
 
-  <!-- SUMMARY -->
   <div class="summary-title">Ringkasan Kunjungan</div>
   <table class="summary-table">
     <tr>
@@ -242,7 +241,6 @@
 
   <hr class="divider">
 
-  <!-- TABEL DATA -->
   <div class="table-title">Detail Data Kunjungan</div>
   <table class="data">
     <colgroup>
@@ -291,7 +289,6 @@
     </tbody>
   </table>
 
-  <!-- FOOTER -->
   <div class="footer">
     <table class="footer-ttd">
       <tr>

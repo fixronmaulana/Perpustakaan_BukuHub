@@ -23,10 +23,6 @@ class WaReminderController extends ResourceController
 
     }
 
-    // ──────────────────────────────────────
-    // HALAMAN UTAMA
-    // ──────────────────────────────────────
-
     public function index()
     {
         $templates = $this->waTemplateModel->findAll();
@@ -53,10 +49,6 @@ class WaReminderController extends ResourceController
             'fonnteToken'    => env('FONNTE_TOKEN') ? '✓ Terkonfigurasi' : '✗ Belum diset',
         ]);
     }
-
-    // ──────────────────────────────────────
-    // KIRIM MANUAL
-    // ──────────────────────────────────────
 
     public function sendAll()
     {
@@ -92,10 +84,6 @@ class WaReminderController extends ResourceController
 
         return redirect()->to('admin/wa-reminder');
     }
-
-    // ──────────────────────────────────────
-    // CRUD TEMPLATE
-    // ──────────────────────────────────────
 
     public function create()
     {
@@ -194,10 +182,6 @@ class WaReminderController extends ResourceController
         return redirect()->to('admin/wa-reminder');
     }
 
-    // ──────────────────────────────────────
-    // PREVIEW TEMPLATE (AJAX)
-    // ──────────────────────────────────────
-
     public function preview()
     {
         if (!$this->request->isAJAX()) {
@@ -215,6 +199,7 @@ class WaReminderController extends ResourceController
             'due_date'   => date('Y-m-d', strtotime('+1 day')),
         ];
 
+        // untuk mengambil method 'renderTemplate' yang protect di luar class
         $service    = new WaReminderService();
         $reflection = new \ReflectionClass($service);
         $method     = $reflection->getMethod('renderTemplate');
@@ -223,9 +208,7 @@ class WaReminderController extends ResourceController
 
         return $this->response->setJSON(['preview' => $rendered]);
     }
-    // ──────────────────────────────────────
-    // RIWAYAT LOG
-    // ──────────────────────────────────────
+   
     public function logs()
     {
         $itemPerPage = 20;
@@ -241,9 +224,6 @@ class WaReminderController extends ResourceController
             'itemPerPage' => $itemPerPage,
         ]);
     }
-    // ──────────────────────────────────────
-    // PREVIEW DATA PEMINJAMAN (AJAX)
-    // ──────────────────────────────────────
 
     public function previewLoans(string $type)
     {

@@ -86,6 +86,23 @@
           </div>
         </div>
       </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Deskripsi / Abstrak</label>
+        <textarea
+          class="form-control <?php if ($validation->hasError('description')) : ?>is-invalid<?php endif ?>"
+          id="description"
+          name="description"
+          rows="5"
+          maxlength="5000"
+          placeholder="Tuliskan deskripsi atau abstrak buku..."
+        ><?= $oldInput['description'] ?? $book['description']; ?></textarea>
+        <div class="form-text">Opsional. Maksimal 5000 karakter.</div>
+        <div class="invalid-feedback">
+          <?= $validation->getError('description'); ?>
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-12 col-md-6 col-lg-4 mb-3">
           <label for="rack" class="form-label">Rak</label>

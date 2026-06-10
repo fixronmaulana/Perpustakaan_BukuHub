@@ -303,7 +303,6 @@ class LoansController extends ResourceController
         }
 
         $newLoanIds     = [];
-        $poinPeminjaman = get_poin_setting('loan');
 
         foreach ($bookSlugs as $slug) {
             $duration = $this->request->getVar('duration-' . $slug);
@@ -338,7 +337,8 @@ class LoansController extends ResourceController
             $loanId = $this->loanModel->getInsertID();
             array_push($newLoanIds, $loanId);
 
-            // ── Catat poin peminjaman 
+            $poinPeminjaman = get_poin_setting('loan');
+
             catat_poin(
                 $member['id'],
                 'loan',

@@ -20,6 +20,7 @@ class BookModel extends Model
         'publisher',
         'isbn',
         'year',
+        'description',
         'rack_id',
         'category_id',
         'book_cover',

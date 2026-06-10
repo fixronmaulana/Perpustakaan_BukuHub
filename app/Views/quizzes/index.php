@@ -122,7 +122,7 @@
   </div>
 </div>
 
-<!-- ── Modal Tambah Kuis ── -->
+<!-- Modal Tambah Kuis -->
 <div class="modal fade" id="modalTambahKuis" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -178,7 +178,7 @@
   </div>
 </div>
 
-<!-- ── Modal Edit Kuis (BARU) ── -->
+<!-- Modal Edit Kuis (BARU) -->
 <div class="modal fade" id="modalEditKuis" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -253,9 +253,8 @@
     allowClear: true,
   });
 
-  // ── Fungsi buka modal edit kuis (BARU) ──
+  // Fungsi buka modal edit kuis
   function bukaEditKuis(quiz) {
-    // Isi form dengan data kuis yang dipilih
     document.getElementById('editNamaKuis').value      = quiz.name;
     document.getElementById('editDeskripsi').value     = quiz.description ?? '';
     document.getElementById('editDurasi').value        = quiz.duration_minutes;
@@ -268,7 +267,6 @@
     document.getElementById('formEditKuis').action =
       '<?= base_url('admin/kuis/') ?>' + quiz.id + '/edit';
 
-    // Tampilkan modal
     new bootstrap.Modal(document.getElementById('modalEditKuis')).show();
   }
 </script>

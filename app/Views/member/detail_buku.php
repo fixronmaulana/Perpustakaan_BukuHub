@@ -14,7 +14,7 @@
   $huruf     = strtoupper(substr($book['title'], 0, 1));
   $stok      = (int)($book['quantity'] ?? 0);
 
-  // 🔥 LOGIKA STATUS STOK (LEBIH LENGKAP)
+  // LOGIKA STATUS STOK (LEBIH LENGKAP)
   if ($stok <= 0) {
     $status = 'Tidak tersedia';
     $class  = 'habis';

@@ -12,10 +12,10 @@
     <!-- Bagian Atas: Logo & Nama Sekolah -->
     <div class="kepala-masuk">
       <div class="logo-masuk">
-        <img src="<?= base_url('assets/images/logo-perpus2.png') ?>" alt="Logo SMK AL-Munawwir">
+        <img src="<?= base_url('assets/images/logo-perpus3.png') ?>" alt="Logo SMK AL-Munawwir">
       </div>
       <!-- <div class="nama-sekolah">SMK AL-munawwir</div> -->
-      <div class="tagline-masuk">Masuk untuk akses layanan perpustakaan</div>
+      <div class="tagline-masuk"> <span style="color: #1e3a8a; font-size: 1rem; font-weight:700;">Selamat Datang</span><br> Masuk untuk akses layanan perpustakaan kami.</div>
     </div>
 
     <div class="pemisah-masuk"></div>

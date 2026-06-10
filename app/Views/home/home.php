@@ -28,14 +28,15 @@
       <div class="item-statistik">
         <div class="ikon-statistik">📖</div>
         <div>
-          <div class="angka-statistik">15,000+</div>
+          <div class="angka-statistik"><?= number_format($totalBooks, 0, ',', '.') ?>+</div>
           <div class="label-statistik">Koleksi Buku</div>
         </div>
       </div>
+      
       <div class="item-statistik">
         <div class="ikon-statistik">👥</div>
         <div>
-          <div class="angka-statistik">2,500+</div>
+          <div class="angka-statistik"><?= number_format($totalMembers, 0, ',', '.') ?>+</div>
           <div class="label-statistik">Anggota Aktif</div>
         </div>
       </div>
@@ -45,7 +46,6 @@
   <div class="petunjuk-gulir">↓</div>
 </section>
 
-<!-- ══ KOLEKSI POPULER ══ -->
 <section class="seksi-populer">
   <div class="dalam-populer">
 
@@ -66,59 +66,64 @@
 
     <div class="grid-populer">
 
-      <a href="<?= base_url('book') ?>" class="kartu-populer" style="animation-delay:0ms">
-        <div class="bungkus-sampul-populer">
-          <div class="sampul-populer" style="background-image:url('https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&q=80')"></div>
-          <span class="lencana-baru">Baru</span>
+      <?php if (empty($books)) : ?>
+        <div class="kondisi-kosong" style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #888;">
+          <div class="ikon-kosong" style="font-size: 2.5rem; margin-bottom: 0.5rem;">📭</div>
+          <h3>Buku belum tersedia</h3>
+          <p>Koleksi populer saat ini belum dapat ditampilkan.</p>
         </div>
-        <div class="isi-kartu-populer">
-          <span class="label-kategori">Fiksi</span>
-          <p class="judul-kartu">Laskar Pelangi</p>
-          <p class="penulis-kartu">Andrea Hirata</p>
-          <div class="rating-kartu"><span class="bintang">★</span> 4.8</div>
-        </div>
-      </a>
+      <?php endif; ?>
 
-      <a href="<?= base_url('book') ?>" class="kartu-populer" style="animation-delay:80ms">
-        <div class="bungkus-sampul-populer">
-          <div class="sampul-populer" style="background-image:url('https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80')"></div>
-        </div>
-        <div class="isi-kartu-populer">
-          <span class="label-kategori">Sejarah</span>
-          <p class="judul-kartu">Bumi Manusia</p>
-          <p class="penulis-kartu">Pramoedya Ananta Toer</p>
-          <div class="rating-kartu"><span class="bintang">★</span> 4.9</div>
-        </div>
-      </a>
+      <?php foreach ($books as $i => $book) : ?>
+        <?php
+          // Mengikuti standar pengecekan cover dari menu koleksi Anda
+          $coverPath = BOOK_COVER_PATH . ($book['book_cover'] ?? '');
+          $adaCover  = !empty($book['book_cover']) && file_exists($coverPath);
+          $coverUrl  = base_url(
+            $adaCover
+              ? BOOK_COVER_URI . $book['book_cover']
+              : BOOK_COVER_URI . DEFAULT_BOOK_COVER
+          );
+          
+          // Mengikuti rumus delay animasi beranda Anda sebelumnya (0ms, 80ms, 160ms, dst)
+          $tunda = $i * 80; 
+        ?>
 
-      <a href="<?= base_url('book') ?>" class="kartu-populer" style="animation-delay:160ms">
-        <div class="bungkus-sampul-populer">
-          <div class="sampul-populer" style="background-image:url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80')"></div>
-          <span class="lencana-baru">Baru</span>
-        </div>
-        <div class="isi-kartu-populer">
-          <span class="label-kategori">Self-Help</span>
-          <p class="judul-kartu">Filosofi Teras</p>
-          <p class="penulis-kartu">Henry Manampiring</p>
-          <div class="rating-kartu"><span class="bintang">★</span> 4.7</div>
-        </div>
-      </a>
+        <a href="<?= base_url("book/{$book['slug']}") ?>"
+           class="kartu-populer"
+           style="animation-delay: <?= $tunda ?>ms">
 
-      <a href="<?= base_url('book') ?>" class="kartu-populer" style="animation-delay:240ms">
-        <div class="bungkus-sampul-populer">
-          <div class="sampul-populer" style="background-image:url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&q=80')"></div>
-        </div>
-        <div class="isi-kartu-populer">
-          <span class="label-kategori">Pengembangan Diri</span>
-          <p class="judul-kartu">Atomic Habits</p>
-          <p class="penulis-kartu">James Clear</p>
-          <div class="rating-kartu"><span class="bintang">★</span> 4.9</div>
-        </div>
-      </a>
+          <div class="bungkus-sampul-populer">
+            <div class="sampul-populer"
+                 style="background-image: url('<?= $coverUrl ?>');">
+            </div>
+            
+            <?php if (isset($book['created_at']) && (strtotime($book['created_at']) > strtotime('-30 days'))): ?>
+              <span class="lencana-baru">Baru</span>
+            <?php endif; ?>
+          </div>
 
-    </div>
+          <div class="isi-kartu-populer">
+            <?php if (!empty($book['category'])) : ?>
+              <span class="label-kategori"><?= esc($book['category']) ?></span>
+            <?php endif; ?>
+            
+            <p class="judul-kartu">
+              <?= esc(substr($book['title'], 0, 60) . (strlen($book['title']) > 60 ? '…' : '')) ?>
+            </p>
+            
+            <p class="penulis-kartu"><?= esc($book['author']) ?></p>
+            
+            <div class="tombol-detail-koleksi" style="margin-top: 12px; font-size: 0.85rem; font-weight: 600; color: #0d1b3e;">
+              Lihat Detail →
+            </div>
+          </div>
 
-    <div class="ajakan-populer">
+        </a>
+
+      <?php endforeach; ?>
+
+    </div><div class="ajakan-populer">
       <a href="<?= base_url('book') ?>" class="tombol-lihat-semua">Lihat Semua Koleksi →</a>
     </div>
 

@@ -58,7 +58,6 @@ class LeaderboardController extends BaseController
         ]);
     }
 
-    // ── Realtime dengan breakdown per aktivitas ───────────
     private function _getLeaderboardRealtime(int $bulan, int $tahun): array
     {
         $members = $this->memberModel->where('deleted_at', null)->findAll();
@@ -100,7 +99,6 @@ class LeaderboardController extends BaseController
         return $data;
     }
 
-    // ── Tambah breakdown ke snapshot bulan lalu ───────────
     private function _tambahBreakdown(array $leaderboard, int $bulan, int $tahun): array
     {
         $db = \Config\Database::connect();

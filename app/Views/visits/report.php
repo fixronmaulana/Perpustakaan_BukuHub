@@ -53,7 +53,7 @@
 
 <?php if (!empty($visits)): ?>
 
-  <!-- ── Summary Cards ── -->
+  <!-- Summary Cards -->
   <div class="row g-2 mb-3">
     <div class="col-6 col-md-3">
       <div class="card border-primary h-100">
@@ -89,7 +89,7 @@
     </div>
   </div>
 
-  <!-- ── Tabel Data ── -->
+  <!-- Tabel Data -->
   <div class="card">
     <div class="card-body">
       <div class="row mb-3">

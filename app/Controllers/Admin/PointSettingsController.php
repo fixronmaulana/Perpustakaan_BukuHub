@@ -67,7 +67,7 @@ class PointSettingsController extends BaseController
         foreach ($data as $activityType => $rawValue) {
             $value = (int) $rawValue;
 
-            // ── Validasi aktivitas positif ──────────────────────────
+            // Validasi aktivitas positif
             if (in_array($activityType, $this->positiveActivities)) {
                 if ($value <= 0) {
                     $label = $this->getLabelByType($activityType);
@@ -75,13 +75,11 @@ class PointSettingsController extends BaseController
                 }
             }
 
-            // ── Aktivitas negatif: konversi otomatis ke negatif ─────
+            // Aktivitas negatif: konversi otomatis ke negatif
             if (in_array($activityType, $this->negativeActivities)) {
-                // Jika user input positif, jadikan negatif
                 if ($value > 0) {
                     $data[$activityType] = -$value;
                 }
-                // Jika user input 0, tolak
                 if ($value === 0) {
                     $label = $this->getLabelByType($activityType);
                     $errors[] = "Poin <b>{$label}</b> tidak boleh bernilai 0.";
@@ -98,7 +96,9 @@ class PointSettingsController extends BaseController
         }
 
         foreach ($data as $activityType => $points) {
-            $row = $this->pointSettingModel->where('activity_type', $activityType)->first();
+            $row = $this->pointSettingModel
+                ->where('activity_type', $activityType)
+                ->first();
             if ($row) {
                 $this->pointSettingModel->update($row['id'], ['points' => (int) $points]);
             }
@@ -122,7 +122,6 @@ class PointSettingsController extends BaseController
         return $labels[$type] ?? $type;
     }
 
-    // ── Simpan / update hadiah ─────────────────────────────
     public function storeHadiah()
     {
         if (!$this->validate([
@@ -182,7 +181,6 @@ class PointSettingsController extends BaseController
         return redirect()->to('admin/pengaturan-poin');
     }
 
-    // ── Hapus hadiah ───────────────────────────────────────
     public function deleteHadiah($id = null)
     {
         $hadiah = $this->rewardModel->find($id);
@@ -201,7 +199,6 @@ class PointSettingsController extends BaseController
         return redirect()->to('admin/pengaturan-poin');
     }
 
-    // ── Toggle aktif/nonaktif hadiah ──────────────────────
     public function toggleHadiah($id = null)
     {
         $hadiah = $this->rewardModel->find($id);

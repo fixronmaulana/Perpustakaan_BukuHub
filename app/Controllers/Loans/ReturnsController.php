@@ -223,7 +223,6 @@ class ReturnsController extends ResourceController
                 return redirect()->to('admin/returns/new?loan-uid=' . $loan['uid']);
             }
 
-            // ── Catat poin pengembalian terlambat ───────────
             if ($member) {
                 $poin = get_poin_setting('return_late');
                 catat_poin(
@@ -235,9 +234,8 @@ class ReturnsController extends ResourceController
                     'loan'
                 );
             }
-            // ────────────────────────────────────────────────
 
-            // ── Flashdata untuk modal terlambat ─────────────
+            // Flashdata untuk modal terlambat 
             session()->setFlashdata([
                 'msg'            => 'Success',
                 'error'          => false,
@@ -249,7 +247,6 @@ class ReturnsController extends ResourceController
                     'denda'     => $totalFine,
                 ]
             ]);
-            // ────────────────────────────────────────────────
 
         } else {
             deleteLoansQRCode($loan['qr_code']);
@@ -261,7 +258,7 @@ class ReturnsController extends ResourceController
                 return redirect()->to('admin/returns/new?loan-uid=' . $loan['uid']);
             }
 
-            // ── Catat poin pengembalian tepat waktu ─────────
+            // Catat poin pengembalian tepat waktu 
             if ($member) {
                 $poin = get_poin_setting('return_ontime');
                 catat_poin(
@@ -273,9 +270,6 @@ class ReturnsController extends ResourceController
                     'loan'
                 );
             }
-            // ────────────────────────────────────────────────
-
-            // ── Flashdata untuk modal tepat waktu ───────────
             session()->setFlashdata([
                 'msg'            => 'Success',
                 'error'          => false,
@@ -285,7 +279,6 @@ class ReturnsController extends ResourceController
                     'terlambat' => false,
                 ]
             ]);
-            // ────────────────────────────────────────────────
         }
 
         return redirect()->to('admin/returns');

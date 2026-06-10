@@ -12,7 +12,6 @@
 
 <div class="row">
 
-  <!-- ── Kolom kiri: Scan QR ── -->
   <div class="col-12 col-lg-6 mb-3">
     <div class="card h-100">
       <div class="card-body">
@@ -47,7 +46,7 @@
     </div>
   </div>
 
-  <!-- ── Kolom kanan: Form Manual ── -->
+  <!-- Form Manual -->
   <div class="col-12 col-lg-6 mb-3">
     <div class="card h-100">
       <div class="card-body">
@@ -58,7 +57,6 @@
         <form action="<?= base_url('admin/kunjungan') ?>" method="post">
           <?= csrf_field() ?>
 
-          <!-- Cari anggota -->
           <div class="mb-3">
             <label class="form-label">Cari Anggota <span class="text-danger">*</span></label>
             <input type="text" class="form-control mb-2" id="cariAnggota"
@@ -80,7 +78,6 @@
             </div>
           </div>
 
-          <!-- Tanggal kunjungan -->
           <div class="mb-3">
             <label class="form-label">Tanggal & Waktu Kunjungan <span class="text-danger">*</span></label>
             <input type="datetime-local" class="form-control" name="visit_date"
@@ -95,7 +92,6 @@
             <?php endif; ?>
           </div>
 
-          <!-- Catatan -->
           <div class="mb-3">
             <label class="form-label">Catatan <span class="text-muted">(opsional)</span></label>
             <select class="form-select" id="notesSelect" onchange="toggleCatatanLain(this.value)">
@@ -141,7 +137,6 @@
                     'Meminjam / Mengembalikan buku','Menggunakan komputer / internet'
                   ])) ? esc($oldInput['notes']) : '' ?>">
 
-            <!-- Input hidden inilah yang dikirim ke controller -->
             <input type="hidden" name="notes" id="notesHidden"
                   value="<?= esc($oldInput['notes'] ?? '') ?>">
           </div>
@@ -163,7 +158,6 @@
 <script src="<?= base_url('assets/libs/html5-qrcode/html5-qrcode.min.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-// ── Scanner QR ──────────────────────────────────────────────
 const html5QrcodeScanner = new Html5QrcodeScanner(
   'reader',
   { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE] },
@@ -214,7 +208,6 @@ function kirimScan(uid) {
     pesanSpan.textContent  = data.message;
 
     if (data.success) {
-      // --- MODAL REWARD POIN ---
       Swal.fire({
           width: '360px',
           icon: 'success',
@@ -255,7 +248,7 @@ function kirimScan(uid) {
       document.getElementById('identitasMemberScan').textContent = data.member.no_identitas + ' — ' + data.member.tipe;
 
     } else {
-      // --- MODAL PERINGATAN SUDAH KUNJUNGAN ---
+      // MODAL PERINGATAN SUDAH KUNJUNGAN
       Swal.fire({
         title: 'Perhatian',
         text: data.message,
@@ -278,12 +271,12 @@ function kirimScan(uid) {
     Swal.fire('Error', 'Terjadi kesalahan sistem.', 'error');
   });
 }
-// ── Cari anggota untuk form manual ─────────────────────────
+//  Cari anggota untuk form manual 
 let cariTimeout;
 document.getElementById('cariAnggota').addEventListener('input', function() {
   clearTimeout(cariTimeout);
   const val = this.value.trim();
-  if (val.length < 2) {
+  if (val.length < 1) {
     document.getElementById('hasilCari').style.display = 'none';
     return;
   }
@@ -326,7 +319,8 @@ document.addEventListener('click', function(e) {
     document.getElementById('hasilCari').style.display = 'none';
   }
 });
-// ── Dropdown Catatan ────────────────────────────────────────
+
+// Dropdown Catatan 
 function toggleCatatanLain(val) {
   const inputLain   = document.getElementById('notesLainInput');
   const hiddenNotes = document.getElementById('notesHidden');
@@ -341,11 +335,10 @@ function toggleCatatanLain(val) {
   } else {
     inputLain.style.display = 'none';
     inputLain.value   = '';
-    hiddenNotes.value = val; // langsung pakai nilai dropdown
+    hiddenNotes.value = val; //langsung pakai nilai dropdown
   }
 }
 
-// Inisialisasi saat halaman load (untuk kondisi oldInput)
 (function () {
   const sel = document.getElementById('notesSelect');
   if (sel) toggleCatatanLain(sel.value);

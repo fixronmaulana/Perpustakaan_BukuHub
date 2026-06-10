@@ -30,10 +30,9 @@ $labelRank = [1 => '🥇 Peringkat 1', 2 => '🥈 Peringkat 2', 3 => '🥉 Perin
   </div>
 <?php endif; ?>
 
-<!-- ── Layout 2 kolom ── -->
 <div class="row g-4 align-items-start">
 
-  <!-- ════ Kolom Kiri: Pengaturan Poin ════ -->
+  <!-- Kolom Pengaturan Poin -->
   <div class="col-12 col-lg-6">
     <div class="card">
       <div class="card-body">
@@ -292,7 +291,7 @@ $labelRank = [1 => '🥇 Peringkat 1', 2 => '🥈 Peringkat 2', 3 => '🥉 Perin
     </div>
     <?php endif; ?>
 
-  </div><!-- /kolom kanan -->
+  </div>
 
 </div><!-- /row -->
 

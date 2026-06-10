@@ -44,6 +44,7 @@ class FonnteService
             ];
         }
 
+        // membangun HTTP request ke API Fonnte
         $ch = curl_init();
         curl_setopt_array($ch, [
             CURLOPT_URL            => $this->apiUrl,
@@ -59,7 +60,8 @@ class FonnteService
             CURLOPT_TIMEOUT        => 30,
             CURLOPT_SSL_VERIFYPEER => true,
         ]);
-
+        
+        // untuk menjalankan request ke Fonnte
         $response  = curl_exec($ch);
         $curlError = curl_error($ch);
         curl_close($ch);

@@ -122,6 +122,7 @@ class VisitsController extends BaseController
         $options = new \Dompdf\Options();
         $options->set('defaultFont', 'Arial');
         $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
 
         $dompdf = new \Dompdf\Dompdf($options);
         $dompdf->loadHtml($html);
@@ -133,7 +134,16 @@ class VisitsController extends BaseController
             : 'laporan-kunjungan-semua.pdf';
 
         $isPreview = $this->request->getGet('preview') === '1';
-        $dompdf->stream($namaFile, ['Attachment' => !$isPreview]);
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        $dompdf->stream($namaFile, [
+            'Attachment' => !$isPreview
+        ]);
+
+        exit;
     }
     public function create()
     {
@@ -161,7 +171,6 @@ class VisitsController extends BaseController
             ]);
         }
 
-        // Validasi tanggal tidak boleh masa depan
         $visitDateInput = strtotime($this->request->getPost('visit_date'));
         if ($visitDateInput > time()) {
             return view('visits/create', [
@@ -203,6 +212,7 @@ class VisitsController extends BaseController
             'method'     => 'manual',
             'notes'      => $this->request->getPost('notes') ?: '-',
         ]);
+
         $visitId = $this->visitModel->getInsertID();
 
         $poinKunjungan = get_poin_setting('visit');
@@ -269,9 +279,11 @@ class VisitsController extends BaseController
             'method'     => 'scan',
             'notes'      => null,
         ]);
+
         $visitId = $this->visitModel->getInsertID();
 
         $poinKunjungan = get_poin_setting('visit');
+        
         catat_poin(
             $member['id'],
             'visit',

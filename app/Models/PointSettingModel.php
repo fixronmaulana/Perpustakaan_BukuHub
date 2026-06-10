@@ -29,7 +29,6 @@ class PointSettingModel extends Model
         return $row ? (int) $row['points'] : 0;
     }
 
-    // Ambil semua sebagai array key => row
     public function getAllAsMap(): array
     {
         $rows = $this->findAll();

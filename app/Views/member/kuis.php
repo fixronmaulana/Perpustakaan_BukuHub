@@ -326,7 +326,7 @@ function startTimer() {
   }, 1000);
 }
 
-// ── Dot indikator ─────────────────────────────────────────
+//  Dot indikator 
 function updateDots() {
   for (let i = 0; i < TOTAL_SOAL; i++) {
     const dot     = document.getElementById(`dot-${i}`);
@@ -337,7 +337,7 @@ function updateDots() {
   }
 }
 
-// ── Pilih opsi ────────────────────────────────────────────
+//  Pilih opsi 
 function pilihOpsi(idx, opt, questionId) {
   ['A','B','C','D'].forEach(o =>
     document.getElementById(`opsi-${idx}-${o}`)?.classList.remove('terpilih')
@@ -347,7 +347,7 @@ function pilihOpsi(idx, opt, questionId) {
   updateDots();
 }
 
-// ── Navigasi soal ─────────────────────────────────────────
+// Navigasi soal 
 function pindahSoal(arah) {
   document.getElementById(`soal-${soalAktif}`).style.display = 'none';
   soalAktif += arah;

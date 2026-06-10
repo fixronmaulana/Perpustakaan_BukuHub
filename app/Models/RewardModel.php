@@ -29,6 +29,6 @@ class RewardModel extends Model
         foreach ($rows as $row) {
             $result[$row['rank']] = $row;
         }
-        return $result; // [1 => [...], 2 => [...], 3 => [...]]
+        return $result;
     }
 }

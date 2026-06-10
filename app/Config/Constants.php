@@ -97,8 +97,10 @@ define('EVENT_PRIORITY_HIGH', 10);
  * uploads path
  * `public/uploads/`
  */
-defined('UPLOADS_PATH') || define('UPLOADS_PATH', ROOTPATH . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR);
-
+defined('UPLOADS_PATH') || define(
+    'UPLOADS_PATH',
+    FCPATH . 'uploads' . DIRECTORY_SEPARATOR
+);
 /**
  * book cover path
  * `public/uploads/book_cover/`
