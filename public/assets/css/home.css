@@ -895,7 +895,16 @@ body {
   grid-template-columns: 1.8fr 1fr 1fr 1fr;
   gap: 3rem;
 }
+.link-ig {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: rgba(255,255,255,0.6); 
+}
 
+.link-ig:hover {
+  opacity: 0.75;
+}
 .nama-merek-kaki { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
 .nama-merek-kaki .ikon-merek {
   width: 36px; height: 36px;
@@ -940,7 +949,7 @@ body {
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: 0.5rem;
 }
-.bawah-kaki p { font-size: 0.8rem; color: rgba(255,255,255,0.35); margin: 0; }
+.bawah-kaki p { font-size: 0.9rem; color: rgba(255,255,255,0.75); margin: 0; }
 .teks-emas { color: var(--emas); }
 
 /* ════════════════════════════════════════

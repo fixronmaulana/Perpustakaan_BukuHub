@@ -690,7 +690,6 @@ body {
   display: grid;
   grid-template-columns: 1.75fr 1fr;
   gap: 0rem;
-  margin-bottom: 1.25rem;
 }
 @media (max-width: 768px) {
   .grid-konten-dashboard {
@@ -2800,7 +2799,6 @@ html, body {
     padding: 0rem;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     width: 100%;
-    margin-bottom: 1.25rem;
     overflow: hidden;
 }
 

@@ -16,15 +16,24 @@ class LeaderboardSnapshotModel extends Model
     protected $updatedField  = 'updated_at';
 
     // Ambil leaderboard bulan & tahun tertentu dari snapshot
-    public function getLeaderboard(int $bulan, int $tahun): array
+    public function getLeaderboard(int $bulan, int $tahun, string $tipeAnggota = 'semua'): array
     {
-        return $this->select('leaderboard_snapshots.*, members.first_name, members.last_name,
+        $data = $this->select('leaderboard_snapshots.*, members.first_name, members.last_name,
                               members.tipe_anggota, members.foto_profil, members.no_identitas')
             ->join('members', 'leaderboard_snapshots.member_id = members.id', 'LEFT')
             ->where('month', $bulan)
             ->where('year',  $tahun)
             ->orderBy('rank', 'ASC')
             ->findAll();
+
+        if ($tipeAnggota !== 'semua') {
+            $data = array_values(array_filter(
+                $data,
+                fn($row) => $row['tipe_anggota'] === $tipeAnggota
+            ));
+        }
+
+        return $data;
     }
 
     // Buat snapshot bulan tertentu dari point_transactions

@@ -120,23 +120,35 @@ class Home extends BaseController
         $bulanIni = (int) date('n');
         $tahunIni = (int) date('Y');
 
-        $bulan = (int) ($this->request->getGet('bulan') ?? $bulanIni);
-        $tahun = (int) ($this->request->getGet('tahun') ?? $tahunIni);
+        $bulan       = (int) ($this->request->getGet('bulan') ?? $bulanIni);
+        $tahun       = (int) ($this->request->getGet('tahun') ?? $tahunIni);
+        $tipeAnggota = $this->request->getGet('tipe') ?? 'semua';
 
         if ($bulan === $bulanIni && $tahun === $tahunIni) {
-            // Bulan berjalan real-time
-            $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
+            // ── Ambil semua dulu untuk podium (tanpa filter) ──
+            $leaderboardSemua = $this->_getLeaderboardRealtime($bulan, $tahun, 'semua');
+
+            // ── Leaderboard tabel dengan filter tipe ──
+            $leaderboard = $tipeAnggota !== 'semua'
+                ? array_values(array_filter(
+                    $leaderboardSemua,
+                    fn($row) => $row['tipe_anggota'] === $tipeAnggota
+                ))
+                : $leaderboardSemua;
+
         } else {
-            // Bulan lalu lazy snapshot
             if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
                 $this->leaderboardModel->buatSnapshot($bulan, $tahun);
             }
-            $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun);
+            // ── Ambil semua untuk podium (tanpa filter) ──
+            $leaderboardSemua = $this->leaderboardModel->getLeaderboard($bulan, $tahun, 'semua');
+
+            // ── Leaderboard tabel dengan filter tipe ──
+            $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun, $tipeAnggota);
         }
 
         $pointSettings = $this->pointSettingModel->getAllAsMap();
 
-        // Dropdown 6 bulan
         $daftarBulan = [];
         for ($i = 0; $i < 6; $i++) {
             $ts = mktime(0, 0, 0, $bulanIni - $i, 1, $tahunIni);
@@ -174,15 +186,18 @@ class Home extends BaseController
         }
 
         return view('home/leaderboard', [
-            'activeNav'     => 'leaderboard',
-            'leaderboard'   => $leaderboard,
-            'bulan'         => $bulan,
-            'tahun'         => $tahun,
-            'bulanIni'      => $bulanIni,
-            'tahunIni'      => $tahunIni,
-            'daftarBulan'   => $daftarBulan,
-            'pointSettings' => $pointSettings,
-            'hadiah'        => $hadiah,
+            'activeNav'        => 'leaderboard',
+            'leaderboard'      => $leaderboard,
+            // ── TAMBAHAN: kirim data semua untuk podium ──
+            'leaderboardSemua' => $leaderboardSemua,
+            'bulan'            => $bulan,
+            'tahun'            => $tahun,
+            'bulanIni'         => $bulanIni,
+            'tahunIni'         => $tahunIni,
+            'daftarBulan'      => $daftarBulan,
+            'pointSettings'    => $pointSettings,
+            'hadiah'           => $hadiah,
+            'tipeAnggota'      => $tipeAnggota,
         ]);
     }
 
@@ -191,45 +206,57 @@ class Home extends BaseController
         return view('home/kontak', ['activeNav' => 'kontak']);
     }
 
-    private function _getLeaderboardRealtime(int $bulan, int $tahun): array
-    {
-        $members = $this->memberModel->where('deleted_at', null)->findAll();
-        $data    = [];
-        $db      = \Config\Database::connect();
+    private function _getLeaderboardRealtime(int $bulan, int $tahun, string $tipeAnggota = 'semua'): array
+{
+    $query = $this->memberModel->where('deleted_at', null);
 
-        foreach ($members as $m) {
-            // Hitung poin per aktivitas dalam bulan ini
-            $breakdown = $db->table('point_transactions')
-                ->select("
-                    SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
-                    SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
-                    SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
-                    SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
-                    SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis,
-                    SUM(points) as total_points
-                ")
-                ->where('member_id', $m['id'])
-                ->where('MONTH(created_at)', $bulan)
-                ->where('YEAR(created_at)',  $tahun)
-                ->get()->getRowArray();
-
-            $data[] = [
-                'member_id'       => $m['id'],
-                'first_name'      => $m['first_name'],
-                'last_name'       => $m['last_name'] ?? '',
-                'no_identitas'    => $m['no_identitas'],
-                'tipe_anggota'    => $m['tipe_anggota'],
-                'foto_profil'     => $m['foto_profil'] ?? null,
-                'poin_kunjungan'  => (int) ($breakdown['poin_kunjungan']  ?? 0),
-                'poin_peminjaman' => (int) ($breakdown['poin_peminjaman'] ?? 0),
-                'poin_tepat'      => (int) ($breakdown['poin_tepat']      ?? 0),
-                'poin_terlambat'  => (int) ($breakdown['poin_terlambat']  ?? 0),
-                'poin_kuis'       => (int) ($breakdown['poin_kuis']       ?? 0),
-                'total_points'    => (int) ($breakdown['total_points']    ?? 0),
-            ];
-        }
-
-        usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
-        return $data;
+    if ($tipeAnggota !== 'semua') {
+        $query->where('tipe_anggota', $tipeAnggota);
     }
+
+    $members = $query->findAll();
+    $data    = [];
+    $db      = \Config\Database::connect();
+
+    foreach ($members as $m) {
+        $breakdown = $db->table('point_transactions')
+            ->select("
+                SUM(CASE WHEN activity_type = 'visit'         THEN points ELSE 0 END) as poin_kunjungan,
+                SUM(CASE WHEN activity_type = 'loan'          THEN points ELSE 0 END) as poin_peminjaman,
+                SUM(CASE WHEN activity_type = 'return_ontime' THEN points ELSE 0 END) as poin_tepat,
+                SUM(CASE WHEN activity_type = 'return_late'   THEN points ELSE 0 END) as poin_terlambat,
+                SUM(CASE WHEN activity_type = 'quiz'          THEN points ELSE 0 END) as poin_kuis,
+                SUM(points) as total_points
+            ")
+            ->where('member_id', $m['id'])
+            ->where('MONTH(created_at)', $bulan)
+            ->where('YEAR(created_at)',  $tahun)
+            ->get()->getRowArray();
+
+        $data[] = [
+            'member_id'       => $m['id'],
+            'first_name'      => $m['first_name'],
+            'last_name'       => $m['last_name'] ?? '',
+            'no_identitas'    => $m['no_identitas'],
+            'tipe_anggota'    => $m['tipe_anggota'],
+            'foto_profil'     => $m['foto_profil'] ?? null,
+            'poin_kunjungan'  => (int) ($breakdown['poin_kunjungan']  ?? 0),
+            'poin_peminjaman' => (int) ($breakdown['poin_peminjaman'] ?? 0),
+            'poin_tepat'      => (int) ($breakdown['poin_tepat']      ?? 0),
+            'poin_terlambat'  => (int) ($breakdown['poin_terlambat']  ?? 0),
+            'poin_kuis'       => (int) ($breakdown['poin_kuis']       ?? 0),
+            'total_points'    => (int) ($breakdown['total_points']    ?? 0),
+        ];
+    }
+
+    usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
+
+    // ── TAMBAHAN: assign rank setelah sort ──
+    foreach ($data as $i => &$row) {
+        $row['rank'] = $i + 1;
+    }
+    unset($row);
+
+    return $data;
+}
 }

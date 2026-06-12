@@ -17,7 +17,7 @@
 <aside class="sidebar" id="sidebar">
 
   <div class="sidebar-brand">
-    <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="sidebar-logo">
+    <img src="<?= base_url('assets/images/logo-perpus3.png') ?>" alt="Logo SMK" class="sidebar-logo">
     <div>
       <div class="sidebar-brand-title">SMK Al-Munawwir</div>
       <div class="sidebar-brand-sub">Portal Anggota</div>
@@ -205,14 +205,14 @@
 
   <main class="area-halaman">
     <?= $this->renderSection('content') ?>
+    <?= $this->include('layouts/member_footer') ?>
   </main>
-
 </div>
 
 <?= $this->renderSection('scripts') ?>
 
 <script>
-// ── Toggle Sidebar ────────────────────────────────────────
+// Toggle Sidebar 
 document.addEventListener('click', function(e) {
   const sidebar = document.getElementById('sidebar');
   const toggle  = document.querySelector('.tombol-toggle-sidebar');
@@ -223,7 +223,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ── Toggle Dropdown Profil ────────────────────────────────
+// Toggle Dropdown Profil 
 function toggleProfilDropdown(e) {
   e.stopPropagation();
   document.getElementById('profilDropdown').classList.toggle('active');

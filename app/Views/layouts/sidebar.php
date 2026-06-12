@@ -231,7 +231,7 @@ $currentPath = uri_string();
 
   <!-- Brand -->
   <div class="sidebar-brand">
-    <img src="<?= base_url('assets/images/logo-smk.png') ?>" alt="Logo SMK" class="sidebar-logo">
+    <img src="<?= base_url('assets/images/logo-perpus3.png') ?>" alt="Logo SMK" class="sidebar-logo">
     <div>
       <div class="sidebar-brand-title">SMK Al-Munawwir</div>
       <div class="sidebar-brand-sub">Portal Petugas</div>

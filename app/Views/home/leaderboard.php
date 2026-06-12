@@ -14,7 +14,7 @@ $namaBulan = [
 ];
 $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 $bulanLabel = ($namaBulan[$bulan] ?? $bulan) . ' ' . $tahun;
-$top3       = array_slice($leaderboard, 0, 3);
+$top3       = array_slice($leaderboardSemua, 0, 3);
 $namaRank   = [1 => 'Juara 1', 2 => 'Juara 2', 3 => 'Juara 3'];
 $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
 ?>
@@ -23,7 +23,6 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
 <div class="header-halaman">
   <h1>Leaderboard Perpustakaan</h1>
   <div class="garis-emas"></div>
-  <!-- Hitung mundur -->
   <?php if ($isRealtime): ?>
   <div class="lb-countdown-section">
     <div class="lb-countdown-label">Periode berakhir dalam</div>
@@ -109,6 +108,19 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
              placeholder="Cari nama anggota..." onkeyup="filterDanPaginasi()">
     </div>
     <div class="lb-filter-right">
+
+      <div class="lb-filter-tipe">
+        <?php
+        $tipeList = ['semua' => 'Semua', 'Murid' => 'Murid', 'Guru' => 'Guru', 'Staf' => 'Staf'];
+        foreach ($tipeList as $value => $label):
+        ?>
+          <a href="?bulan=<?= $bulan ?>&tahun=<?= $tahun ?>&tipe=<?= $value ?>"
+             class="lb-tipe-btn <?= ($tipeAnggota === $value) ? 'aktif' : '' ?>">
+            <?= $label ?>
+          </a>
+        <?php endforeach; ?>
+      </div>
+
       <span class="lb-filter-label">Periode:</span>
       <form method="get" action="" style="display:flex;align-items:center;gap:6px">
         <select name="bulan" class="lb-select" id="selectBulan">
@@ -121,6 +133,8 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
           <?php endforeach; ?>
         </select>
         <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
+        <!-- ── TAMBAHAN: pertahankan tipe saat ganti bulan ── -->
+        <input type="hidden" name="tipe" value="<?= esc($tipeAnggota) ?>">
       </form>
     </div>
   </div>
@@ -160,11 +174,18 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
             </tr>
           <?php else: ?>
             <?php foreach ($leaderboard as $i => $row):
-              $rank     = $i + 1;
+              // ── PERBAIKAN: pakai rank asli dari data kalau ada ──
+              $rank = isset($row['rank']) && $row['rank'] > 0
+                          ? (int) $row['rank']
+                          : $i + 1;
+
               $nama     = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
               $inisial  = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
               $adaFoto  = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
+
+              // ── PERBAIKAN: rowClass berdasarkan rank asli ──
               $rowClass = $rank === 1 ? 'row-top-1' : ($rank === 2 ? 'row-top-2' : ($rank === 3 ? 'row-top-3' : ''));
+
               $poinKunjungan  = (int) ($row['poin_kunjungan']  ?? 0);
               $poinPeminjaman = (int) ($row['poin_peminjaman'] ?? 0);
               $poinTepat      = (int) ($row['poin_tepat']      ?? 0);
@@ -180,6 +201,7 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
                   <?php elseif ($rank === 3): ?>
                     <span class="lb-rank-badge bronze">🥉</span>
                   <?php else: ?>
+                    <!-- ── PERBAIKAN: tampilkan rank asli bukan index ── -->
                     <span class="lb-rank-num"><?= $rank ?></span>
                   <?php endif; ?>
                 </td>
@@ -246,7 +268,6 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
     </nav>
   </div>
 
-  <!-- Info halaman -->
   <div class="lb-pager-info" id="pagerInfo"></div>
 
   <?php if (!auth()->loggedIn()): ?>
@@ -292,16 +313,12 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
 <?php endforeach; ?>
 
 <style>
-/* ── Info halaman (misal: "Menampilkan 1–20 dari 57 anggota") ── */
 .lb-pager-info {
   text-align: center;
   font-size: .78rem;
   color: #94a3b8;
   margin-top: .5rem;
 }
-
-/* ── Tombol pagination pakai style .bungkus-pager yang sudah ada,
-      tambahan: tombol ellipsis dan active state ── */
 .bungkus-pager nav ul li.ellipsis span {
   background: transparent;
   border-color: transparent;
@@ -321,28 +338,49 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
   pointer-events: none;
   cursor: default;
 }
+
+/* ── TAMBAHAN: Filter Tipe Anggota ── */
+.lb-filter-tipe {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lb-tipe-btn {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 500;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  text-decoration: none;
+  transition: all .15s;
+}
+.lb-tipe-btn:hover {
+  background: #e2e8f0;
+  color: #1e3a8a;
+}
+.lb-tipe-btn.aktif {
+  background: var(--navy, #1e3a8a);
+  color: #fff;
+  border-color: var(--navy, #1e3a8a);
+}
 </style>
 
 <?= $this->include('layouts/home_footer') ?>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   LEADERBOARD — Client-side Pagination + Search
-═══════════════════════════════════════════════════════════ */
 (function () {
   const PER_PAGE    = 20;
   let currentPage   = 1;
   let filteredRows  = [];
 
-  // Ambil semua baris data (exclude baris "kosong/placeholder")
   const semuaBaris = Array.from(
     document.querySelectorAll('#tabelBody tr[data-nama]')
   );
 
-  // Sembunyikan semua baris dulu — akan ditampilkan oleh render()
   semuaBaris.forEach(tr => tr.style.display = 'none');
 
-  /* ── Filter berdasarkan kata kunci pencarian ── */
   function filter(keyword) {
     const q = keyword.trim().toLowerCase();
     filteredRows = q
@@ -350,27 +388,22 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
       : [...semuaBaris];
   }
 
-  /* ── Render halaman tertentu ── */
   function render(page) {
     currentPage = page;
     const total     = filteredRows.length;
     const totalPage = Math.ceil(total / PER_PAGE) || 1;
 
-    // Pastikan page valid
     if (currentPage < 1)          currentPage = 1;
     if (currentPage > totalPage)  currentPage = totalPage;
 
     const start = (currentPage - 1) * PER_PAGE;
     const end   = Math.min(start + PER_PAGE, total);
 
-    // Sembunyikan semua, tampilkan yang di halaman ini
     semuaBaris.forEach(tr => tr.style.display = 'none');
     filteredRows.slice(start, end).forEach(tr => tr.style.display = '');
 
-    // Update counter
     document.getElementById('jumlahAnggota').textContent = total + ' anggota';
 
-    // Update info halaman
     const infoEl = document.getElementById('pagerInfo');
     if (total === 0) {
       infoEl.textContent = '';
@@ -379,14 +412,12 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
         'Menampilkan ' + (start + 1) + '–' + end + ' dari ' + total + ' anggota';
     }
 
-    // Render tombol pagination
     renderPager(currentPage, totalPage);
   }
 
-  /* ── Render tombol pagination ── */
   function renderPager(page, totalPage) {
-    const wrap   = document.getElementById('pagerWrap');
-    const list   = document.getElementById('pagerList');
+    const wrap = document.getElementById('pagerWrap');
+    const list = document.getElementById('pagerList');
 
     if (totalPage <= 1) {
       wrap.style.display = 'none';
@@ -394,7 +425,6 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
     }
     wrap.style.display = 'flex';
 
-    // Algoritma halaman yang ditampilkan (dengan ellipsis)
     function pages(cur, tot) {
       const delta = 2;
       const range = [];
@@ -419,14 +449,12 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
     const pageNums = pages(page, totalPage);
     let html = '';
 
-    // Tombol Prev
     if (page > 1) {
       html += `<li><a href="#" onclick="lbGoPage(${page - 1});return false;">‹</a></li>`;
     } else {
       html += `<li><a href="#" data-disabled="true" aria-disabled="true">‹</a></li>`;
     }
 
-    // Nomor halaman
     for (const p of pageNums) {
       if (p === '...') {
         html += `<li class="ellipsis"><span>…</span></li>`;
@@ -437,7 +465,6 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
       }
     }
 
-    // Tombol Next
     if (page < totalPage) {
       html += `<li><a href="#" onclick="lbGoPage(${page + 1});return false;">›</a></li>`;
     } else {
@@ -447,34 +474,28 @@ $emojiRank  = [1 => '🥇', 2 => '🥈', 3 => '🥉'];
     list.innerHTML = html;
   }
 
-  /* ── Public: pindah halaman ── */
   window.lbGoPage = function(page) {
     render(page);
-    // Scroll ke atas tabel
     document.querySelector('.lb-tabel-section')
       .scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  /* ── Public: dipanggil saat onkeyup di input search ── */
   window.filterDanPaginasi = function() {
     const q = document.getElementById('cariMember').value;
     filter(q);
-    render(1); // kembali ke halaman 1 setiap kali filter berubah
+    render(1);
   };
 
-  // Inisialisasi: tampilkan halaman pertama
   filter('');
   render(1);
 })();
 
-/* ── Event listener select bulan ── */
 document.getElementById('selectBulan').addEventListener('change', function () {
   document.getElementById('tahunInput').value =
     this.options[this.selectedIndex].dataset.tahun;
   this.form.submit();
 });
 
-/* ── Modal Hadiah ── */
 function bukaModalHadiah(rank) {
   const m = document.getElementById('modalHadiah' + rank);
   if (m) m.classList.add('tampil');
@@ -493,7 +514,6 @@ document.addEventListener('keydown', e => {
       .forEach(m => m.classList.remove('tampil'));
 });
 
-/* ── Hitung mundur ── */
 <?php if ($isRealtime): ?>
 (function () {
   function tick() {
