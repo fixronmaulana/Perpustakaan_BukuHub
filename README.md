@@ -1,4 +1,4 @@
-# Perpustakaan SMK Al-Munawwir IIBS
+# Perpustakaan SMK Al-Munawwir Berbasis Gamifikasi
 
 Sistem Informasi Perpustakaan berbasis web untuk SMK Al-Munawwir IIBS, dikembangkan di atas fondasi [BukuHub](https://github.com/ikhsan3adi/sistem-perpustakaan-qr-code) dengan penambahan fitur-fitur sesuai kebutuhan institusi.
 
@@ -13,11 +13,13 @@ Sistem Informasi Perpustakaan berbasis web untuk SMK Al-Munawwir IIBS, dikembang
 ## Fitur
 
 ### Fitur Dasar (dari BukuHub)
-- Login, Register & Magic login link (via Email)
-- Dashboard admin
-- QR Code anggota
-- QR Code peminjaman
+- Autentikasi pengguna
+- Manajemen buku
+- Manajemen anggota
+- Transaksi peminjaman dan pengembalian
+- Katalog buku
 - Sistem denda
+- Dashboard Analitik
 
 ### Fitur Pengembangan
 - **Import Data Anggota** — impor data anggota secara massal melalui file Excel
@@ -37,7 +39,7 @@ Sistem Informasi Perpustakaan berbasis web untuk SMK Al-Munawwir IIBS, dikembang
 - [Apex Charts](https://apexcharts.com/)
 - [Endroid QR Code Generator](https://github.com/endroid/qr-code)
 - [Mebjas Html5-QRCode Scanner](https://github.com/mebjas/html5-qrcode)
-- [Fonnte](https://fonnte.com/) — notifikasi WhatsApp
+- [Fonnte](https://fonnte.com/)
 
 ## Cara Penggunaan
 
