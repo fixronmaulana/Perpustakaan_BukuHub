@@ -424,32 +424,37 @@ class MemberDashboardController extends Controller
         $bulanIni = (int) date('n');
         $tahunIni = (int) date('Y');
 
-        // Bulan yang dipilih (default bulan ini)
         $bulan = (int) ($this->request->getGet('bulan') ?? $bulanIni);
         $tahun = (int) ($this->request->getGet('tahun') ?? $tahunIni);
+        $tipeAnggota = $this->request->getGet('tipe') ?? 'semua';
 
         if ($bulan === $bulanIni && $tahun === $tahunIni) {
-            // Bulan berjalan — kalkulasi real-time
-            $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
+            $leaderboardSemua = $this->_getLeaderboardRealtime($bulan, $tahun, 'semua');
+            $leaderboard = $tipeAnggota !== 'semua'
+                ? array_values(array_filter(
+                    $leaderboardSemua,
+                    fn($row) => $row['tipe_anggota'] === $tipeAnggota
+                ))
+                : $leaderboardSemua;
         } else {
-            // Bulan lalu pakai snapshot
             if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
                 $this->leaderboardModel->buatSnapshot($bulan, $tahun);
             }
-            $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun);
+            $leaderboardSemua = $this->leaderboardModel->getLeaderboard($bulan, $tahun, 'semua');
+            $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun, $tipeAnggota);
             $leaderboard = $this->_tambahBreakdown($leaderboard, $bulan, $tahun);
         }
 
-        // Rank member yang login di bulan yang dipilih
         $rankSaya = 0;
-        foreach ($leaderboard as $i => $row) {
+        foreach ($leaderboardSemua as $i => $row) {
             if ($row['member_id'] == $member['id']) {
-                $rankSaya = $i + 1;
+                $rankSaya = isset($row['rank']) && $row['rank'] > 0
+                    ? (int) $row['rank']
+                    : $i + 1;
                 break;
             }
         }
 
-        // Daftar bulan untuk dropdown (6 bulan ke belakang)
         $daftarBulan = [];
         for ($i = 0; $i < 6; $i++) {
             $ts = mktime(0, 0, 0, $bulanIni - $i, 1, $tahunIni);
@@ -470,6 +475,7 @@ class MemberDashboardController extends Controller
             'daftarBulan'  => $daftarBulan,
             'bulanIni'     => $bulanIni,
             'tahunIni'     => $tahunIni,
+            'tipeAnggota'  => $tipeAnggota,
         ]);
     }
 
@@ -499,9 +505,15 @@ class MemberDashboardController extends Controller
         return $leaderboard;
     }
 
-    private function _getLeaderboardRealtime(int $bulan, int $tahun): array
+    private function _getLeaderboardRealtime(int $bulan, int $tahun, string $tipeAnggota = 'semua'): array
     {
-        $members = $this->memberModel->where('deleted_at', null)->findAll();
+        $query = $this->memberModel->where('deleted_at', null);
+
+        if ($tipeAnggota !== 'semua') {
+            $query->where('tipe_anggota', $tipeAnggota);
+        }
+
+        $members = $query->findAll();
         $db      = \Config\Database::connect();
         $data    = [];
 
@@ -527,8 +539,6 @@ class MemberDashboardController extends Controller
                 'no_identitas'    => $m['no_identitas'],
                 'tipe_anggota'    => $m['tipe_anggota'],
                 'foto_profil'     => $m['foto_profil'],
-
-                // TAMBAHAN
                 'poin_kunjungan'  => (int) ($bd['poin_kunjungan']  ?? 0),
                 'poin_peminjaman' => (int) ($bd['poin_peminjaman'] ?? 0),
                 'poin_tepat'      => (int) ($bd['poin_tepat']      ?? 0),
@@ -539,9 +549,14 @@ class MemberDashboardController extends Controller
         }
 
         usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
+
+        foreach ($data as $i => &$row) {
+            $row['rank'] = $i + 1;
+        }
+        unset($row);
+
         return $data;
     }
-
     // Helper: hitung rank member real-time 
     private function _hitungRankRealtime(int $memberId, int $bulan, int $tahun): int
     {

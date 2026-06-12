@@ -25,17 +25,30 @@ class LeaderboardController extends BaseController
         $bulanIni = (int) date('n');
         $tahunIni = (int) date('Y');
 
-        $bulan = (int) ($this->request->getGet('bulan') ?? $bulanIni);
-        $tahun = (int) ($this->request->getGet('tahun') ?? $tahunIni);
+        $bulan       = (int) ($this->request->getGet('bulan') ?? $bulanIni);
+        $tahun       = (int) ($this->request->getGet('tahun') ?? $tahunIni);
+        // ── TAMBAHAN: ambil filter tipe anggota ──
+        $tipeAnggota = $this->request->getGet('tipe') ?? 'semua';
 
         if ($bulan === $bulanIni && $tahun === $tahunIni) {
-            $leaderboard = $this->_getLeaderboardRealtime($bulan, $tahun);
+            // ── TAMBAHAN: ambil semua dulu untuk podium ──
+            $leaderboardSemua = $this->_getLeaderboardRealtime($bulan, $tahun, 'semua');
+            // ── TAMBAHAN: filter untuk tabel ──
+            $leaderboard = $tipeAnggota !== 'semua'
+                ? array_values(array_filter(
+                    $leaderboardSemua,
+                    fn($row) => $row['tipe_anggota'] === $tipeAnggota
+                  ))
+                : $leaderboardSemua;
         } else {
             if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
                 $this->leaderboardModel->buatSnapshot($bulan, $tahun);
             }
-            $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun);
-            $leaderboard = $this->_tambahBreakdown($leaderboard, $bulan, $tahun);
+            // ── TAMBAHAN: ambil semua untuk podium ──
+            $leaderboardSemua = $this->leaderboardModel->getLeaderboard($bulan, $tahun, 'semua');
+            // ── TAMBAHAN: ambil dengan filter untuk tabel ──
+            $leaderboard      = $this->leaderboardModel->getLeaderboard($bulan, $tahun, $tipeAnggota);
+            $leaderboard      = $this->_tambahBreakdown($leaderboard, $bulan, $tahun);
         }
 
         $daftarBulan = [];
@@ -49,18 +62,30 @@ class LeaderboardController extends BaseController
         }
 
         return view('leaderboard/index', [
-            'leaderboard'  => $leaderboard,
-            'bulan'        => $bulan,
-            'tahun'        => $tahun,
-            'bulanIni'     => $bulanIni,
-            'tahunIni'     => $tahunIni,
-            'daftarBulan'  => $daftarBulan,
+            'leaderboard'      => $leaderboard,
+            // ── TAMBAHAN: kirim leaderboardSemua untuk podium ──
+            'leaderboardSemua' => $leaderboardSemua,
+            'bulan'            => $bulan,
+            'tahun'            => $tahun,
+            'bulanIni'         => $bulanIni,
+            'tahunIni'         => $tahunIni,
+            'daftarBulan'      => $daftarBulan,
+            // ── TAMBAHAN: kirim tipeAnggota ke view ──
+            'tipeAnggota'      => $tipeAnggota,
         ]);
     }
 
-    private function _getLeaderboardRealtime(int $bulan, int $tahun): array
+    // ── UPDATED: tambah parameter $tipeAnggota & assign rank ──
+    private function _getLeaderboardRealtime(int $bulan, int $tahun, string $tipeAnggota = 'semua'): array
     {
-        $members = $this->memberModel->where('deleted_at', null)->findAll();
+        // ── TAMBAHAN: filter member by tipe ──
+        $query = $this->memberModel->where('deleted_at', null);
+
+        if ($tipeAnggota !== 'semua') {
+            $query->where('tipe_anggota', $tipeAnggota);
+        }
+
+        $members = $query->findAll();
         $db      = \Config\Database::connect();
         $data    = [];
 
@@ -96,9 +121,17 @@ class LeaderboardController extends BaseController
         }
 
         usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
+
+        // ── TAMBAHAN: assign rank setelah sort ──
+        foreach ($data as $i => &$row) {
+            $row['rank'] = $i + 1;
+        }
+        unset($row);
+
         return $data;
     }
 
+    // _tambahBreakdown() tidak diubah sama sekali
     private function _tambahBreakdown(array $leaderboard, int $bulan, int $tahun): array
     {
         $db = \Config\Database::connect();

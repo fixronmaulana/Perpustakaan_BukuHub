@@ -20,7 +20,7 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 
 <!-- Header -->
 <div class="kotak-konten" style="margin-bottom:1.25rem">
-  <div class="kepala-kotak">
+  <div class="kepala-kotak" style="flex-wrap:wrap;gap:.75rem">
     <h3>
       Leaderboard
       <span class="badge-admin biru" style="font-size:.75rem;margin-left:6px">
@@ -30,18 +30,40 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
         <span class="badge-admin hijau" style="font-size:.72rem;margin-left:4px">Live</span>
       <?php endif; ?>
     </h3>
-    <form method="get" action="" style="display:flex;gap:8px;align-items:center">
-      <select name="bulan" id="selectBulan" class="form-select form-select-sm" style="width:auto">
-        <?php foreach ($daftarBulan as $db): ?>
-          <option value="<?= $db['bulan'] ?>"
-                  data-tahun="<?= $db['tahun'] ?>"
-                  <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
-            <?= esc($db['label']) ?>
-          </option>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+
+      <!-- ── TAMBAHAN: Filter Tipe Anggota ── -->
+      <div style="display:flex;gap:4px;align-items:center">
+        <?php
+        $tipeList = ['semua' => 'Semua', 'Murid' => 'Murid', 'Guru' => 'Guru', 'Staf' => 'Staf'];
+        foreach ($tipeList as $value => $label):
+        ?>
+          <a href="?bulan=<?= $bulan ?>&tahun=<?= $tahun ?>&tipe=<?= $value ?>"
+             style="padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:500;
+                    text-decoration:none;border:1px solid #e2e8f0;
+                    background:<?= $tipeAnggota === $value ? '#1e3a8a' : '#f8fafc' ?>;
+                    color:<?= $tipeAnggota === $value ? '#fff' : '#64748b' ?>">
+            <?= $label ?>
+          </a>
         <?php endforeach; ?>
-      </select>
-      <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
-    </form>
+      </div>
+
+      <form method="get" action="" style="display:flex;gap:8px;align-items:center">
+        <select name="bulan" id="selectBulan" class="form-select form-select-sm" style="width:auto">
+          <?php foreach ($daftarBulan as $db): ?>
+            <option value="<?= $db['bulan'] ?>"
+                    data-tahun="<?= $db['tahun'] ?>"
+                    <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
+              <?= esc($db['label']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+        <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
+        <!-- ── TAMBAHAN: pertahankan tipe saat ganti bulan ── -->
+        <input type="hidden" name="tipe" value="<?= esc($tipeAnggota) ?>">
+      </form>
+
+    </div>
   </div>
 </div>
 
@@ -75,7 +97,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
   <div class="kepala-kotak" style="flex-wrap:wrap;gap:.75rem">
     <h3>Semua Peringkat</h3>
     <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-      <!-- Search — pakai style input-cari-buku yang sudah ada di member.css -->
       <div class="input-cari-buku" style="max-width:200px;padding:0 10px">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
@@ -116,7 +137,10 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
           </tr>
         <?php else: ?>
           <?php foreach ($leaderboard as $i => $row):
-            $rank    = $i + 1;
+            // ── PERBAIKAN: pakai rank asli dari data ──
+            $rank    = isset($row['rank']) && $row['rank'] > 0
+                           ? (int) $row['rank']
+                           : $i + 1;
             $isMe    = ($row['member_id'] == $member['id']);
             $nama    = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
             $inisial = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
@@ -133,6 +157,7 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                 <?php elseif ($rank === 3): ?>
                   <span style="font-size:1.2rem">🥉</span>
                 <?php else: ?>
+                  <!-- ── PERBAIKAN: tampilkan rank asli ── -->
                   <span class="teks-redup-sm" style="font-weight:600"><?= $rank ?></span>
                 <?php endif; ?>
               </td>
@@ -200,7 +225,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     </table>
   </div>
 
-  <!-- Pagination + info — pakai class .bungkus-pager-member & .tombol-pager dari member.css -->
   <div id="pagerArea" style="display:none;padding:.875rem 1.25rem;
        border-top:1px solid #f1f5f9;
        display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
@@ -213,9 +237,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   LEADERBOARD MEMBER — Client-side Pagination + Search
-═══════════════════════════════════════════════════════════ */
 (function () {
   const PER_PAGE   = 20;
   let currentPage  = 1;
@@ -246,14 +267,13 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 
     document.getElementById('jumlahAnggota').textContent = total + ' anggota';
 
-    // Info halaman + link loncat ke baris "Kamu"
-    const infoEl         = document.getElementById('pagerInfo');
-    const infoBase       = total > 0
+    const infoEl        = document.getElementById('pagerInfo');
+    const infoBase      = total > 0
       ? 'Menampilkan ' + (start + 1) + '–' + end + ' dari ' + total + ' anggota'
       : '';
-    const idxAku         = filteredRows.findIndex(tr => tr.dataset.isme === '1');
-    const adaAkuHalaman  = filteredRows.slice(start, end).some(tr => tr.dataset.isme === '1');
-    const sedangCari     = document.getElementById('cariMember').value.trim() !== '';
+    const idxAku        = filteredRows.findIndex(tr => tr.dataset.isme === '1');
+    const adaAkuHalaman = filteredRows.slice(start, end).some(tr => tr.dataset.isme === '1');
+    const sedangCari    = document.getElementById('cariMember').value.trim() !== '';
 
     if (idxAku >= 0 && !adaAkuHalaman && !sedangCari) {
       const halamanAku = Math.floor(idxAku / PER_PAGE) + 1;
@@ -268,7 +288,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     renderPager(currentPage, totalPage);
   }
 
-  /* ── Render tombol — pakai class .tombol-pager dari member.css ── */
   function renderPager(page, totalPage) {
     const area = document.getElementById('pagerArea');
     const list = document.getElementById('pagerList');
@@ -299,7 +318,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 
     let html = '';
 
-    // Prev — .tombol-pager.nonaktif sudah ada di member.css
     html += page > 1
       ? `<a class="tombol-pager" href="#" onclick="lbGoPage(${page - 1});return false;">‹</a>`
       : `<span class="tombol-pager nonaktif">‹</span>`;
@@ -308,14 +326,12 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
       if (p === '...') {
         html += `<span class="tombol-pager nonaktif" style="border:none;background:transparent">…</span>`;
       } else if (p === page) {
-        // .tombol-pager.aktif sudah ada di member.css (background: var(--navy))
         html += `<span class="tombol-pager aktif">${p}</span>`;
       } else {
         html += `<a class="tombol-pager" href="#" onclick="lbGoPage(${p});return false;">${p}</a>`;
       }
     }
 
-    // Next
     html += page < totalPage
       ? `<a class="tombol-pager" href="#" onclick="lbGoPage(${page + 1});return false;">›</a>`
       : `<span class="tombol-pager nonaktif">›</span>`;

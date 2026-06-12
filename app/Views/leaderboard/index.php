@@ -26,19 +26,38 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
         <span class="badge bg-success">Live</span>
       <?php endif; ?>
     </div>
-    <form method="get" action="" class="d-flex align-items-center gap-2">
-      <label class="text-muted small mb-0">Periode:</label>
-      <select name="bulan" class="form-select form-select-sm" style="width:auto" id="selectBulan">
-        <?php foreach ($daftarBulan as $db): ?>
-          <option value="<?= $db['bulan'] ?>"
-                  data-tahun="<?= $db['tahun'] ?>"
-                  <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
-            <?= esc($db['label']) ?>
-          </option>
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+
+      <!-- ── TAMBAHAN: Filter Tipe Anggota ── -->
+      <div class="d-flex align-items-center gap-1">
+        <?php
+        $tipeList = ['semua' => 'Semua', 'Murid' => 'Murid', 'Guru' => 'Guru', 'Staf' => 'Staf'];
+        foreach ($tipeList as $value => $label):
+        ?>
+          <a href="?bulan=<?= $bulan ?>&tahun=<?= $tahun ?>&tipe=<?= $value ?>"
+             class="btn btn-sm <?= $tipeAnggota === $value ? 'btn-primary' : 'btn-outline-secondary' ?>">
+            <?= $label ?>
+          </a>
         <?php endforeach; ?>
-      </select>
-      <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
-    </form>
+      </div>
+
+      <form method="get" action="" class="d-flex align-items-center gap-2">
+        <label class="text-muted small mb-0">Periode:</label>
+        <select name="bulan" class="form-select form-select-sm" style="width:auto" id="selectBulan">
+          <?php foreach ($daftarBulan as $db): ?>
+            <option value="<?= $db['bulan'] ?>"
+                    data-tahun="<?= $db['tahun'] ?>"
+                    <?= ($db['bulan'] == $bulan && $db['tahun'] == $tahun) ? 'selected' : '' ?>>
+              <?= esc($db['label']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+        <input type="hidden" name="tahun" id="tahunInput" value="<?= $tahun ?>">
+        <!-- ── TAMBAHAN: pertahankan tipe saat ganti bulan ── -->
+        <input type="hidden" name="tipe" value="<?= esc($tipeAnggota) ?>">
+      </form>
+
+    </div>
   </div>
 </div>
 
@@ -48,7 +67,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
       <h5 class="card-title fw-semibold mb-0">Semua Peringkat</h5>
       <div class="d-flex align-items-center gap-3">
-        <!-- Search -->
         <div class="input-group input-group-sm" style="width:220px">
           <span class="input-group-text bg-white border-end-0">
             <i class="ti ti-search" style="font-size:.85rem;color:#94a3b8"></i>
@@ -96,7 +114,11 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
             </tr>
           <?php else: ?>
             <?php foreach ($leaderboard as $i => $row):
-              $rank           = $i + 1;
+              // ── PERBAIKAN: pakai rank asli dari data ──
+              $rank = isset($row['rank']) && $row['rank'] > 0
+                          ? (int) $row['rank']
+                          : $i + 1;
+
               $nama           = ucwords(strtolower(trim($row['first_name'] . ' ' . ($row['last_name'] ?? ''))));
               $inisial        = strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'] ?? '', 0, 1));
               $adaFoto        = !empty($row['foto_profil']) && file_exists(FCPATH . 'uploads/foto_profil/' . $row['foto_profil']);
@@ -105,13 +127,13 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
               $poinTepat      = (int) ($row['poin_tepat']      ?? 0);
               $poinTerlambat  = (int) ($row['poin_terlambat']  ?? 0);
               $poinKuis       = (int) ($row['poin_kuis']       ?? 0);
+              // ── PERBAIKAN: bgBaris berdasarkan rank asli ──
               $bgBaris = '';
               if ($rank === 1) $bgBaris = 'background:#fffbeb';
               elseif ($rank === 2) $bgBaris = 'background:#f8fafc';
               elseif ($rank === 3) $bgBaris = 'background:#fff7ed';
             ?>
               <tr style="<?= $bgBaris ?>" data-nama="<?= strtolower($nama) ?>">
-                <!-- Rank -->
                 <td class="text-center">
                   <?php if ($rank === 1): ?>
                     <span style="font-size:1.15rem">🥇</span>
@@ -120,11 +142,10 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                   <?php elseif ($rank === 3): ?>
                     <span style="font-size:1.15rem">🥉</span>
                   <?php else: ?>
+                    <!-- ── PERBAIKAN: tampilkan rank asli ── -->
                     <span class="text-muted small"><?= $rank ?></span>
                   <?php endif; ?>
                 </td>
-
-                <!-- Anggota -->
                 <td>
                   <div class="d-flex align-items-center gap-2">
                     <div style="width:34px;height:34px;border-radius:50%;flex-shrink:0;overflow:hidden;
@@ -148,8 +169,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                     </div>
                   </div>
                 </td>
-
-                <!-- Kunjungan -->
                 <td class="text-center border-start">
                   <?php if ($poinKunjungan > 0): ?>
                     <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
@@ -159,8 +178,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                     <span class="text-muted" style="font-size:.8rem">—</span>
                   <?php endif; ?>
                 </td>
-
-                <!-- Peminjaman -->
                 <td class="text-center">
                   <?php if ($poinPeminjaman > 0): ?>
                     <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
@@ -170,8 +187,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                     <span class="text-muted" style="font-size:.8rem">—</span>
                   <?php endif; ?>
                 </td>
-
-                <!-- Tepat Waktu -->
                 <td class="text-center">
                   <?php if ($poinTepat > 0): ?>
                     <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
@@ -181,8 +196,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                     <span class="text-muted" style="font-size:.8rem">—</span>
                   <?php endif; ?>
                 </td>
-
-                <!-- Terlambat -->
                 <td class="text-center">
                   <?php if ($poinTerlambat < 0): ?>
                     <span class="badge" style="background:#fef2f2;color:#dc2626;font-size:.72rem;font-weight:600">
@@ -192,8 +205,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                     <span class="text-muted" style="font-size:.8rem">—</span>
                   <?php endif; ?>
                 </td>
-
-                <!-- Kuis -->
                 <td class="text-center">
                   <?php if ($poinKuis > 0): ?>
                     <span class="badge" style="background:#f0fdf4;color:#16a34a;font-size:.72rem;font-weight:600">
@@ -203,8 +214,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
                     <span class="text-muted" style="font-size:.8rem">—</span>
                   <?php endif; ?>
                 </td>
-
-                <!-- Total -->
                 <td class="text-center border-start">
                   <span class="fw-bold" style="color:<?= $row['total_points'] >= 0 ? '#16a34a' : '#dc2626' ?>;font-size:.9rem">
                     <?= ($row['total_points'] >= 0 ? '+' : '') . number_format($row['total_points']) ?>
@@ -217,7 +226,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
       </table>
     </div>
 
-    <!-- Pagination Bootstrap -->
     <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2" id="pagerArea" style="display:none!important">
       <div class="text-muted small" id="pagerInfo"></div>
       <nav>
@@ -229,9 +237,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   LEADERBOARD ADMIN — Client-side Pagination + Search
-═══════════════════════════════════════════════════════════ */
 (function () {
   const PER_PAGE   = 20;
   let currentPage  = 1;
@@ -241,10 +246,8 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     document.querySelectorAll('#tabelBody tr[data-nama]')
   );
 
-  // Sembunyikan semua baris dulu
   semuaBaris.forEach(tr => tr.style.display = 'none');
 
-  /* ── Filter ── */
   function filter(keyword) {
     const q  = keyword.trim().toLowerCase();
     filteredRows = q
@@ -252,7 +255,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
       : [...semuaBaris];
   }
 
-  /* ── Render halaman ── */
   function render(page) {
     currentPage = page;
     const total     = filteredRows.length;
@@ -267,20 +269,16 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     semuaBaris.forEach(tr => tr.style.display = 'none');
     filteredRows.slice(start, end).forEach(tr => tr.style.display = '');
 
-    // Counter anggota
     document.getElementById('jumlahAnggota').textContent = total + ' anggota';
 
-    // Info halaman
     const infoEl = document.getElementById('pagerInfo');
     infoEl.textContent = total > 0
       ? 'Menampilkan ' + (start + 1) + '–' + end + ' dari ' + total + ' anggota'
       : '';
 
-    // Pagination
     renderPager(currentPage, totalPage, total);
   }
 
-  /* ── Render tombol pagination Bootstrap ── */
   function renderPager(page, totalPage, total) {
     const area = document.getElementById('pagerArea');
     const list = document.getElementById('pagerList');
@@ -292,7 +290,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     area.style.removeProperty('display');
     area.style.display = 'flex';
 
-    // Algoritma halaman dengan ellipsis
     function pages(cur, tot) {
       const delta = 2;
       const range = [];
@@ -317,12 +314,10 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     const pageNums = pages(page, totalPage);
     let html = '';
 
-    // Prev
     html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
       <a class="page-link" href="#" onclick="lbGoPage(${page - 1});return false;">‹</a>
     </li>`;
 
-    // Nomor
     for (const p of pageNums) {
       if (p === '...') {
         html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
@@ -335,7 +330,6 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
       }
     }
 
-    // Next
     html += `<li class="page-item ${page === totalPage ? 'disabled' : ''}">
       <a class="page-link" href="#" onclick="lbGoPage(${page + 1});return false;">›</a>
     </li>`;
@@ -343,25 +337,21 @@ $isRealtime = ($bulan === $bulanIni && $tahun === $tahunIni);
     list.innerHTML = html;
   }
 
-  /* ── Public: pindah halaman ── */
   window.lbGoPage = function (page) {
     render(page);
     document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  /* ── Public: dipanggil saat input search ── */
   window.filterDanPaginasi = function () {
     const q = document.getElementById('cariMember').value;
     filter(q);
     render(1);
   };
 
-  // Init
   filter('');
   render(1);
 })();
 
-/* ── Select bulan ── */
 document.getElementById('selectBulan').addEventListener('change', function () {
   document.getElementById('tahunInput').value =
     this.options[this.selectedIndex].dataset.tahun;
