@@ -6,7 +6,7 @@ Sistem Informasi Perpustakaan berbasis web untuk SMK Al-Munawwir IIBS, dikembang
 
 ![Preview BukuHub](https://github.com/ikhsan3adi/sistem-perpustakaan-qr-code/raw/main/screenshots/home.png)
 
-## Dokumentasi Perpustakaan SMK Al-Munawwir IIBS
+## Dokumentasi Perpustakaan SMK Al-Munawwir IIBS Berbasis Gamifikasi
 
 > Tambahkan screenshot aplikasi Anda di sini setelah mengupload ke folder `screenshots/` di repositori.
 
