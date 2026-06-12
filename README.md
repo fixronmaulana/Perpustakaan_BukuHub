@@ -8,16 +8,7 @@ Sistem Informasi Perpustakaan berbasis web untuk SMK Al-Munawwir IIBS, dikembang
 
 ## Dokumentasi Perpustakaan SMK Al-Munawwir IIBS Berbasis Gamifikasi
 
-> Tambahkan screenshot aplikasi Anda di sini setelah mengupload ke folder `screenshots/` di repositori.
-
-<!-- Uncomment dan sesuaikan path berikut setelah upload screenshot:
-![Dashboard](screenshots/dashboard.png)
-![Kartu Perpustakaan](screenshots/kartu-perpustakaan.png)
-![Kelola Kunjungan](screenshots/kunjungan.png)
-![Kelola Kuis](screenshots/kuis.png)
-![Leaderboard](screenshots/leaderboard.png)
-![Notifikasi WhatsApp](screenshots/notifikasi-wa.png)
--->
+![Preview Perpustakaan SMK Al-Munawwir IIBS](screenshots/home-almunawwir.png)
 
 ## Fitur
 
@@ -29,11 +20,11 @@ Sistem Informasi Perpustakaan berbasis web untuk SMK Al-Munawwir IIBS, dikembang
 - Sistem denda
 
 ### Fitur Pengembangan
-- **Import Data Anggota** — impor data anggota secara massal melalui file
+- **Import Data Anggota** — impor data anggota secara massal melalui file Excel
 - **Kartu Perpustakaan** — generate dan cetak kartu perpustakaan anggota
 - **Kelola Kunjungan** — rekam dan rekap kunjungan anggota perpustakaan
 - **Kelola Kuis** — manajemen kuis oleh admin dan pengerjaan kuis di sisi anggota
-- **Poin Reward & Leaderboard** — sistem poin untuk anggota aktif beserta papan peringkat
+- **Poin Reward & Leaderboard** — sistem poin reward untuk anggota beserta papan peringkat
 - **Notifikasi Pengingat Jatuh Tempo** — notifikasi otomatis via WhatsApp menggunakan Fonnte
 
 ## Framework dan Library Yang Digunakan
@@ -118,4 +109,4 @@ Mengikuti lisensi repositori asal. Lihat file [LICENSE](LICENSE) untuk detail le
 ## Authors
 
 - [@ikhsan3adi](https://github.com/ikhsan3adi) — Pengembang BukuHub (basis proyek)
-- [@gilangsetia](https://github.com/gilangsetia/) — Pengembang Perpustakaan SMK Al-Munawwir IIBS
+- [@gilangsetia](https://github.com/gilangsetia/) — Pengembang Perpustakaan SMK Al-Munawwir IIBS Berbasis Gamifikasi
