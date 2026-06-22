@@ -125,10 +125,9 @@ class Home extends BaseController
         $tipeAnggota = $this->request->getGet('tipe') ?? 'semua';
 
         if ($bulan === $bulanIni && $tahun === $tahunIni) {
-            // ── Ambil semua dulu untuk podium (tanpa filter) ──
             $leaderboardSemua = $this->_getLeaderboardRealtime($bulan, $tahun, 'semua');
 
-            // ── Leaderboard tabel dengan filter tipe ──
+            // Leaderboard tabel dengan filter tipe
             $leaderboard = $tipeAnggota !== 'semua'
                 ? array_values(array_filter(
                     $leaderboardSemua,
@@ -140,10 +139,10 @@ class Home extends BaseController
             if (!$this->leaderboardModel->sudahAda($bulan, $tahun)) {
                 $this->leaderboardModel->buatSnapshot($bulan, $tahun);
             }
-            // ── Ambil semua untuk podium (tanpa filter) ──
+            // Ambil semua untuk podium (tanpa filter) 
             $leaderboardSemua = $this->leaderboardModel->getLeaderboard($bulan, $tahun, 'semua');
 
-            // ── Leaderboard tabel dengan filter tipe ──
+            // Leaderboard tabel dengan filter tipe
             $leaderboard = $this->leaderboardModel->getLeaderboard($bulan, $tahun, $tipeAnggota);
         }
 
@@ -188,7 +187,6 @@ class Home extends BaseController
         return view('home/leaderboard', [
             'activeNav'        => 'leaderboard',
             'leaderboard'      => $leaderboard,
-            // ── TAMBAHAN: kirim data semua untuk podium ──
             'leaderboardSemua' => $leaderboardSemua,
             'bulan'            => $bulan,
             'tahun'            => $tahun,
@@ -251,7 +249,7 @@ class Home extends BaseController
 
     usort($data, fn($a, $b) => $b['total_points'] <=> $a['total_points']);
 
-    // ── TAMBAHAN: assign rank setelah sort ──
+    // TAMBAHAN: assign rank setelah sort 
     foreach ($data as $i => &$row) {
         $row['rank'] = $i + 1;
     }
